@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.gabys.notsound.ConfigActivity"
+    tools:showIn="@layout/activity_config">
+
+    <LinearLayout
+        android:layout_width="368dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:orientation="horizontal"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.63"
+                android:text="Estado  "
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/txtEstado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Desconectado"
+                android:textColor="@color/colorAccent"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="43dp"
+            android:orientation="horizontal"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bluetooth  "
+                android:textSize="18sp" />
+
+            <Switch
+                android:id="@+id/swB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                tools:checked="false" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dispositivo"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/lstDispos"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:spinnerMode="dialog"
+                android:visibility="visible" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/btnBuscar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"
+                android:clickable="true"
+                app:backgroundTint="@android:color/darker_gray"
+                app:fabSize="mini"
+                app:srcCompat="?android:attr/actionModeWebSearchDrawable" />
+
+            <CheckBox
+                android:id="@+id/checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="CheckBox" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Conectar Al Dispositivo"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btnConectar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CONECTAR" />
+
+        <EditText
+            android:id="@+id/txtInfo"
+            android:layout_width="match_parent"
+            android:layout_height="135dp"
+            android:editable="false"
+            android:ems="10"
+            android:enabled="false"
+            android:inputType="textMultiLine"
+            android:lines="8" />
+
+        <Button
+            android:id="@+id/btnTestcnx"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Test Estado" />
+
+        <ImageButton
+            android:id="@+id/btnGuardar"
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            app:srcCompat="@android:drawable/ic_menu_save" />
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
