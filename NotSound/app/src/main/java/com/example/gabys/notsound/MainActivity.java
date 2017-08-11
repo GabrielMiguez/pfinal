@@ -1,7 +1,9 @@
 package com.example.gabys.notsound;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -23,6 +25,11 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Get instance of Vibrator from current Context
+        Vibrator mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrates for 300 Milliseconds
+        mVibrator.vibrate(500);
 
         startService(new Intent(this,ConnectionService.class));
 

@@ -1,8 +1,6 @@
 package com.example.gabys.notsound;
 
 import android.app.NotificationManager;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -34,23 +32,32 @@ public class ConnectionService extends Service {
         //long[] pattern = { 100, 300};
         //mVibrator.vibrate(pattern , 0);
 
-
         // Instanciamos e inicializamos nuestro manager.
-        // Variables de la notificacion
-        NotificationManager nm;
-        String ns = Context.NOTIFICATION_SERVICE;
-        int icon = R.drawable.ic_menu_camera;
+        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Inicio el servicio de notificaciones accediendo al servicio
-        nm = (NotificationManager) getSystemService(ns);
 
-        // Realizo una notificacion por medio de un metodo hecho por mi
-        Notification notif = new Notification(icon, "texto", System.currentTimeMillis());;
-notif.
-        notificacion(notif, icon, "titulo contenido", "texto contenido", "texto extendido");
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                getBaseContext())
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle("MyService")
+                .setContentText("Terminó el servicio!")
+                .setWhen(System.currentTimeMillis());
 
-        // Lanzo la notificacion creada en el paso anterior
-        nm.notify(1, notif);
+        try {
+            // Simulamos trabajo de 10 segundos.
+            Thread.sleep(15000);
+
+            nManager.notify(12345, builder.build());
+            // Get instance of Vibrator from current Context
+            Vibrator mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            // Vibrates for 300 Milliseconds
+            mVibrator.vibrate(500);
+
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
 
         return START_STICKY;
     }
@@ -71,21 +78,4 @@ notif.
         return null;
     }
 
-
-    public void notificacion(Notification notif, int icon, CharSequence textoEstado, CharSequence titulo, CharSequence texto) {
-        // Capturo la hora del evento
-        long hora = System.currentTimeMillis();
-
-        // Definimos la accion de la pulsacion sobre la notificacion (esto es opcional)
-        Context context = getApplicationContext();
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-        // Defino la notificacion, icono, texto y hora
-
-        //notif.setLatestEventInfo(context, titulo, texto, contentIntent);
-
-        //Defino que la notificacion sea permamente
-        notif.flags = Notification.FLAG_ONGOING_EVENT;
-    }
 }
