@@ -38,6 +38,9 @@
             android:name=".SonidosEdicionActivity"
             android:label="@string/title_activity_sonidos_edicion"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <service android:name=".ConnectionService" android:exported="false" />
+
     </application>
 
 </manifest>
