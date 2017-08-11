@@ -4,7 +4,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Configuraciòn</string>
+    <string name="action_settings">Configuración</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->
@@ -78,5 +78,9 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
-    <string name="title_activity_config">Configuraciòn</string>
+    <string name="title_activity_config">Configuración</string>
+    <string name="title_activity_nosotros">Nosotros</string>
+    <string name="title_activity_sonidos">Sonidos</string>
+    <string name="title_activity_sonidos_edicion">Edición de Sonidos</string>
+
 </resources>

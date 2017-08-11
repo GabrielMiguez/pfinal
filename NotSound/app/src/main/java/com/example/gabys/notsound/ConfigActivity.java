@@ -1,5 +1,6 @@
 package com.example.gabys.notsound;
 
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -305,10 +306,6 @@ public class ConfigActivity extends AppCompatActivity {
                 }
             }
         }
-
-
-
-
     }
 
     public void btnBuscar() {
@@ -423,7 +420,7 @@ public class ConfigActivity extends AppCompatActivity {
 
             boolean e = false;
             String dis = prefe.getString("dispositivo", "").toString();
-            if (dis.isEmpty()) finish();
+            if (dis.isEmpty()) return;
             int i = 0;
             if (mArrayAdapter == null){
                 String[] opciones = {dis};

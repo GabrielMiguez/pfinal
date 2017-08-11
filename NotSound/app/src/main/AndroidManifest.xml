@@ -2,8 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.gabys.notsound">
 
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -18,17 +19,25 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings" />
-        <activity
             android:name=".ConfigActivity"
             android:label="@string/title_activity_config"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".NosotrosActivity"
+            android:label="@string/title_activity_nosotros"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".SonidosActivity"
+            android:label="@string/title_activity_sonidos"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".SonidosEdicionActivity"
+            android:label="@string/title_activity_sonidos_edicion"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

@@ -82,13 +82,16 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-
+            Intent i = new Intent(this, SonidosActivity.class );
+            startActivity(i);
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
             Intent i = new Intent(this, ConfigActivity.class );
             startActivity(i);
         } else if (id == R.id.nav_manage) {
+            Intent i = new Intent(this, NosotrosActivity.class );
+            startActivity(i);
 
         }
 
