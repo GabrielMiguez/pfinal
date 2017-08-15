@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
+
 /**
  * Created by VirtualBox on 10/08/2017.
  */
@@ -67,8 +69,9 @@ public class ConnectionService extends Service {
                             notificationIntent, 0);
 */
                     Intent i = new Intent(getApplicationContext(), SonidoAlertaActivity.class);
-                    i.putExtra("sonidoSeleccionado", 88);
-                    PendingIntent viewPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, i, 0);
+                    i.putExtra("sonidoSeleccionado", 28);
+
+                    PendingIntent viewPendingIntent = PendingIntent.getActivity(getApplicationContext(), FLAG_CANCEL_CURRENT, i, 0);
 
                     // Instanciamos e inicializamos nuestro manager.
                     NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -76,7 +79,7 @@ public class ConnectionService extends Service {
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(
                             getBaseContext())
                             .setSmallIcon(android.R.drawable.ic_dialog_info)
-                            .setContentTitle("Notificacion!!")
+                            .setContentTitle("Notificacion 2!!")
                             .setContentText("Notificacion Servicio!")
                             .setContentIntent(viewPendingIntent)
                             .setWhen(System.currentTimeMillis())
