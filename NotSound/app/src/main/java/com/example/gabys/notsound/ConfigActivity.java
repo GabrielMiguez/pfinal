@@ -34,7 +34,8 @@ import java.util.UUID;
 
 import static java.lang.Thread.sleep;
 
-public class ConfigActivity extends AppCompatActivity {
+public class ConfigActivity extends Menu {
+
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     public BluetoothAdapter BA;
     final Handler mHandler = new Handler() {
@@ -192,6 +193,9 @@ public class ConfigActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_config);
+        super.CreateMenu();
+
+
 
         swB = (Switch) findViewById(R.id.swB);
         lstdispos = (Spinner) findViewById(R.id.lstDispos);

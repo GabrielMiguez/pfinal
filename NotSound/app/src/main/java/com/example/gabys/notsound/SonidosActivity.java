@@ -18,7 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SonidosActivity extends AppCompatActivity {
+public class SonidosActivity extends Menu {
 
     private AdaptadorSonidos adaptador;
     private FloatingActionButton fab;
@@ -29,6 +29,7 @@ public class SonidosActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sonidos);
+        super.CreateMenu();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_SonidoNuevo);
         fab.setOnClickListener(new View.OnClickListener() {
