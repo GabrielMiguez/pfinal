@@ -15,16 +15,7 @@ import java.util.ArrayList;
 
 public class SonidoAlertaActivity extends AppCompatActivity {
 
-    private ArrayList<Sonido> sonidos;
     private int itemSeleccionado = -1;
-    private String ser;
-
-    public void recuperarSonidos() {
-        ser = SerializeObject.ReadSettings(this, "notas.dat");
-        if (ser != null && !ser.equalsIgnoreCase("")) {
-            this.sonidos = (ArrayList<Sonido>)SerializeObject.stringToObject(ser);
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,19 +26,15 @@ public class SonidoAlertaActivity extends AppCompatActivity {
 
         final TextView txt_sonidoNombre = (TextView)findViewById(R.id.SonidoID);
 
-        sonidos = new ArrayList<Sonido>();
-        recuperarSonidos();
+        Sonidos sonidos = new Sonidos();
+        sonidos.loadSonidos(getApplicationContext());
 
         //Levanto los parametros
         itemSeleccionado = (int) getIntent().getSerializableExtra("sonidoSeleccionado");
 
-        //Toast.makeText(this,Integer.toString(itemSeleccionado),Toast.LENGTH_LONG).show();
-        //Toast.makeText(this,Integer.toString(sonidos.size()),Toast.LENGTH_LONG).show();
-        //Toast.makeText(this,sonidos.get(itemSeleccionado).getNombre(),Toast.LENGTH_LONG).show();
-
         if (itemSeleccionado != -1){
             //Cargo los parametros en los objetos de la pantalla
-            txt_sonidoNombre.setText(sonidos.get(itemSeleccionado).getNombre());
+            txt_sonidoNombre.setText(sonidos.getSonido(itemSeleccionado).getNombre());
         }
 
     }

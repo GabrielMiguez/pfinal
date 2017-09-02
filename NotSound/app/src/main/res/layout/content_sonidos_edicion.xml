@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,26 +8,60 @@
     tools:context="com.example.gabys.notsound.SonidosEdicionActivity"
     tools:showIn="@layout/activity_sonidos_edicion">
 
-    <LinearLayout
-        android:layout_width="368dp"
-        android:layout_height="495dp"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp">
+    <CheckBox
+        android:id="@+id/chk_Habilitado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:checked="true"
+        android:text="Habilitado" />
 
-        <EditText
-            android:id="@+id/edtxt_sonidoNombre"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Sonido Nuevo" />
+    <EditText
+        android:id="@+id/edtxt_sonidoNombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/chk_Habilitado"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:selectAllOnFocus="false"
+        android:text="Sonido Nuevo" />
 
-        <ImageButton
-            android:id="@+id/btn_Guardar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:srcCompat="@android:drawable/ic_menu_save" />
+    <ImageButton
+        android:id="@+id/btn_GrabarAudio"
+        android:layout_width="75dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="@null"
+        app:srcCompat="@android:drawable/presence_audio_online" />
 
-    </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+    <Button
+        android:id="@+id/btn_CargarImagen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/img_ImagenSonido"
+        android:layout_centerHorizontal="true"
+        android:text="Cargar Imagen" />
+
+    <ImageButton
+        android:id="@+id/btn_Guardar"
+        android:layout_width="75dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_weight="1"
+        android:layoutDirection="rtl"
+        android:background="@null"
+        app:srcCompat="@android:drawable/ic_menu_save" />
+
+    <ImageView
+        android:id="@+id/img_ImagenSonido"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_below="@+id/edtxt_sonidoNombre"
+        android:layout_centerHorizontal="true"
+        app:srcCompat="@android:drawable/ic_menu_report_image" />
+
+</RelativeLayout>

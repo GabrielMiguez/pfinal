@@ -16,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class SonidosActivity extends Menu {
 
@@ -102,7 +101,7 @@ public class SonidosActivity extends Menu {
         AppCompatActivity appCompatActivity;
 
         AdaptadorSonidos(AppCompatActivity context) {
-            super(context, R.layout.sonido, sonidos.getSonidos());
+            super(context, R.layout.sonido, sonidos.getListasonidos());
             appCompatActivity = context;
         }
 
