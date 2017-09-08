@@ -37,14 +37,6 @@
         android:background="@null"
         app:srcCompat="@android:drawable/presence_audio_online" />
 
-    <Button
-        android:id="@+id/btn_CargarImagen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/img_ImagenSonido"
-        android:layout_centerHorizontal="true"
-        android:text="Cargar Imagen" />
-
     <ImageButton
         android:id="@+id/btn_Guardar"
         android:layout_width="75dp"
@@ -63,5 +55,33 @@
         android:layout_below="@+id/edtxt_sonidoNombre"
         android:layout_centerHorizontal="true"
         app:srcCompat="@android:drawable/ic_menu_report_image" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/img_ImagenSonido"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_CargarImagen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/img_ImagenSonido"
+            android:layout_weight="1"
+            android:text="Cargar Imagen" />
+
+        <Button
+            android:id="@+id/btn_TomarFoto"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/img_ImagenSonido"
+            android:layout_toRightOf="@+id/btn_CargarImagen"
+            android:layout_weight="1"
+            android:text="Tomar Foto"
+            android:onClick="tomarFoto"/>
+    </LinearLayout>
 
 </RelativeLayout>

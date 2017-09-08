@@ -109,14 +109,14 @@ public class SonidosActivity extends Menu {
             LayoutInflater inflater = appCompatActivity.getLayoutInflater();
             View item = inflater.inflate(R.layout.sonido, null);
 
+            Sonido sonido = sonidos.getSonido(position);
+
             TextView textView1 = (TextView)item.findViewById(R.id.textView);
-            textView1.setText(sonidos.getSonido(position).getNombre());
+            textView1.setText(sonido.getNombre());
 
             ImageView imageView1 = (ImageView)item.findViewById(R.id.imageView);
-            if (sonidos.getSonido(position).getGenero()=='m')
-                imageView1.setImageResource(R.mipmap.ic_launcher);
-            else
-                imageView1.setImageResource(R.mipmap.ic_launcher_round);
+            imageView1.setImageBitmap(sonido.getImagen());
+
             return(item);
         }
     }
