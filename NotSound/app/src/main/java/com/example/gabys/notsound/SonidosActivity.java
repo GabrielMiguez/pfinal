@@ -49,7 +49,6 @@ public class SonidosActivity extends Menu {
         lv1.setAdapter(adaptador);
 
         registerForContextMenu(lv1);
-
     }
 
     @Override
@@ -109,7 +108,7 @@ public class SonidosActivity extends Menu {
             LayoutInflater inflater = appCompatActivity.getLayoutInflater();
             View item = inflater.inflate(R.layout.sonido, null);
 
-            Sonido sonido = sonidos.getSonido(position);
+            Sonido sonido = sonidos.getSonidoByPosition(position);
 
             TextView textView1 = (TextView)item.findViewById(R.id.textView);
             textView1.setText(sonido.getNombre());

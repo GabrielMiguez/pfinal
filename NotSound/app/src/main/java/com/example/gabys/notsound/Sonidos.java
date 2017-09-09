@@ -24,8 +24,37 @@ public class Sonidos extends Application{
         return listasonidos.size();
     }
 
-    public Sonido getSonido(int itemIndex){
+    public Sonido getSonidoByPosition(int itemIndex){
+
         return listasonidos.get(itemIndex);
+    }
+
+    public Sonido getSonidoByID(int sonidoID){
+        int itemIndex=0;
+
+        for (Sonido sonido: listasonidos) {
+            if(sonido.getID() == sonidoID){
+                break;
+            }
+            itemIndex++;
+        }
+        return listasonidos.get(itemIndex);
+    }
+
+    public int getAvailableSonidoID(){
+        Boolean repetirBusqueda = true;
+        int vSonidoID = 0;
+
+        while (repetirBusqueda){
+            repetirBusqueda = false;
+            vSonidoID++;
+            for (Sonido sonido: listasonidos) {
+                if(sonido.getID() == vSonidoID){
+                    repetirBusqueda = true;
+                }
+            }
+        }
+        return vSonidoID;
     }
 
     public void setSonido(int itemIndex, Sonido sonido){

@@ -1,8 +1,6 @@
 package com.example.gabys.notsound;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,17 +12,19 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import java.io.File;
 
 public class SonidosEdicionActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 1888;
+
     private Sonidos sonidos;
     private int itemSeleccionado = -1;
 
     private String rutaFoto = "";
 
+    private TextView txt_sonidoID;
     private EditText txt_sonidoNombre;
     private CheckBox chk_habilitado;
     private ImageView img_imagenSonido;
@@ -37,6 +37,7 @@ public class SonidosEdicionActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        txt_sonidoID = (TextView)findViewById(R.id.txtvw_sonidoID);
         txt_sonidoNombre = (EditText)findViewById(R.id.edtxt_sonidoNombre);
         chk_habilitado = (CheckBox) findViewById(R.id.chk_Habilitado);
         img_imagenSonido = (ImageView)findViewById(R.id.img_ImagenSonido);
@@ -49,9 +50,13 @@ public class SonidosEdicionActivity extends AppCompatActivity {
         itemSeleccionado = (int) getIntent().getSerializableExtra("sonidoSeleccionado");
 
         if (itemSeleccionado != -1){
-            Sonido sonido = sonidos.getSonido(itemSeleccionado);
+            Sonido sonido = sonidos.getSonidoByPosition(itemSeleccionado);
+
+            //Cargo las variables auxiliares del objeto
+            rutaFoto = sonido.getRutaFoto();
 
             //Cargo los parametros en los objetos de la pantalla
+            txt_sonidoID.setText(String.valueOf(sonido.getID()));
             txt_sonidoNombre.setText(sonido.getNombre());
             chk_habilitado.setChecked(sonido.getHabilitado());
             img_imagenSonido.setImageBitmap(sonido.getImagen());
@@ -61,15 +66,19 @@ public class SonidosEdicionActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
 
+                int IDSonido = sonidos.getAvailableSonidoID();
+                if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){
+                     IDSonido = Integer.parseInt(txt_sonidoID.getText().toString());
+                }
                 String nombreSonido = txt_sonidoNombre.getText().toString();
                 Boolean estaHabilitado = chk_habilitado.isChecked();
 
                 if (itemSeleccionado != -1) {
-                    sonidos.setSonido(itemSeleccionado,(new Sonido(nombreSonido,'m',rutaFoto,estaHabilitado)));
+                    sonidos.setSonido(itemSeleccionado,(new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado)));
                     sonidos.saveSonidos(getApplicationContext());
                 }
                 else {
-                    Sonido sonidoNuevo = new Sonido(nombreSonido,'m',rutaFoto,estaHabilitado);
+                    Sonido sonidoNuevo = new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado);
                     sonidos.addSonido(getApplicationContext(), sonidoNuevo);
                 }
 

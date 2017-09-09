@@ -8,14 +8,39 @@
     tools:context="com.example.gabys.notsound.SonidosEdicionActivity"
     tools:showIn="@layout/activity_sonidos_edicion">
 
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/edtxt_sonidoNombre"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        android:text="ID de Sonido:"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:id="@+id/txtvw_sonidoID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/edtxt_sonidoNombre"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/textView11"
+        android:layout_toRightOf="@+id/textView11"
+        android:gravity="center_vertical"
+        android:paddingLeft="5dp"
+        android:text="(Desconocido)" />
+
     <CheckBox
         android:id="@+id/chk_Habilitado"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:checked="true"
-        android:text="Habilitado" />
+        android:text="Habilitado"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <EditText
         android:id="@+id/edtxt_sonidoNombre"
@@ -30,21 +55,23 @@
 
     <ImageButton
         android:id="@+id/btn_GrabarAudio"
-        android:layout_width="75dp"
+        android:layout_width="65dp"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
+        android:scaleType="fitXY"
         android:background="@null"
         app:srcCompat="@android:drawable/presence_audio_online" />
 
     <ImageButton
         android:id="@+id/btn_Guardar"
-        android:layout_width="75dp"
+        android:layout_width="65dp"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_weight="1"
         android:layoutDirection="rtl"
+        android:scaleType="fitXY"
         android:background="@null"
         app:srcCompat="@android:drawable/ic_menu_save" />
 
@@ -61,7 +88,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/img_ImagenSonido"
         android:layout_centerHorizontal="true"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout2">
 
         <Button
             android:id="@+id/btn_CargarImagen"

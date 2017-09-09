@@ -7,23 +7,23 @@ import java.io.Serializable;
 
 public class Sonido implements Serializable {
     private String nombre;
-    private char genero;
+    private int ID;
     private String rutaFoto;
     private Boolean habilitado;
 
-    public Sonido(String nombre, char genero, String rutaFoto, Boolean habilitado) {
+    public Sonido(int ID, String nombre, String rutaFoto, Boolean habilitado) {
+        this.ID=ID;
         this.nombre=nombre;
-        this.genero=genero;
         this.rutaFoto=rutaFoto;
         this.habilitado=habilitado;
     }
 
-    public String getNombre() {
-        return nombre;
+    public int getID() {
+        return ID;
     }
 
-    public char getGenero() {
-        return genero;
+    public String getNombre() {
+        return nombre;
     }
 
     public String getRutaFoto() {
