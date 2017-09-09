@@ -4,11 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.widget.Toast;
 
 public class MainActivity extends Menu {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void _onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         super.CreateMenu();
@@ -18,7 +18,30 @@ public class MainActivity extends Menu {
         // Vibrates for 300 Milliseconds
         mVibrator.vibrate(500);
 
-        startService(new Intent(this,ConnectionService.class));
+        Intent intent = new Intent(this, ConnectionService.class);
+
+        // con starservice siempre quedara el servicio activo
+        startService(intent);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        super.CreateMenu();
+
+        //todos los activities que hereden de Menu, tiene el servicio bindeado, desde aca lo creo normal para que no muera nunca
+        Intent intent = new Intent(this, MiServiceIBinder.MiBinderIBinder.class);
+        // con starservice siempre quedara el servicio activo
+        startService(intent);
+
+/*
+        if (mServiceIBinder != null) {
+            mServiceIBinder.stopForeground(true);
+            unbindService(sConnectionIB);
+            mServiceIBinder = null;
+        }
+*/
     }
 
 

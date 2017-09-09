@@ -6,13 +6,16 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
@@ -39,6 +42,17 @@ public class ConnectionService extends Service {
             public void run() {
 
             try {
+                //tengo que poder conectarme al servicio mediante mi app y mediante el bluetooth
+                //mediante bluetooth se encarga el objeto blue
+                //mediante el servicio, seguramente tengo que exponer algun metodo de escucha
+
+                //hilo de ejeccion del servicio
+
+                //crear bluethoot
+
+                //intentar conectar cada x segundos
+
+
                 long[] vibratePattern = {0, 800};
 
                 Intent i = new Intent(getApplicationContext(), SonidoAlertaActivity.class);
@@ -72,7 +86,9 @@ public class ConnectionService extends Service {
         }).start();
 
         return START_STICKY;
-        //return super.onStartCommand(intent, flags, startId);
+        //START_STICKY: Vuelve a crear el servicio, llamando a onStartCommand() pero con una intent nula.
+        //START_REDELIVER_INTENT: Vuelve a crear el servicio,como START_STICKY, llamando a onStartCommand() con los datos de la última petición (última intent).
+
     }
 
     @Override
@@ -83,8 +99,10 @@ public class ConnectionService extends Service {
 
     @Nullable
     @Override
+    // metodo ejecutado al bindear un serviceio a un componente
     public IBinder onBind(Intent intent) {
         return null;
     }
+
 
 }

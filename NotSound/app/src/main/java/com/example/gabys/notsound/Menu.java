@@ -1,7 +1,11 @@
 package com.example.gabys.notsound;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -9,6 +13,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 /**
  * Created by Gabys on 26/08/2017.
@@ -17,6 +22,22 @@ import android.view.MenuItem;
 
 
 public class Menu extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private MiServiceIBinder mServiceIBinder;
+    boolean mBound;
+
+    //Creamos una interface ServiceConection para enlazar el servicio con el objeto mService
+    // CONFIGURACION INTERFACE SERVICECONNECTION IBINDER
+    private ServiceConnection sConnectionIB = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MiServiceIBinder.MiBinderIBinder binder = (MiServiceIBinder.MiBinderIBinder) service;
+            mServiceIBinder = binder.getService();
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBound=false;
+        }
+    };
 
     public void CreateMenu(){
         //Titulo
@@ -39,9 +60,23 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_nosotros);
+
+        //Si el serviicio no esta bindeado a este activity, lo bindeo
+        if (mServiceIBinder == null) {
+            Intent intent = new Intent(Menu.this, MiServiceIBinder.class);
+            bindService(intent, sConnectionIB, Context.BIND_AUTO_CREATE);
+        }
     }
 
     public boolean onNavigationItemSelected(MenuItem item) {
+        if (mServiceIBinder != null) {
+            String resultado = Integer.toString(mServiceIBinder.getResultado());
+            //texto.setText("Su resuldato es: " + resultado);
+            Toast.makeText(this,"Service Bluetooth: " + resultado ,Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(this,"Service OFF" ,Toast.LENGTH_LONG).show();
+        }
+
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -72,4 +107,6 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             super.onBackPressed();
         }
     }
+
+
 }

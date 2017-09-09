@@ -16,9 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <service
-            android:name=".ConnectionService"
-            android:process=":remote" />
+        <service android:name=".MiServiceIBinder" />
+
 
         <activity
             android:name=".MainActivity"
