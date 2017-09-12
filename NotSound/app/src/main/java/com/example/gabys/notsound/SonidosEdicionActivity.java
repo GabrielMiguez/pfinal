@@ -1,34 +1,45 @@
 package com.example.gabys.notsound;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewDebug;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 public class SonidosEdicionActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 1888;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private Sonidos sonidos;
     private int itemSeleccionado = -1;
 
-    private String rutaFoto = "";
+    private Bitmap imagen;
 
     private TextView txt_sonidoID;
     private EditText txt_sonidoNombre;
     private CheckBox chk_habilitado;
     private ImageView img_imagenSonido;
     private ImageButton botonGuardar;
+
+    private TextView txt_Ruta;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +54,8 @@ public class SonidosEdicionActivity extends AppCompatActivity {
         img_imagenSonido = (ImageView)findViewById(R.id.img_ImagenSonido);
         botonGuardar = (ImageButton) findViewById(R.id.btn_Guardar);
 
+        txt_Ruta = (TextView)findViewById(R.id.txtvw_ruta);
+
         sonidos = new Sonidos();
         sonidos.loadSonidos(getApplicationContext());
 
@@ -52,14 +65,13 @@ public class SonidosEdicionActivity extends AppCompatActivity {
         if (itemSeleccionado != -1){
             Sonido sonido = sonidos.getSonidoByPosition(itemSeleccionado);
 
-            //Cargo las variables auxiliares del objeto
-            rutaFoto = sonido.getRutaFoto();
-
             //Cargo los parametros en los objetos de la pantalla
             txt_sonidoID.setText(String.valueOf(sonido.getID()));
             txt_sonidoNombre.setText(sonido.getNombre());
             chk_habilitado.setChecked(sonido.getHabilitado());
             img_imagenSonido.setImageBitmap(sonido.getImagen());
+
+            txt_Ruta.setText(sonido.getImagen().toString());
         }
 
         botonGuardar.setOnClickListener(new OnClickListener() {
@@ -67,11 +79,12 @@ public class SonidosEdicionActivity extends AppCompatActivity {
             public void onClick(View arg0) {
 
                 int IDSonido = sonidos.getAvailableSonidoID();
-                if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){
-                     IDSonido = Integer.parseInt(txt_sonidoID.getText().toString());
-                }
+                if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){ IDSonido = Integer.parseInt(txt_sonidoID.getText().toString()); }
                 String nombreSonido = txt_sonidoNombre.getText().toString();
                 Boolean estaHabilitado = chk_habilitado.isChecked();
+                String rutaFoto = getExternalFilesDir(null) + "/" + nombreSonido + ".png";
+
+                saveImage(imagen, rutaFoto);
 
                 if (itemSeleccionado != -1) {
                     sonidos.setSonido(itemSeleccionado,(new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado)));
@@ -89,19 +102,36 @@ public class SonidosEdicionActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+
+        if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
+            imagen = (Bitmap) data.getExtras().get("data");
+            img_imagenSonido.setImageBitmap(imagen);
+        }
+    }
+
     public void tomarFoto (View v){
 
-        File dirFoto = getExternalFilesDir(null);
-        String nombreFoto = txt_sonidoNombre.getText().toString();
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, CAMERA_REQUEST);
 
-        this.rutaFoto = dirFoto + "/" + nombreFoto; // Se guarda la ruta para despues guardarla
-
-        Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File archivoFoto = new File(dirFoto, nombreFoto);
-        i.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(archivoFoto));
-        startActivity(i);
-
-        //Cargo en el imageView la foto recien sacada
-        //img_imagenSonido.setImageBitmap((Bitmap) BitmapFactory.decodeFile(this.rutaFoto));
     }
+
+
+    public boolean saveImage(Bitmap image, String fullPathFile) {
+
+        try {
+
+            OutputStream os = new FileOutputStream(fullPathFile);
+            image.compress(Bitmap.CompressFormat.PNG, 100, os);
+            os.close();
+
+            return true;
+        } catch (Exception e) {
+            Log.e("saveToInternalStorage()", e.getMessage());
+            return false;
+        }
+    }
+
 }

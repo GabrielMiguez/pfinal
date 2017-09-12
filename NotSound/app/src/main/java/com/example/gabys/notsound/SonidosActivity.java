@@ -111,7 +111,7 @@ public class SonidosActivity extends Menu {
             Sonido sonido = sonidos.getSonidoByPosition(position);
 
             TextView textView1 = (TextView)item.findViewById(R.id.textView);
-            textView1.setText(sonido.getNombre());
+            textView1.setText(sonido.getNombre()+sonido.getRutaFoto());
 
             ImageView imageView1 = (ImageView)item.findViewById(R.id.imageView);
             imageView1.setImageBitmap(sonido.getImagen());
