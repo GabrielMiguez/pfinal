@@ -31,7 +31,7 @@ public class SonidosEdicionActivity extends AppCompatActivity {
     private Sonidos sonidos;
     private int itemSeleccionado = -1;
 
-    private Bitmap imagen;
+    //private Bitmap imagen;
 
     private TextView txt_sonidoID;
     private EditText txt_sonidoNombre;
@@ -69,7 +69,7 @@ public class SonidosEdicionActivity extends AppCompatActivity {
             txt_sonidoID.setText(String.valueOf(sonido.getID()));
             txt_sonidoNombre.setText(sonido.getNombre());
             chk_habilitado.setChecked(sonido.getHabilitado());
-            img_imagenSonido.setImageBitmap(sonido.getImagen());
+            if (sonido.getImagen() != null) {img_imagenSonido.setImageBitmap(sonido.getImagen());}
 
             txt_Ruta.setText(sonido.getImagen().toString());
         }
@@ -83,6 +83,9 @@ public class SonidosEdicionActivity extends AppCompatActivity {
                 String nombreSonido = txt_sonidoNombre.getText().toString();
                 Boolean estaHabilitado = chk_habilitado.isChecked();
                 String rutaFoto = getExternalFilesDir(null) + "/" + nombreSonido + ".png";
+
+                img_imagenSonido.buildDrawingCache();
+                Bitmap imagen = img_imagenSonido.getDrawingCache();
 
                 saveImage(imagen, rutaFoto);
 
@@ -106,7 +109,7 @@ public class SonidosEdicionActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
 
         if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
-            imagen = (Bitmap) data.getExtras().get("data");
+            Bitmap imagen = (Bitmap) data.getExtras().get("data");
             img_imagenSonido.setImageBitmap(imagen);
         }
     }

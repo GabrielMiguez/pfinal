@@ -1,9 +1,13 @@
 package com.example.gabys.notsound;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.v4.app.NotificationCompat;
+import android.view.View;
 import android.widget.Toast;
 
 public class MainActivity extends Menu {
@@ -44,5 +48,40 @@ public class MainActivity extends Menu {
 */
     }
 
+    public void bluetoothConectado(View v){
+        // Instanciamos e inicializamos nuestro manager.
+        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                getApplicationContext())
+                .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
+                .setContentTitle("Estado Bluetooth")
+                .setContentText("Conectado")
+                //.setContentIntent(viewPendingIntent)
+                .setWhen(System.currentTimeMillis())
+                //.setVibrate(vibratePattern)
+                .setPriority(Notification.PRIORITY_MIN) //Maxima prioridad
+                .setAutoCancel(false);
+
+        nManager.notify(123123, builder.build());
+    }
+
+    public void bluetoothDesconectado(View v){
+        // Instanciamos e inicializamos nuestro manager.
+        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                getApplicationContext())
+                .setSmallIcon(android.R.drawable.ic_lock_idle_charging)
+                .setContentTitle("Estado Bluetooth")
+                .setContentText("Desconectado")
+                //.setContentIntent(viewPendingIntent)
+                .setWhen(System.currentTimeMillis())
+                //.setVibrate(vibratePattern)
+                .setPriority(Notification.PRIORITY_MIN) //Maxima prioridad
+                .setAutoCancel(false);
+
+        nManager.notify(123123, builder.build());
+    }
 
 }
