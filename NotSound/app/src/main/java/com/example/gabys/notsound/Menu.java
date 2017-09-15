@@ -6,12 +6,16 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -22,11 +26,11 @@ import android.widget.Toast;
 
 
 public class Menu extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    private MiServiceIBinder mServiceIBinder;
+    //private MiServiceIBinder mServiceIBinder;
     boolean mBound;
-
     //Creamos una interface ServiceConection para enlazar el servicio con el objeto mService
     // CONFIGURACION INTERFACE SERVICECONNECTION IBINDER
+    /*
     private ServiceConnection sConnectionIB = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -36,6 +40,23 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mBound=false;
+        }
+    };
+    */
+
+    Messenger mService = null;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+
+            mService = new Messenger(service);
+            mBound = true;
+            Log.d("estado","conectado");
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            //Cuando termina la conexión con el servicio de forma inesperada. no cuando el cliente se desenlaza
+            mService = null;
+            mBound = false;
         }
     };
 
@@ -62,20 +83,44 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         //setContentView(R.layout.activity_nosotros);
 
         //Si el serviicio no esta bindeado a este activity, lo bindeo
-        if (mServiceIBinder == null) {
+        //if (mServiceIBinder == null) {
             Intent intent = new Intent(Menu.this, MiServiceIBinder.class);
-            bindService(intent, sConnectionIB, Context.BIND_AUTO_CREATE);
+            //bindService(intent, sConnectionIB, Context.BIND_AUTO_CREATE);
+
+
+            //nuevo, corro el servicio y lo ato al activity
+            // Iniciar el servicio
+            startService(intent);
+            // Atar el servicio a la actividad
+            bindService(intent, mConnection,this.BIND_AUTO_CREATE);
+
+        //}
+    }
+
+    public void sendMSGSRV() {
+        if (!mBound) return;
+
+        //Creamos y enviamos un mensaje al servicio, asignandole como dato el nombre del EditText
+        Message msg = Message.obtain(null, MiServiceIBinder.MSG_HOLA, 0, 0);
+        Bundle b = new Bundle();
+        b.putString("data", "Hola");
+        msg.setData(b);
+        try {
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 
     public boolean onNavigationItemSelected(MenuItem item) {
+        /*
         if (mServiceIBinder != null) {
             String resultado = Integer.toString(mServiceIBinder.getResultado());
-            //texto.setText("Su resuldato es: " + resultado);
             Toast.makeText(this,"Service Bluetooth: " + resultado ,Toast.LENGTH_LONG).show();
         }else{
             Toast.makeText(this,"Service OFF" ,Toast.LENGTH_LONG).show();
         }
+        */
 
         // Handle navigation view item clicks here.
         int id = item.getItemId();

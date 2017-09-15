@@ -35,9 +35,9 @@ public class MainActivity extends Menu {
         super.CreateMenu();
 
         //todos los activities que hereden de Menu, tiene el servicio bindeado, desde aca lo creo normal para que no muera nunca
-        Intent intent = new Intent(this, MiServiceIBinder.MiBinderIBinder.class);
+        //Intent intent = new Intent(this, MiServiceIBinder.MiBinderIBinder.class);
         // con starservice siempre quedara el servicio activo
-        startService(intent);
+        //startService(intent);
 
 /*
         if (mServiceIBinder != null) {
@@ -46,42 +46,6 @@ public class MainActivity extends Menu {
             mServiceIBinder = null;
         }
 */
-    }
-
-    public void bluetoothConectado(View v){
-        // Instanciamos e inicializamos nuestro manager.
-        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(
-                getApplicationContext())
-                .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
-                .setContentTitle("Estado Bluetooth")
-                .setContentText("Conectado")
-                //.setContentIntent(viewPendingIntent)
-                .setWhen(System.currentTimeMillis())
-                //.setVibrate(vibratePattern)
-                .setPriority(Notification.PRIORITY_MIN) //Maxima prioridad
-                .setAutoCancel(false);
-
-        nManager.notify(123123, builder.build());
-    }
-
-    public void bluetoothDesconectado(View v){
-        // Instanciamos e inicializamos nuestro manager.
-        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(
-                getApplicationContext())
-                .setSmallIcon(android.R.drawable.ic_lock_idle_charging)
-                .setContentTitle("Estado Bluetooth")
-                .setContentText("Desconectado")
-                //.setContentIntent(viewPendingIntent)
-                .setWhen(System.currentTimeMillis())
-                //.setVibrate(vibratePattern)
-                .setPriority(Notification.PRIORITY_MIN) //Maxima prioridad
-                .setAutoCancel(false);
-
-        nManager.notify(123123, builder.build());
     }
 
 }

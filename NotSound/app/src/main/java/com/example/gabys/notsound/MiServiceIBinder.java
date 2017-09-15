@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Messenger;
 import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import android.widget.Toast;
@@ -63,6 +64,22 @@ SonidoActivity.
 */
 
 public class MiServiceIBinder extends Service {
+    static final int MSG_HOLA = 1;
+
+    class MiHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_HOLA:
+                    Toast.makeText(getApplicationContext(), "Hola", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+    final Messenger mMessenger = new Messenger(new MiHandler());
+
 
     private final IBinder iBinder = new MiBinderIBinder();
     private final Random random = new Random();
@@ -77,12 +94,20 @@ public class MiServiceIBinder extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        _onBind(intent);
         Toast.makeText(this,"Service Star...",Toast.LENGTH_LONG).show();
         return START_STICKY;
     }
 
     @Override
-    public IBinder onBind(Intent arg0) {
+    public IBinder onBind(Intent intent) {
+        //_onBind(intent);
+        Toast.makeText(this,"Service Binder...",Toast.LENGTH_LONG).show();
+        return mMessenger.getBinder();
+    }
+
+    public IBinder _onBind(Intent arg0) {
+
         bt= new Bluetooth(this);
         Toast.makeText(this, "Service Binder", Toast.LENGTH_SHORT).show();
         new Thread(new Runnable() {
@@ -127,7 +152,6 @@ public class MiServiceIBinder extends Service {
 
         return iBinder;
     }
-
 
     @Override
     public void onDestroy(){
@@ -179,6 +203,7 @@ public class MiServiceIBinder extends Service {
 
         nManager.notify(123123, builder.build());
     }
+
 
     private void Notificar(){
         long[] vibratePattern = {0, 800};
