@@ -1,5 +1,6 @@
 package com.example.gabys.notsound;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -9,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
+import android.view.View;
 import android.widget.Toast;
 import java.util.Random;
 import android.os.IBinder;
@@ -90,14 +92,19 @@ public class MiServiceIBinder extends Service {
 
                 try {
                     while(1==1) {
+
+
                         //tengo que poder conectarme al servicio mediante mi app y mediante el bluetooth
                         //mediante bluetooth se encarga el objeto blue
                         //mediante el servicio, seguramente tengo que exponer algun metodo de escucha(lo realizo con el Binder)
                         if (bt.Conected()){
+                            bluetoothConectado(); //nofif
                             Thread.sleep(5000); //espero 5 segndo, y vuelvo a intentar conectarme, solo cuando no estoy conectado.
                             //podria llevarlo a la pantalla de configuracion.
                             continue;
                         }
+
+                        bluetoothDesconectado();//nofif
 
                         SharedPreferences prefe = getSharedPreferences("configuracion", Context.MODE_PRIVATE);
                         String dis = prefe.getString("dispositivo", "").toString();
@@ -131,9 +138,46 @@ public class MiServiceIBinder extends Service {
     public int enviarSMS(String sms){
         return bt.EnviarSMS(sms);
     }
+
     public int getResultado() {
         Notificar();
         return random.nextInt(1000);
+    }
+
+    public void bluetoothConectado(){
+        // Instanciamos e inicializamos nuestro manager.
+        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                getApplicationContext())
+                .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
+                .setContentTitle("Estado Bluetooth")
+                .setContentText("Conectado")
+                //.setContentIntent(viewPendingIntent)
+                .setWhen(System.currentTimeMillis())
+                //.setVibrate(vibratePattern)
+                .setPriority(Notification.PRIORITY_MIN) //Maxima prioridad
+                .setAutoCancel(false);
+
+        nManager.notify(123123, builder.build());
+    }
+
+    public void bluetoothDesconectado(){
+        // Instanciamos e inicializamos nuestro manager.
+        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                getApplicationContext())
+                .setSmallIcon(android.R.drawable.ic_lock_idle_charging)
+                .setContentTitle("Estado Bluetooth")
+                .setContentText("Desconectado")
+                //.setContentIntent(viewPendingIntent)
+                .setWhen(System.currentTimeMillis())
+                //.setVibrate(vibratePattern)
+                .setPriority(Notification.PRIORITY_MIN) //Maxima prioridad
+                .setAutoCancel(false);
+
+        nManager.notify(123123, builder.build());
     }
 
     private void Notificar(){

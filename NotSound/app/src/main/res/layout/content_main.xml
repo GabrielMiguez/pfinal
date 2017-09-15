@@ -36,25 +36,6 @@
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent">
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="161dp"
-            android:layout_height="55dp"
-            android:layout_weight="1"
-            android:onClick="bluetoothConectado"
-            android:text="Bluetooth Conectado"
-            tools:layout_editor_absoluteX="112dp"
-            tools:layout_editor_absoluteY="293dp" />
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="161dp"
-            android:layout_height="60dp"
-            android:layout_weight="1"
-            android:onClick="bluetoothDesconectado"
-            android:text="Bluetooth Desconectado"
-            tools:layout_editor_absoluteX="112dp"
-            tools:layout_editor_absoluteY="348dp" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
