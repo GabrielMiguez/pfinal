@@ -72,6 +72,7 @@ public class MiServiceIBinder extends Service {
             switch (msg.what) {
                 case MSG_HOLA:
                     Toast.makeText(getApplicationContext(), "Hola", Toast.LENGTH_SHORT).show();
+                    //procesarMsg("hola");
                     break;
                 default:
                     super.handleMessage(msg);
@@ -102,14 +103,12 @@ public class MiServiceIBinder extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         //_onBind(intent);
-        Toast.makeText(this,"Service Binder...",Toast.LENGTH_LONG).show();
         return mMessenger.getBinder();
     }
 
     public IBinder _onBind(Intent arg0) {
 
         bt= new Bluetooth(this);
-        Toast.makeText(this, "Service Binder", Toast.LENGTH_SHORT).show();
         new Thread(new Runnable() {
 
             @Override
@@ -130,6 +129,7 @@ public class MiServiceIBinder extends Service {
                         }
 
                         bluetoothDesconectado();//nofif
+                        sebdbroadcast();
 
                         SharedPreferences prefe = getSharedPreferences("configuracion", Context.MODE_PRIVATE);
                         String dis = prefe.getString("dispositivo", "").toString();
@@ -205,7 +205,14 @@ public class MiServiceIBinder extends Service {
     }
 
 
+    private void sebdbroadcast(){
+        Intent ir = new Intent();
+        ir.setAction("com.example.gabys.notsound.MyReceiver");
+        sendBroadcast(ir);
+    }
     private void Notificar(){
+
+
         long[] vibratePattern = {0, 800};
 
         Intent i = new Intent(getApplicationContext(), SonidoAlertaActivity.class);

@@ -1,8 +1,10 @@
 package com.example.gabys.notsound;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -26,6 +28,9 @@ import android.widget.Toast;
 
 
 public class Menu extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    BroadcastReceiver receiver = null ;
+    IntentFilter intentFilter;
+
     //private MiServiceIBinder mServiceIBinder;
     boolean mBound;
     //Creamos una interface ServiceConection para enlazar el servicio con el objeto mService
@@ -82,6 +87,23 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_nosotros);
 
+        try {
+            intentFilter = new IntentFilter("com.example.gabys.notsound.MyReceiver");
+
+            Log.i("DESARROLLO","DESARROLLO111 ");
+            receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    Log.i("DESARROLLO","PROBANDO ONRECEIVE ");
+                    processReceive(context, intent);
+                }
+            };
+            Log.i("DESARROLLO","DESARROLLO1112222 ");
+            registerReceiver(receiver,intentFilter);
+        }catch (Exception e){
+            Log.e("TAGERROR","ERROR CON CODIGO: "+ e);
+        }
+
         //Si el serviicio no esta bindeado a este activity, lo bindeo
         //if (mServiceIBinder == null) {
             Intent intent = new Intent(Menu.this, MiServiceIBinder.class);
@@ -95,6 +117,13 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             bindService(intent, mConnection,this.BIND_AUTO_CREATE);
 
         //}
+
+
+    }
+
+    public void processReceive(Context context, Intent intent) {
+        Log.i("DESARROLLO","processReceive ");
+        Toast.makeText(context, "PROBANDO ", Toast.LENGTH_LONG).show();
     }
 
     public void sendMSGSRV() {
@@ -110,6 +139,22 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+    }
+    public void onResume(){
+        Log.i("DESARROLLO","onResume ");
+        super.onResume();
+        registerReceiver (receiver,intentFilter);
+    }
+    public void onPause(){
+        Log.i("DESARROLLO","onPause ");
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i("DESARROLLO","onDestroy ");
+        unregisterReceiver(receiver);
     }
 
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -141,6 +186,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+        sendMSGSRV();
         return true;
     }
     @Override
