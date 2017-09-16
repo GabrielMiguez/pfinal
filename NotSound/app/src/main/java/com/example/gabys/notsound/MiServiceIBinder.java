@@ -68,11 +68,12 @@ public class MiServiceIBinder extends Service {
 
     class MiHandler extends Handler {
         @Override
-        public void handleMessage(Message msg) {
+        public void handleMessage(Message msg) { //recibe sms de activity y envia a bt
             switch (msg.what) {
                 case MSG_HOLA:
                     Toast.makeText(getApplicationContext(), "Hola", Toast.LENGTH_SHORT).show();
-                    //procesarMsg("hola");
+                    //enviarSMS("hola");
+
                     break;
                 default:
                     super.handleMessage(msg);
@@ -129,7 +130,6 @@ public class MiServiceIBinder extends Service {
                         }
 
                         bluetoothDesconectado();//nofif
-                        sebdbroadcast();
 
                         SharedPreferences prefe = getSharedPreferences("configuracion", Context.MODE_PRIVATE);
                         String dis = prefe.getString("dispositivo", "").toString();
@@ -161,11 +161,6 @@ public class MiServiceIBinder extends Service {
 
     public int enviarSMS(String sms){
         return bt.EnviarSMS(sms);
-    }
-
-    public int getResultado() {
-        Notificar();
-        return random.nextInt(1000);
     }
 
     public void bluetoothConectado(){
@@ -205,11 +200,16 @@ public class MiServiceIBinder extends Service {
     }
 
 
-    private void sebdbroadcast(){
-        Intent ir = new Intent();
-        ir.setAction("com.example.gabys.notsound.MyReceiver");
-        sendBroadcast(ir);
+    private void sebdbroadcast(String s){
+        try {
+            Intent ir = new Intent();
+            ir.setAction("com.example.gabys.notsound.MyReceiver");
+            ir.putExtra("sms", s);
+            sendBroadcast(ir);
+        } catch (Exception e) {
+        }
     }
+
     private void Notificar(){
 
 
@@ -237,10 +237,11 @@ public class MiServiceIBinder extends Service {
         nManager.notify(12345, builder.build());
     }
 
-    public void procesarMsg(String s)
+    public void procesarMsg(String s)//procesa sms que llega al servicio, desde el bt
     {
         try {
             Notificar();
+            sebdbroadcast(s);
         } catch (Exception e) {
         }
     }

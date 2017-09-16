@@ -123,16 +123,17 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
     public void processReceive(Context context, Intent intent) {
         Log.i("DESARROLLO","processReceive ");
-        Toast.makeText(context, "PROBANDO ", Toast.LENGTH_LONG).show();
+
+        Toast.makeText(context, intent.getExtras().getSerializable("sms").toString(), Toast.LENGTH_LONG).show();
     }
 
-    public void sendMSGSRV() {
+    public void sendMSGSRV(String s) {
         if (!mBound) return;
 
         //Creamos y enviamos un mensaje al servicio, asignandole como dato el nombre del EditText
         Message msg = Message.obtain(null, MiServiceIBinder.MSG_HOLA, 0, 0);
         Bundle b = new Bundle();
-        b.putString("data", "Hola");
+        b.putString("data", s);
         msg.setData(b);
         try {
             mService.send(msg);
@@ -186,7 +187,6 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        sendMSGSRV();
         return true;
     }
     @Override

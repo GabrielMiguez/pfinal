@@ -61,16 +61,19 @@ public class ConfigActivity extends Menu {
         btnTestcnx = (Button) findViewById(R.id.btnTestcnx);
         btnGuardar = (ImageButton) findViewById(R.id.btnGuardar);
 
-        setSupportActionBar(toolbar);
+        //setSupportActionBar(toolbar);
         BA = BluetoothAdapter.getDefaultAdapter();  // tomo mi bluetooth
 
         //Verifico el estado del bluetooth
-        if (!BA.isEnabled()) {
-            swB.setChecked(false);
-            Toast.makeText(getApplicationContext(), "Bluetooth DESACTIVADO", Toast.LENGTH_LONG).show();
-        } else {
-            swB.setChecked(true);
-            ObtenerDispos();
+
+        if (BA != null) {
+            if (!BA.isEnabled()) {
+                swB.setChecked(false);
+                Toast.makeText(getApplicationContext(), "Bluetooth DESACTIVADO", Toast.LENGTH_LONG).show();
+            } else {
+                swB.setChecked(true);
+                ObtenerDispos();
+            }
         }
 
         btnBuscar.setOnClickListener(new View.OnClickListener() {
@@ -98,7 +101,16 @@ public class ConfigActivity extends Menu {
             }
         });
 
+        btnTestcnx.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                test();
+            }
+        });
         recuperar();
+    }
+
+    public void test(){
+        sendMSGSRV("TC|");
     }
 
     public void btnOnBluetooth() {
