@@ -5,16 +5,16 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/sonidoImagen"
         android:layout_width="50dp"
         android:layout_height="50dp" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/sonidoNombre"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_weight="1"
-        android:gravity="center_vertical"
+        android:gravity="left|center_vertical"
         android:text="TextView"
         android:textAlignment="textStart" />
 

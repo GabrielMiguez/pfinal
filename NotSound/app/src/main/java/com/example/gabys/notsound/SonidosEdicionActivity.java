@@ -39,8 +39,6 @@ public class SonidosEdicionActivity extends AppCompatActivity {
     private ImageView img_imagenSonido;
     private ImageButton botonGuardar;
 
-    private TextView txt_Ruta;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,8 +51,6 @@ public class SonidosEdicionActivity extends AppCompatActivity {
         chk_habilitado = (CheckBox) findViewById(R.id.chk_Habilitado);
         img_imagenSonido = (ImageView)findViewById(R.id.img_ImagenSonido);
         botonGuardar = (ImageButton) findViewById(R.id.btn_Guardar);
-
-        txt_Ruta = (TextView)findViewById(R.id.txtvw_ruta);
 
         sonidos = new Sonidos();
         sonidos.loadSonidos(getApplicationContext());
@@ -70,8 +66,6 @@ public class SonidosEdicionActivity extends AppCompatActivity {
             txt_sonidoNombre.setText(sonido.getNombre());
             chk_habilitado.setChecked(sonido.getHabilitado());
             if (sonido.getImagen() != null) {img_imagenSonido.setImageBitmap(sonido.getImagen());}
-
-            txt_Ruta.setText(sonido.getImagen().toString());
         }
 
         botonGuardar.setOnClickListener(new OnClickListener() {

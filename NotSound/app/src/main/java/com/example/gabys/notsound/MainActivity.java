@@ -34,6 +34,14 @@ public class MainActivity extends Menu {
         setContentView(R.layout.activity_main);
         super.CreateMenu();
 
+        Sonidos sonidos = new Sonidos();
+        sonidos.loadSonidos(getApplicationContext());
+
+        if (sonidos.getSonidoByID(0) == null){
+            sonidos.addSonido(getApplicationContext(),new Sonido(0,"Alerta Externa", null, true));
+        }
+
+
         //todos los activities que hereden de Menu, tiene el servicio bindeado, desde aca lo creo normal para que no muera nunca
         //Intent intent = new Intent(this, MiServiceIBinder.MiBinderIBinder.class);
         // con starservice siempre quedara el servicio activo

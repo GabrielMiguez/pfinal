@@ -17,12 +17,15 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class SonidosActivity extends Menu {
 
     private AdaptadorSonidos adaptador;
     private FloatingActionButton fab;
 
     private Sonidos sonidos;
+    private ArrayList<Sonido> sonidosSinAlertaExterna;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,8 @@ public class SonidosActivity extends Menu {
 
         sonidos = new Sonidos();
         sonidos.loadSonidos(getApplicationContext());
+        // Cargo la lista de sonidos sin el Alerta Externa. Este arraylist va a servir solo para mostrar visualmente los sonidos. No actualiza el archivo de sonidos
+        sonidosSinAlertaExterna = sonidos.getListaSonidos(false);
 
         adaptador = new AdaptadorSonidos(this);
         ListView lv1 = (ListView)findViewById(R.id.list1);
@@ -60,14 +65,17 @@ public class SonidosActivity extends Menu {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        final int itemSelected;
+        final int itemSelected_sonidosCompleto;
+        final int itemSelected_sonidosSinAlertaExterna;
+
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        itemSelected = info.position;
+        itemSelected_sonidosCompleto = info.position + 1;
+        itemSelected_sonidosSinAlertaExterna = info.position;
 
         switch (item.getItemId()) {
             case R.id.CtxOpEditar:
                 Intent i = new Intent(this, SonidosEdicionActivity.class);
-                i.putExtra("sonidoSeleccionado", itemSelected);
+                i.putExtra("sonidoSeleccionado", itemSelected_sonidosCompleto);
                 startActivity(i);
                 break;
             case R.id.CtxOpBorrar:
@@ -77,7 +85,8 @@ public class SonidosActivity extends Menu {
                 dialogo1.setCancelable(false);
                 dialogo1.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogo1, int id) {
-                        sonidos.removeSonido(getApplicationContext(), itemSelected);
+                        sonidos.removeSonido(getApplicationContext(), itemSelected_sonidosCompleto); // Actualizo la lista completa de los sonidos guardados
+                        sonidosSinAlertaExterna.remove(itemSelected_sonidosSinAlertaExterna); // Actualizo la lista de los sonidos que se visualizan
                         adaptador.notifyDataSetChanged();
                     }
                 });
@@ -100,7 +109,7 @@ public class SonidosActivity extends Menu {
         AppCompatActivity appCompatActivity;
 
         AdaptadorSonidos(AppCompatActivity context) {
-            super(context, R.layout.sonido, sonidos.getListasonidos());
+            super(context, R.layout.sonido, sonidosSinAlertaExterna);
             appCompatActivity = context;
         }
 
@@ -108,13 +117,13 @@ public class SonidosActivity extends Menu {
             LayoutInflater inflater = appCompatActivity.getLayoutInflater();
             View item = inflater.inflate(R.layout.sonido, null);
 
-            Sonido sonido = sonidos.getSonidoByPosition(position);
+            Sonido sonido = sonidosSinAlertaExterna.get(position);
 
-            TextView textView1 = (TextView)item.findViewById(R.id.textView);
-            textView1.setText(sonido.getNombre()+sonido.getRutaFoto());
+            TextView txtvw_sonidoNombre = (TextView)item.findViewById(R.id.sonidoNombre);
+            txtvw_sonidoNombre.setText(sonido.getNombre());
 
-            ImageView imageView1 = (ImageView)item.findViewById(R.id.imageView);
-            imageView1.setImageBitmap(sonido.getImagen());
+            ImageView img_sonidoImagen = (ImageView)item.findViewById(R.id.sonidoImagen);
+            img_sonidoImagen.setImageBitmap(sonido.getImagen());
 
             return(item);
         }

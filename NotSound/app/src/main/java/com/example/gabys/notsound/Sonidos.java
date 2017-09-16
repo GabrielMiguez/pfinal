@@ -18,7 +18,20 @@ public class Sonidos extends Application{
         listasonidos = new ArrayList<Sonido>();
     }
 
-    public ArrayList<Sonido> getListasonidos(){ return listasonidos; }
+    public ArrayList<Sonido> getListaSonidos(Boolean incluirAlertaExterna){
+        if(incluirAlertaExterna){
+            return listasonidos;
+        }
+        else{
+            ArrayList<Sonido> listasonidosSinAlertaExterna = new ArrayList<Sonido>();
+            for (Sonido sonido: listasonidos) {
+                if(sonido.getID() != 0){
+                    listasonidosSinAlertaExterna.add(sonido);
+                }
+            }
+            return listasonidosSinAlertaExterna;
+        }
+    }
 
     public int sizeSonidos(){
         return listasonidos.size();
@@ -30,15 +43,22 @@ public class Sonidos extends Application{
     }
 
     public Sonido getSonidoByID(int sonidoID){
-        int itemIndex=0;
 
-        for (Sonido sonido: listasonidos) {
-            if(sonido.getID() == sonidoID){
-                break;
+        if (listasonidos.size() != 0){
+            int itemIndex=0;
+
+            for (Sonido sonido: listasonidos) {
+                if(sonido.getID() == sonidoID){
+                    break;
+                }
+                itemIndex++;
             }
-            itemIndex++;
+            return listasonidos.get(itemIndex);
         }
-        return listasonidos.get(itemIndex);
+        else{
+            return null;
+        }
+
     }
 
     public int getAvailableSonidoID(){
