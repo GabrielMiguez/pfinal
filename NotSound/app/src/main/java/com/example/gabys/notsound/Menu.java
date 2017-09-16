@@ -115,7 +115,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             // Atar el servicio a la actividad
             bindService(intent, mConnection,this.BIND_AUTO_CREATE);
 
-            //if (this.getClass().getSimpleName().equals("MainActivity"))
+            if (this.getClass().getSimpleName().equals("MainActivity"))
                 startService(intent);
         //}
 
@@ -145,17 +145,17 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     public void onResume(){
         Log.i("DESARROLLO","onResume ");
         super.onResume();
-        //registerReceiver (receiver,intentFilter);
+        registerReceiver (receiver,intentFilter);
     }
     public void onPause(){
         Log.i("DESARROLLO","onPause ");
         super.onPause();
-        //unregisterReceiver(receiver);
+        unregisterReceiver(receiver);
     }
 
     public void onDestroy() {
         super.onDestroy();
-        Log.i("DESARROLLO","onDestroy ");
+        //Log.i("DESARROLLO","onDestroy ");
         //unregisterReceiver(receiver);
     }
 
