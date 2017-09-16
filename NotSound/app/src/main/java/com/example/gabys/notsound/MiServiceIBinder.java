@@ -71,9 +71,9 @@ public class MiServiceIBinder extends Service {
         public void handleMessage(Message msg) { //recibe sms de activity y envia a bt
             switch (msg.what) {
                 case MSG_HOLA:
-                    Toast.makeText(getApplicationContext(), "Hola", Toast.LENGTH_SHORT).show();
-                    //enviarSMS("hola");
-
+                    String s =msg.getData().get("data").toString();
+                    Toast.makeText(getApplicationContext(), "Eviar: "+s, Toast.LENGTH_SHORT).show();
+                    enviarSMS(s);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -109,7 +109,10 @@ public class MiServiceIBinder extends Service {
 
     public IBinder _onBind(Intent arg0) {
 
+        if (bt!=null) return iBinder;
+
         bt= new Bluetooth(this);
+
         new Thread(new Runnable() {
 
             @Override
@@ -117,8 +120,6 @@ public class MiServiceIBinder extends Service {
 
                 try {
                     while(1==1) {
-
-
                         //tengo que poder conectarme al servicio mediante mi app y mediante el bluetooth
                         //mediante bluetooth se encarga el objeto blue
                         //mediante el servicio, seguramente tengo que exponer algun metodo de escucha(lo realizo con el Binder)
@@ -156,12 +157,9 @@ public class MiServiceIBinder extends Service {
     @Override
     public void onDestroy(){
         Toast.makeText(this, "Service finalizado", Toast.LENGTH_SHORT).show();
-        // se recomienda, matar los hilos que el servicio inicio  ??????????????????????????????
+        // se recomienda matar los hilos que el servicio inicio  ??????????????????????????????
     }
 
-    public int enviarSMS(String sms){
-        return bt.EnviarSMS(sms);
-    }
 
     public void bluetoothConectado(){
         // Instanciamos e inicializamos nuestro manager.
@@ -198,7 +196,6 @@ public class MiServiceIBinder extends Service {
 
         nManager.notify(123123, builder.build());
     }
-
 
     private void sebdbroadcast(String s){
         try {
@@ -240,9 +237,15 @@ public class MiServiceIBinder extends Service {
     public void procesarMsg(String s)//procesa sms que llega al servicio, desde el bt
     {
         try {
-            Notificar();
+            if (s.equals("NA"))
+                Notificar();
+
             sebdbroadcast(s);
         } catch (Exception e) {
         }
+    }
+
+    public int enviarSMS(String sms){
+        return bt.EnviarSMS(sms);
     }
 }

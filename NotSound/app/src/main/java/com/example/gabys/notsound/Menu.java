@@ -109,13 +109,14 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             Intent intent = new Intent(Menu.this, MiServiceIBinder.class);
             //bindService(intent, sConnectionIB, Context.BIND_AUTO_CREATE);
 
-
             //nuevo, corro el servicio y lo ato al activity
             // Iniciar el servicio
-            startService(intent);
+
             // Atar el servicio a la actividad
             bindService(intent, mConnection,this.BIND_AUTO_CREATE);
 
+            //if (this.getClass().getSimpleName().equals("MainActivity"))
+                startService(intent);
         //}
 
 
@@ -123,7 +124,6 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
     public void processReceive(Context context, Intent intent) {
         Log.i("DESARROLLO","processReceive ");
-
         Toast.makeText(context, intent.getExtras().getSerializable("sms").toString(), Toast.LENGTH_LONG).show();
     }
 
@@ -141,21 +141,22 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             e.printStackTrace();
         }
     }
+
     public void onResume(){
         Log.i("DESARROLLO","onResume ");
         super.onResume();
-        registerReceiver (receiver,intentFilter);
+        //registerReceiver (receiver,intentFilter);
     }
     public void onPause(){
         Log.i("DESARROLLO","onPause ");
         super.onPause();
-        unregisterReceiver(receiver);
+        //unregisterReceiver(receiver);
     }
 
     public void onDestroy() {
         super.onDestroy();
         Log.i("DESARROLLO","onDestroy ");
-        unregisterReceiver(receiver);
+        //unregisterReceiver(receiver);
     }
 
     public boolean onNavigationItemSelected(MenuItem item) {

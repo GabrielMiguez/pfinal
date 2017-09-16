@@ -110,7 +110,7 @@ public class ConfigActivity extends Menu {
     }
 
     public void test(){
-        sendMSGSRV("TC|");
+        sendMSGSRV("T0|");
     }
 
     public void btnOnBluetooth() {

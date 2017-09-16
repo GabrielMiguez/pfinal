@@ -124,6 +124,10 @@ public class Bluetooth {
             mmOutStream = tmpOut;
         }
 
+        public boolean isConnected() {
+            return mmSocket.isConnected();
+        }
+
         public void run() {
             byte[] buffer = new byte[1024];  // buffer store for the stream
             int bytes; // bytes returned from read()
@@ -216,8 +220,10 @@ public class Bluetooth {
     }
 
     public boolean Conected(){
-        try {
-            if (hilosms.isAlive()) {
+         try {
+             //if (this.BA.EXTRA_STATE.equals(BluetoothAdapter.STATE_CONNECTED) ){
+            if ((hilosms.isAlive()) || (hilosms.isDaemon())) {
+            //if (hilosms.isConnected()){
                 return true;
             }else{
                 return false;
