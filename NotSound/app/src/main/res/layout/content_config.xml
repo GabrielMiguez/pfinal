@@ -12,21 +12,12 @@
         android:layout_width="368dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="34dp"
-            android:orientation="horizontal"
-            tools:layout_editor_absoluteX="8dp"
-            tools:layout_editor_absoluteY="8dp">
-
-        </LinearLayout>
+        tools:layout_editor_absoluteX="6dp"
+        tools:layout_editor_absoluteY="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="43dp"
+            android:layout_height="match_parent"
             android:orientation="horizontal"
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="8dp">
@@ -44,6 +35,36 @@
                 android:layout_height="wrap_content"
                 android:checked="false"
                 tools:checked="false" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="43dp"
+            android:orientation="horizontal"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Modo OUT"
+                android:textSize="18sp" />
+
+            <Switch
+                android:id="@+id/swM"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                tools:checked="false" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="IN"
+                android:textSize="18sp" />
         </LinearLayout>
 
         <TextView

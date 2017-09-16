@@ -42,7 +42,7 @@ public class ConfigActivity extends Menu {
     Set<BluetoothDevice> pairedDevices;
     ArrayAdapter mArrayAdapter;
     private Spinner lstdispos;
-    private Switch swB;
+    private Switch swB, swM;
     private FloatingActionButton btnBuscar;
     public TextView txtInfo;
     private Button btnTestcnx;
@@ -54,12 +54,14 @@ public class ConfigActivity extends Menu {
         super.CreateMenu();
 
         swB = (Switch) findViewById(R.id.swB);
+        swM = (Switch) findViewById(R.id.swM);
         lstdispos = (Spinner) findViewById(R.id.lstDispos);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         btnBuscar = (FloatingActionButton) findViewById(R.id.btnBuscar);
         txtInfo = (TextView) findViewById(R.id.txtInfo);
         btnTestcnx = (Button) findViewById(R.id.btnTestcnx);
         btnGuardar = (ImageButton) findViewById(R.id.btnGuardar);
+        txtInfo.setText("");
 
         //setSupportActionBar(toolbar);
         BA = BluetoothAdapter.getDefaultAdapter();  // tomo mi bluetooth
@@ -94,6 +96,16 @@ public class ConfigActivity extends Menu {
             }
         });
 
+        swM.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                //Log.v("Switch State=", ""+isChecked);
+                if (!isChecked) {
+                    sendMSGSRV("C1|");
+                } else
+                    sendMSGSRV("C2|");
+            }
+        });
 
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -107,6 +119,13 @@ public class ConfigActivity extends Menu {
             }
         });
         recuperar();
+    }
+
+    //Metodo para Implememtar Accion en cada Activity
+    @Override
+    public void ActionRecive(String s){
+        s = txtInfo.getText().toString() + ((char) 10) + ((char) 13) + s;
+        txtInfo.setText(s);
     }
 
     public void test(){

@@ -222,9 +222,10 @@ public class Bluetooth {
     public boolean Conected(){
          try {
              //if (this.BA.EXTRA_STATE.equals(BluetoothAdapter.STATE_CONNECTED) ){
-            if ((hilosms.isAlive()) || (hilosms.isDaemon())) {
+            //if ((hilosms.isAlive()) || (hilosms.isDaemon())) {
             //if (hilosms.isConnected()){
-                return true;
+            if (hilosms.isAlive()){
+             return true;
             }else{
                 return false;
             }

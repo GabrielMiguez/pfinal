@@ -125,6 +125,11 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     public void processReceive(Context context, Intent intent) {
         Log.i("DESARROLLO","processReceive ");
         Toast.makeText(context, intent.getExtras().getSerializable("sms").toString(), Toast.LENGTH_LONG).show();
+        this.ActionRecive(intent.getExtras().getSerializable("sms").toString());
+    }
+
+    //Metodo para Implememtar Accion en cada Activity
+    public void ActionRecive(String s){
     }
 
     public void sendMSGSRV(String s) {

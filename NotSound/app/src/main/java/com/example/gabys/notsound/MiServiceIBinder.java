@@ -208,8 +208,6 @@ public class MiServiceIBinder extends Service {
     }
 
     private void Notificar(){
-
-
         long[] vibratePattern = {0, 800};
 
         Intent i = new Intent(getApplicationContext(), SonidoAlertaActivity.class);
@@ -242,6 +240,7 @@ public class MiServiceIBinder extends Service {
 
             sebdbroadcast(s);
         } catch (Exception e) {
+            Toast.makeText(this, "Error al Notificar", Toast.LENGTH_SHORT).show();
         }
     }
 
