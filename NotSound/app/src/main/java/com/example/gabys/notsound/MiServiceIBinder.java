@@ -17,51 +17,28 @@ import java.util.Random;
 import android.os.IBinder;
 
 /*
-Activity -> Srv -> Arduino
-Arduino -> Srv -> Activity
+'G|'->Comenzar Grabación (x milisegundos máximos)
+                'P1|'<-Sonido PRE Guardado con ID
 
-Opcion Sincro
-                ->Comenzar Grabacion (graba 4segundos maximos)
-                ->Fin Grabacion
-                <-Sonido PRE Guardado con ID
+                'G1|'->Guardar Sonido ID
+                'G1|'<-Sonido Guardado con ID
 
-                ->Guardar Sonido ID
-                <-Sonido Guardado con ID
+                'B1|'->Borrar Sonido ID
+                'B1|'<-Sonido Borrado ID
 
-                ->Borrar Sonido ID
-                <-Sonido Borrado ID
+                'T0|'->TEST ID
+                'T0|'<-TEST ID
 
-                ->TEST ID
-                <-TEST ID
+                'C1|'->CONFIG ID NIVEL
+                'C1|'<-CONFIG ID OK
 
-                ->CONFIG ID NIVEL
-                <-CONFIG ID OK
+                   ‘C2|'->CONFIG ID NIVEL
+                'C2|'<-CONFIG ID OK
 
-                <-Notoficacion ID
+                'NA|'<-Notificación Alerta
+                   'N1|'<-Notificación ID
 */
 
-/*
-SonidoActivity.
-//Andorid servicios comunicacion bidireccional con activity
-//https://miguelangellv.wordpress.com/2011/09/14/creacion-de-servicios-con-comunicacion-bidireccional-con-un-activity/
-//Activity que se comunica con el servicio
-    public ComenzarGrabacion(){
-        //Envia SMS BLueTOOTH
-        Singleton_Binder.getInstance.Send_Message(SMSBT.Grabacion);
-    }
-    public Gardar(){
-        //Verificar si el Servicio respondio...
-        if (respondio){
-
-        }
-    }
-
-    //El servicio se comunica con la Aplicacion mediante Notificaicones
-    //, y mediante BroadCastService, donde cada activitie que queria recivir un evento debe suscribirse de alguna manera al servicio.
-    public onRecive(){
-        respondio=true;
-    }
-*/
 
 public class MiServiceIBinder extends Service {
     static final int MSG_HOLA = 1;
@@ -87,6 +64,7 @@ public class MiServiceIBinder extends Service {
     private final Random random = new Random();
     //crear bluetooth
     private static Bluetooth bt;
+    private btThread hilobt;
 
     public class MiBinderIBinder extends android.os.Binder {
         public MiServiceIBinder getService() {
@@ -107,49 +85,48 @@ public class MiServiceIBinder extends Service {
         return mMessenger.getBinder();
     }
 
+    private class btThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                while(1==1) {
+                    //tengo que poder conectarme al servicio mediante mi app y mediante el bluetooth
+                    //mediante bluetooth se encarga el objeto blue
+                    //mediante el servicio, seguramente tengo que exponer algun metodo de escucha(lo realizo con el Binder)
+                    if (bt.Conected()){
+                        bluetoothConectado(); //nofif
+                        Thread.sleep(5000); //espero 5 segndo, y vuelvo a intentar conectarme, solo cuando no estoy conectado.
+                        //podria llevarlo a la pantalla de configuracion.
+                        continue;
+                    }
+
+                    bluetoothDesconectado();//nofif
+
+                    SharedPreferences prefe = getSharedPreferences("configuracion", Context.MODE_PRIVATE);
+                    String dis = prefe.getString("dispositivo", "").toString();
+                    if (dis.isEmpty()) {
+                        Thread.sleep(5000); //espero 5 segndo, y vuelvo a revisar la config.
+                        continue; //podria llevarlo a la pantalla de configuracion.
+                    }
+
+                    //si no esta conectado, intenta conectar cada 5 segundos
+                    bt.conectar(dis);// una vez conectado, adentro se crean los hilos necesario para mentener la conexion abierta.
+                    Thread.sleep(10000);
+                }
+
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
     public IBinder _onBind(Intent arg0) {
 
         if (bt!=null) return iBinder;
-
         bt= new Bluetooth(this);
 
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-
-                try {
-                    while(1==1) {
-                        //tengo que poder conectarme al servicio mediante mi app y mediante el bluetooth
-                        //mediante bluetooth se encarga el objeto blue
-                        //mediante el servicio, seguramente tengo que exponer algun metodo de escucha(lo realizo con el Binder)
-                        if (bt.Conected()){
-                            bluetoothConectado(); //nofif
-                            Thread.sleep(5000); //espero 5 segndo, y vuelvo a intentar conectarme, solo cuando no estoy conectado.
-                            //podria llevarlo a la pantalla de configuracion.
-                            continue;
-                        }
-
-                        bluetoothDesconectado();//nofif
-
-                        SharedPreferences prefe = getSharedPreferences("configuracion", Context.MODE_PRIVATE);
-                        String dis = prefe.getString("dispositivo", "").toString();
-                        if (dis.isEmpty()) {
-                            Thread.sleep(5000); //espero 5 segndo, y vuelvo a revisar la config.
-                            continue; //podria llevarlo a la pantalla de configuracion.
-                        }
-
-                        //si no esta conectado, intenta conectar cada 5 segundos
-                        bt.conectar(dis);// una vez conectado, adentro se crean los hilos necesario para mentener la conexion abierta.
-                        Thread.sleep(10000);
-                    }
-
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        hilobt = new btThread();
+        hilobt.start();
 
         return iBinder;
     }
