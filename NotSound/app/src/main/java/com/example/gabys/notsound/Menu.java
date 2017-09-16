@@ -182,7 +182,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             startActivity(i);
         } else if (id == R.id.nav_gallery) {
             Intent i = new Intent(this, SonidosEdicionActivity.class);
-            i.putExtra("sonidoSeleccionado", 0); // Sonido Alerta
+            i.putExtra("sonidoSeleccionado", Sonidos.POSICION_SONIDO_ALERTA_EXTERNA); // Sonido Alerta
             startActivity(i);
         } else if (id == R.id.nav_slideshow) {
             Intent i = new Intent(this, ConfigActivity.class );

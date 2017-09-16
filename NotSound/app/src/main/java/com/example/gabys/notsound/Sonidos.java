@@ -11,6 +11,9 @@ import java.util.ArrayList;
  */
 
 public class Sonidos extends Application{
+    public static int ID_SONIDO_ALERTA_EXTERNA = 99;
+    public static int POSICION_SONIDO_ALERTA_EXTERNA = 0;
+
     private ArrayList<Sonido> listasonidos;
     private String file = "notas.dat";
 
@@ -25,7 +28,7 @@ public class Sonidos extends Application{
         else{
             ArrayList<Sonido> listasonidosSinAlertaExterna = new ArrayList<Sonido>();
             for (Sonido sonido: listasonidos) {
-                if(sonido.getID() != 0){
+                if(sonido.getID() != ID_SONIDO_ALERTA_EXTERNA){
                     listasonidosSinAlertaExterna.add(sonido);
                 }
             }
@@ -101,6 +104,11 @@ public class Sonidos extends Application{
 
     public void addSonido(Context context, Sonido sonido){
         int newItemIndex = this.sizeSonidos(); //devuelve la cantidad de elementos +1;
+
+        if (sonido.getID() == ID_SONIDO_ALERTA_EXTERNA){
+            newItemIndex = POSICION_SONIDO_ALERTA_EXTERNA;
+        }
+
         listasonidos.add(newItemIndex,sonido);
         this.saveSonidos(context);
     }

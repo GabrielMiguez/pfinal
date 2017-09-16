@@ -29,7 +29,7 @@ public class SonidosEdicionActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private Sonidos sonidos;
-    private int itemSeleccionado = -1;
+    private int itemSeleccionado;
 
     //private Bitmap imagen;
 
@@ -58,14 +58,19 @@ public class SonidosEdicionActivity extends AppCompatActivity {
         //Levanto los parametros con los datos del Sonido a Editar
         itemSeleccionado = (int) getIntent().getSerializableExtra("sonidoSeleccionado");
 
-        if (itemSeleccionado != -1){
+        if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO){
             Sonido sonido = sonidos.getSonidoByPosition(itemSeleccionado);
 
-            //Cargo los parametros en los objetos de la pantalla
             txt_sonidoID.setText(String.valueOf(sonido.getID()));
             txt_sonidoNombre.setText(sonido.getNombre());
             chk_habilitado.setChecked(sonido.getHabilitado());
             if (sonido.getImagen() != null) {img_imagenSonido.setImageBitmap(sonido.getImagen());}
+        }
+
+        //Deshabilito algunos objetos para el sonidos "Alerta Externa"
+        if (itemSeleccionado == Sonidos.POSICION_SONIDO_ALERTA_EXTERNA) {
+            txt_sonidoNombre.setEnabled(false);
+            chk_habilitado.setEnabled(false);
         }
 
         botonGuardar.setOnClickListener(new OnClickListener() {
@@ -83,7 +88,7 @@ public class SonidosEdicionActivity extends AppCompatActivity {
 
                 saveImage(imagen, rutaFoto);
 
-                if (itemSeleccionado != -1) {
+                if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO) {
                     sonidos.setSonido(itemSeleccionado,(new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado)));
                     sonidos.saveSonidos(getApplicationContext());
                 }
@@ -92,8 +97,10 @@ public class SonidosEdicionActivity extends AppCompatActivity {
                     sonidos.addSonido(getApplicationContext(), sonidoNuevo);
                 }
 
-                Intent i = new Intent(getApplicationContext(), SonidosActivity.class );
-                startActivity(i);
+                if (itemSeleccionado != Sonidos.POSICION_SONIDO_ALERTA_EXTERNA) {
+                    Intent i = new Intent(getApplicationContext(), SonidosActivity.class );
+                    startActivity(i);
+                }
             }
         });
 

@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 public class SonidoAlertaActivity extends AppCompatActivity {
 
-    private int itemSeleccionado = -1;
+    private int itemSeleccionado;
     private TextView txt_sonidoNombre;
     private ImageView img_imagenSonido;
 
@@ -28,12 +28,11 @@ public class SonidoAlertaActivity extends AppCompatActivity {
         //Levanto los parametros
         itemSeleccionado = (int) getIntent().getSerializableExtra("sonidoSeleccionado");
 
-        if (itemSeleccionado != -1){
-            Sonido sonido = sonidos.getSonidoByPosition(itemSeleccionado);
 
-            //Cargo los parametros en los objetos de la pantalla
-            txt_sonidoNombre.setText(sonido.getNombre());
-            if (sonido.getImagen() != null) {img_imagenSonido.setImageBitmap(sonido.getImagen());}
-        }
+        Sonido sonido = sonidos.getSonidoByID(itemSeleccionado);
+
+        //Cargo los parametros en los objetos de la pantalla
+        txt_sonidoNombre.setText(sonido.getNombre());
+        if (sonido.getImagen() != null) {img_imagenSonido.setImageBitmap(sonido.getImagen());}
     }
 }

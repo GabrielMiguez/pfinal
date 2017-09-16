@@ -37,10 +37,9 @@ public class MainActivity extends Menu {
         Sonidos sonidos = new Sonidos();
         sonidos.loadSonidos(getApplicationContext());
 
-        if (sonidos.getSonidoByID(0) == null){
-            sonidos.addSonido(getApplicationContext(),new Sonido(0,"Alerta Externa", null, true));
+        if (sonidos.getSonidoByID(Sonidos.ID_SONIDO_ALERTA_EXTERNA) == null){
+            sonidos.addSonido(getApplicationContext(),new Sonido(Sonidos.ID_SONIDO_ALERTA_EXTERNA,"Alerta Externa", null, true));
         }
-
 
         //todos los activities que hereden de Menu, tiene el servicio bindeado, desde aca lo creo normal para que no muera nunca
         //Intent intent = new Intent(this, MiServiceIBinder.MiBinderIBinder.class);

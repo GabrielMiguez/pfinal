@@ -20,6 +20,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class SonidosActivity extends Menu {
+    public static int SONIDO_NUEVO = 98;
 
     private AdaptadorSonidos adaptador;
     private FloatingActionButton fab;
@@ -39,7 +40,7 @@ public class SonidosActivity extends Menu {
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), SonidosEdicionActivity.class);
                 //i.putExtra("sonidos", sonidos);
-                i.putExtra("sonidoSeleccionado", -1);
+                i.putExtra("sonidoSeleccionado", SONIDO_NUEVO);
                 startActivity(i);
             }
         });
