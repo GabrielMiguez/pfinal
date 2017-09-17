@@ -5,7 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/color_link_bodyStart</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -16,5 +16,15 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="style_button" >
+        <item name="android:textColor" >@drawable/dw_button_text</item>
+        <item name="android:background" >@drawable/dw_button_background</item>=
+        <item name="android:gravity" >center</item>
+        <item name="android:layout_marginLeft" >8dp</item>
+        <item name="android:layout_marginRight" >8dp</item>
+        <item name="android:layout_marginTop" >8dp</item>
+        <item name="android:layout_marginBottom" >8dp</item>
+    </style>
 
 </resources>

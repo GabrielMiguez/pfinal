@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
-public class SonidosEdicionActivity extends AppCompatActivity {
+public class SonidosEdicionActivity extends Menu {
     private static final int CAMERA_REQUEST = 1888;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
@@ -50,7 +50,6 @@ public class SonidosEdicionActivity extends AppCompatActivity {
         txt_sonidoNombre = (EditText)findViewById(R.id.edtxt_sonidoNombre);
         chk_habilitado = (CheckBox) findViewById(R.id.chk_Habilitado);
         img_imagenSonido = (ImageView)findViewById(R.id.img_ImagenSonido);
-        botonGuardar = (ImageButton) findViewById(R.id.btn_Guardar);
 
         sonidos = new Sonidos();
         sonidos.loadSonidos(getApplicationContext());
@@ -72,38 +71,17 @@ public class SonidosEdicionActivity extends AppCompatActivity {
             txt_sonidoNombre.setEnabled(false);
             chk_habilitado.setEnabled(false);
         }
+    }
 
-        botonGuardar.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-
-                int IDSonido = sonidos.getAvailableSonidoID();
-                if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){ IDSonido = Integer.parseInt(txt_sonidoID.getText().toString()); }
-                String nombreSonido = txt_sonidoNombre.getText().toString();
-                Boolean estaHabilitado = chk_habilitado.isChecked();
-                String rutaFoto = getExternalFilesDir(null) + "/" + nombreSonido + ".png";
-
-                img_imagenSonido.buildDrawingCache();
-                Bitmap imagen = img_imagenSonido.getDrawingCache();
-
-                saveImage(imagen, rutaFoto);
-
-                if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO) {
-                    sonidos.setSonido(itemSeleccionado,(new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado)));
-                    sonidos.saveSonidos(getApplicationContext());
-                }
-                else {
-                    Sonido sonidoNuevo = new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado);
-                    sonidos.addSonido(getApplicationContext(), sonidoNuevo);
-                }
-
-                if (itemSeleccionado != Sonidos.POSICION_SONIDO_ALERTA_EXTERNA) {
-                    Intent i = new Intent(getApplicationContext(), SonidosActivity.class );
-                    startActivity(i);
-                }
-            }
-        });
-
+    @Override
+    public void onBackPressed() {
+        if (itemSeleccionado != Sonidos.POSICION_SONIDO_ALERTA_EXTERNA) {
+            Intent i = new Intent(this, SonidosActivity.class );
+            startActivity(i);
+        } else {
+            Intent i = new Intent(this, MainActivity.class );
+            startActivity(i);
+        }
     }
 
     @Override
@@ -114,6 +92,37 @@ public class SonidosEdicionActivity extends AppCompatActivity {
             img_imagenSonido.setImageBitmap(imagen);
         }
     }
+
+    public void guardarSonidoEdicion (View v){
+        int IDSonido = sonidos.getAvailableSonidoID();
+        if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){ IDSonido = Integer.parseInt(txt_sonidoID.getText().toString()); }
+        String nombreSonido = txt_sonidoNombre.getText().toString();
+        Boolean estaHabilitado = chk_habilitado.isChecked();
+        String rutaFoto = getExternalFilesDir(null) + "/" + nombreSonido + ".png";
+
+        img_imagenSonido.buildDrawingCache();
+        Bitmap imagen = img_imagenSonido.getDrawingCache();
+
+        saveImage(imagen, rutaFoto);
+
+        if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO) {
+            sonidos.setSonido(itemSeleccionado,(new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado)));
+            sonidos.saveSonidos(getApplicationContext());
+        }
+        else {
+            Sonido sonidoNuevo = new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado);
+            sonidos.addSonido(getApplicationContext(), sonidoNuevo);
+        }
+
+        if (itemSeleccionado != Sonidos.POSICION_SONIDO_ALERTA_EXTERNA) {
+            Intent i = new Intent(getApplicationContext(), SonidosActivity.class );
+            startActivity(i);
+        }
+    }
+    public void cancelarSonidoEdicion (View v) {
+        this.onBackPressed();
+    }
+
 
     public void tomarFoto (View v){
 

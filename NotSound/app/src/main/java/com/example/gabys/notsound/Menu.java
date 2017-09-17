@@ -197,13 +197,17 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            //super.onBackPressed();
+
+            Intent i = new Intent(this, MainActivity.class );
+            startActivity(i);
         }
     }
 
