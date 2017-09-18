@@ -177,17 +177,17 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_sonidos) {
             Intent i = new Intent(this, SonidosActivity.class );
             startActivity(i);
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_alerta_externa) {
             Intent i = new Intent(this, SonidosEdicionActivity.class);
             i.putExtra("sonidoSeleccionado", Sonidos.POSICION_SONIDO_ALERTA_EXTERNA); // Sonido Alerta
             startActivity(i);
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_configuracion) {
             Intent i = new Intent(this, ConfigActivity.class );
             startActivity(i);
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_nosotros) {
             Intent i = new Intent(this, NosotrosActivity.class );
             startActivity(i);
 
