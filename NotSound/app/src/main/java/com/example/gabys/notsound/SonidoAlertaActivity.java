@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class SonidoAlertaActivity extends AppCompatActivity {
 
@@ -28,11 +29,14 @@ public class SonidoAlertaActivity extends AppCompatActivity {
         //Levanto los parametros
         itemSeleccionado = (int) getIntent().getSerializableExtra("sonidoSeleccionado");
 
+        try {
+            Sonido sonido = sonidos.getSonidoByID(itemSeleccionado);
+            //Cargo los parametros en los objetos de la pantalla
+            txt_sonidoNombre.setText(sonido.getNombre());
+            if (sonido.getImagen() != null) {img_imagenSonido.setImageBitmap(sonido.getImagen());}
+        }catch (Exception e){
+            Toast.makeText(getApplicationContext(), "error:"+e.getMessage().toString(), Toast.LENGTH_LONG).show();
+        }
 
-        Sonido sonido = sonidos.getSonidoByID(itemSeleccionado);
-
-        //Cargo los parametros en los objetos de la pantalla
-        txt_sonidoNombre.setText(sonido.getNombre());
-        if (sonido.getImagen() != null) {img_imagenSonido.setImageBitmap(sonido.getImagen());}
     }
 }

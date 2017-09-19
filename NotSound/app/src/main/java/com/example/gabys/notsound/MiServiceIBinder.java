@@ -188,7 +188,7 @@ public class MiServiceIBinder extends Service {
         long[] vibratePattern = {0, 800};
 
         Intent i = new Intent(getApplicationContext(), SonidoAlertaActivity.class);
-        i.putExtra("sonidoSeleccionado", -1);
+        i.putExtra("sonidoSeleccionado", 99);
 
         PendingIntent viewPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, i, PendingIntent.FLAG_ONE_SHOT);
 

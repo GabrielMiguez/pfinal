@@ -215,7 +215,7 @@ public class Bluetooth {
             e.printStackTrace();
         }
 
-        hilosms.write(new String("TESTS CONEXION|"));
+        //hilosms.write(new String("T0|"));
 
     }
 

@@ -30,7 +30,7 @@ public class SonidosEdicionActivity extends Menu {
 
     private Sonidos sonidos;
     private int itemSeleccionado;
-
+    private int IDSonido_grabado=-1;
     //private Bitmap imagen;
 
     private TextView txt_sonidoID;
@@ -38,6 +38,7 @@ public class SonidosEdicionActivity extends Menu {
     private CheckBox chk_habilitado;
     private ImageView img_imagenSonido;
     private ImageButton botonGuardar;
+    private ImageButton btn_GrabarAudio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +51,7 @@ public class SonidosEdicionActivity extends Menu {
         txt_sonidoNombre = (EditText)findViewById(R.id.edtxt_sonidoNombre);
         chk_habilitado = (CheckBox) findViewById(R.id.chk_Habilitado);
         img_imagenSonido = (ImageView)findViewById(R.id.img_ImagenSonido);
-
+        btn_GrabarAudio = (ImageButton) findViewById(R.id.btn_GrabarAudio);
         sonidos = new Sonidos();
         sonidos.loadSonidos(getApplicationContext());
 
@@ -110,6 +111,8 @@ public class SonidosEdicionActivity extends Menu {
             sonidos.saveSonidos(getApplicationContext());
         }
         else {
+            if (IDSonido_grabado != -1)
+                IDSonido=IDSonido_grabado;
             Sonido sonidoNuevo = new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado);
             sonidos.addSonido(getApplicationContext(), sonidoNuevo);
         }
@@ -144,6 +147,20 @@ public class SonidosEdicionActivity extends Menu {
         } catch (Exception e) {
             Log.e("saveToInternalStorage()", e.getMessage());
             return false;
+        }
+    }
+
+    public void grabarAudio (View v) {
+        sendMSGSRV("G|");
+    };
+
+    //Metodo para Implememtar Accion en cada Activity
+    @Override
+    public void ActionRecive(String s){
+        //'G1|'<-Sonido Guardado con ID 1
+        if (s.charAt(0)=='G'){
+            s=s.substring(1);
+            IDSonido_grabado =  Integer.valueOf(s);
         }
     }
 
