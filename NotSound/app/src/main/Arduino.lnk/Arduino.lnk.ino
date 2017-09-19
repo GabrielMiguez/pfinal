@@ -82,7 +82,7 @@ void callback()
   if (modo!=0) return; // modo != OUT => salgo
   if (normal==0) return; //modo fast me voy
   
-  //Serial.println("-----Inicio-----");
+  Serial.println("-----Inicio callback-----");
   
   double arrayOfTops[50];
   int contArrayOfTops=0;
@@ -96,7 +96,7 @@ void callback()
     arrayOfTops[contArrayOfTops]=lecturaMic;
     contArrayOfTops++;
   }
-
+Serial.println("-----callback Listo lecturas-----");
   //Hago burbuja para ordenarlos
   double temp=0;
   for (int i=0; i<50; i++){
@@ -192,9 +192,9 @@ void loop()
        } 
        delay(25) ;
      }
-    //Serial.println("Antes modo 0");
+    Serial.println("Antes modo 0");
     if (modo==0){ // modo OUT
-      //Serial.println("modo 0");
+      Serial.println("modo 0");
       //Vamos leyendo lo que capta el mic
       //si supera valor promedio, prendemos led
       int lecturaMic=analogRead(A0);
@@ -214,6 +214,7 @@ void loop()
         digitalWrite(ledPin1, LOW);
       }
     }else{ //modo IN
+      Serial.println("modo 1");
       modoPatron();
     }
   }
