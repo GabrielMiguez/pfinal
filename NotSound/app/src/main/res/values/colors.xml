@@ -15,5 +15,5 @@
     <color name="color_link_pressed_shadow">@color/colorPrimaryDark</color>
 
     <color name="color_text">#000000</color>
-    <color name="color_text_pressed">#FFFFFF</color>
+    <color name="color_text_pressed">#ffffff</color>
 </resources>

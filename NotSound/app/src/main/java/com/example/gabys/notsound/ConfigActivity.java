@@ -1,36 +1,27 @@
 package com.example.gabys.notsound;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
-import android.os.Handler;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.UUID;
 
 import static java.lang.Thread.sleep;
 
@@ -45,8 +36,6 @@ public class ConfigActivity extends Menu {
     private Switch swB, swM;
     private FloatingActionButton btnBuscar;
     public TextView txtInfo;
-    private Button btnTestcnx;
-    private ImageButton btnGuardar;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,8 +48,6 @@ public class ConfigActivity extends Menu {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         btnBuscar = (FloatingActionButton) findViewById(R.id.btnBuscar);
         txtInfo = (TextView) findViewById(R.id.txtInfo);
-        btnTestcnx = (Button) findViewById(R.id.btnTestcnx);
-        btnGuardar = (ImageButton) findViewById(R.id.btnGuardar);
         txtInfo.setText("");
 
         //setSupportActionBar(toolbar);
@@ -107,17 +94,6 @@ public class ConfigActivity extends Menu {
             }
         });
 
-        btnGuardar.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                guardar();
-            }
-        });
-
-        btnTestcnx.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                test();
-            }
-        });
         recuperar();
     }
 
@@ -128,7 +104,7 @@ public class ConfigActivity extends Menu {
         txtInfo.setText(s);
     }
 
-    public void test(){
+    public void test(View view){
         sendMSGSRV("T0|");
     }
 
@@ -223,16 +199,23 @@ public class ConfigActivity extends Menu {
         }
     }
 
-    public void guardar(){
+    public void guardar(View view){
         try {
             SharedPreferences preferencias=getSharedPreferences("configuracion",Context.MODE_PRIVATE);
             SharedPreferences.Editor editor=preferencias.edit();
             editor.putString("dispositivo", lstdispos.getSelectedItem().toString());
             editor.commit();
             Toast.makeText(this,"Datos grabados", Toast.LENGTH_LONG).show();
+
         }catch (Exception e){
 
         }
 
+        Intent i = new Intent(this, MainActivity.class );
+        startActivity(i);
+    }
+
+    public void cancelar (View v) {
+        this.onBackPressed();
     }
 }
