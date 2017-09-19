@@ -421,8 +421,8 @@ Serial.println("----Comienza la escucha-----");
   picosConocidos[1]=48;
   picosConocidos[2]=122;
 */
-  
-  
+setFast();
+Serial.println("----SetFast-----");
     cli();  // UDRE interrupt slows this way down on arduino1.0
     for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
       while(!(ADCSRA & 0x10)); // wait for adc to be ready
@@ -442,7 +442,10 @@ Serial.println("----Comienza la escucha-----");
     sei();
     //Serial.write(255); // send a start byte
     //Serial.write(fht_log_out, FHT_N/2); // send out the data
-
+Serial.println("----Ya Tome las Lecturas-----");
+setNormal();  
+Serial.println("----SetNormal-----");  
+  
     //int picos[128];
     int tresPrimerosPicos[3];
     tresPrimerosPicos[0]=0;
