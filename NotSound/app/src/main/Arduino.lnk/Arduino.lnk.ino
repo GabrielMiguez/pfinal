@@ -13,6 +13,7 @@ String buf="";
 
 bool  modo=0; //modo 0: out, 1: in
 bool estado=0;  //0 lecturea, 1 grabando
+bool normal=1; //SetNormal or fast
 
 int IDSoundGrab=-1;
 int ledPin = 10;
@@ -28,12 +29,14 @@ void setNormal(){
   ADCSRA |= bit (ADPS1);    
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
+  normal=1;
 }
 void setFast(){
   TIMSK0 = 0; // turn off timer0 for lower jitter -->Problemas con el sleep
   ADCSRA = 0xe5; // set the adc to free running mode -->Problemas con el analogRead
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
+  normal=0;
 }
 
 void setup()
@@ -77,6 +80,7 @@ void setup()
 void callback()
 {
   if (modo!=0) return; // modo != OUT => salgo
+  if (normal==0) return; //modo fast me voy
   
   //Serial.println("-----Inicio-----");
   
