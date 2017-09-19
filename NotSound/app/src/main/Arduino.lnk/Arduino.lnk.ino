@@ -53,7 +53,7 @@ void setup()
 
   Serial.begin(BAUDRATE); // use the serial port
 
- 
+  setFast();
   //TIMSK0 = 0; // turn off timer0 for lower jitter -->Problemas con el sleep
   //ADCSRA = 0xe5; // set the adc to free running mode -->Problemas con el analogRead
   //ADMUX = 0x40; // use adc0
@@ -80,23 +80,31 @@ void setup()
 void callback()
 {
   if (modo!=0) return; // modo != OUT => salgo
-  if (normal==0) return; //modo fast me voy
+  //if (normal==0) return; //modo fast me voy
   
-  Serial.println("-----Inicio callback-----");
+  //Serial.println("-----Inicio callback-----");
   
   double arrayOfTops[50];
   int contArrayOfTops=0;
   //Serial.println("--------------Muestras-----------");
   for (int i=0; i<50; i++) {
     //Obtengo todos los valores y los aguardo para tomar lods 20 mas altos
-    int lecturaMic=analogRead(A0);
+    
+    while(!(ADCSRA & 0x10)); // wait for adc to be ready
+    ADCSRA = 0xf5; // restart adc
+    byte m = ADCL; // fetch adc data
+    byte j = ADCH;
+    int k = (j << 8) | m; // form into an int
+    k -= 0x0200; // form into a signed int
+    k <<= 6; // form into a 16b signed int
+    
     //if (lecturaMic <=1023) 
       //Serial.println(lecturaMic);
     
-    arrayOfTops[contArrayOfTops]=lecturaMic;
+    arrayOfTops[contArrayOfTops]=k;
     contArrayOfTops++;
   }
-Serial.println("-----callback Listo lecturas-----");
+//Serial.println("-----callback Listo lecturas-----");
   //Hago burbuja para ordenarlos
   double temp=0;
   for (int i=0; i<50; i++){
@@ -192,17 +200,22 @@ void loop()
        } 
        delay(25) ;
      }
-    Serial.println("Antes modo 0");
+    //Serial.println("Antes modo 0");
     if (modo==0){ // modo OUT
-      Serial.println("modo 0");
+      //Serial.println("modo 0");
       //Vamos leyendo lo que capta el mic
       //si supera valor promedio, prendemos led
-      int lecturaMic=analogRead(A0);
-      //Serial.println(lecturaMic);
+      while(!(ADCSRA & 0x10)); // wait for adc to be ready
+      ADCSRA = 0xf5; // restart adc
+      byte m = ADCL; // fetch adc data
+      byte j = ADCH;
+      int k = (j << 8) | m; // form into an int
+      k -= 0x0200; // form into a signed int
+      k <<= 6; // form into a 16b signed int
       
       
       //if(lecturaMic>(GLOBAL_ruidoPromedio*procentajeSuperacionPromedio)){
-      if(lecturaMic>(GLOBAL_ruidoPromedio +  procentajeSuperacionPromedio)){
+      if(k>(GLOBAL_ruidoPromedio +  procentajeSuperacionPromedio)){
         //Prendo led
         digitalWrite(ledPin1, HIGH);
         //Envio sms x blue
@@ -214,7 +227,7 @@ void loop()
         digitalWrite(ledPin1, LOW);
       }
     }else{ //modo IN
-      Serial.println("modo 1");
+      //Serial.println("modo 1");
       modoPatron();
     }
   }
@@ -426,8 +439,8 @@ Serial.println("----Comienza la escucha-----");
   picosConocidos[1]=48;
   picosConocidos[2]=122;
 */
-setFast();
-Serial.println("----SetFast-----");
+//setFast();
+//Serial.println("----SetFast-----");
     cli();  // UDRE interrupt slows this way down on arduino1.0
     for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
       while(!(ADCSRA & 0x10)); // wait for adc to be ready
@@ -448,8 +461,8 @@ Serial.println("----SetFast-----");
     //Serial.write(255); // send a start byte
     //Serial.write(fht_log_out, FHT_N/2); // send out the data
 Serial.println("----Ya Tome las Lecturas-----");
-setNormal();  
-Serial.println("----SetNormal-----");  
+//setNormal();  
+//Serial.println("----SetNormal-----");  
   
     //int picos[128];
     int tresPrimerosPicos[3];
@@ -594,4 +607,3 @@ Serial.println(valorHastaDondeLeoDeLaEEPROM);
 //digitalWrite(ledPin1, HIGH);
   
 }
-
