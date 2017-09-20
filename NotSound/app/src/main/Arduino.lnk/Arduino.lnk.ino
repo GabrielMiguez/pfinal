@@ -70,6 +70,7 @@ void setup()
 
   Serial.begin(BAUDRATE); // use the serial port
   setFast();
+  BT1.flush();
 }
 
 
@@ -155,10 +156,12 @@ void reccmd(String buf){
   if (buf=="C1"){//out
     modo=0;
     BT1.write("C1|"); //out
+    BT1.flush();
   }
   if (buf=="C2"){//in
     modo=1;
     BT1.write("C2|"); // in
+    BT1.flush();
   }
   
   if (buf=="CE"){
@@ -502,9 +505,10 @@ void modoPatron() {
   Serial.println(valorHastaDondeLeoDeLaEEPROM);
 
   //bool CantCoicidencia[valorHastaDondeLeoDeLaEEPROM]; //vector que guardara la cantida de coincidencias por patron ? tiene sentido, o si le pega a 3 listo adentro?
-  
+  if (valorHastaDondeLeoDeLaEEPROM <= 0) return;
   //Comparo lo que escuché recién con algo conocido
   for (int i = 0 ; i <= valorHastaDondeLeoDeLaEEPROM ; i=i+5) {
+    int idsound=i;
     //Me guardo de a 5
     int picosConocidosDeMemoria[5];
     picosConocidosDeMemoria[0]=EEPROM.read(i);
@@ -521,7 +525,11 @@ void modoPatron() {
     Serial.println(picosConocidosDeMemoria[3]);
     Serial.println(picosConocidosDeMemoria[4]);
     //delay(1000000);
-
+    Serial.println("Vs picos:");
+    Serial.println(tresPrimerosPicosPos[0]);
+    Serial.println(tresPrimerosPicosPos[1]);
+    Serial.println(tresPrimerosPicosPos[2]);
+    
 
     int con=0;
     for (int i = 0 ; i < 3 ; i++) {
@@ -536,7 +544,7 @@ void modoPatron() {
       digitalWrite(ledPin1, HIGH);
       //Envio sms x blue
       BT1.write('N');
-      BT1.print(i);
+      BT1.print(idsound);
       BT1.write('|');
       delay(500000);
       digitalWrite(ledPin1, LOW);
