@@ -103,6 +103,7 @@
         android:layout_below="@+id/img_ImagenSonido"
         android:adjustViewBounds="true"
         android:background="@null"
+        android:onClick="grabarAudio"
         android:scaleType="centerCrop"
         app:srcCompat="@android:drawable/presence_audio_online" />
 
