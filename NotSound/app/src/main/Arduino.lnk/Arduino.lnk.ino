@@ -531,15 +531,28 @@ void modoPatron() {
     Serial.println(tresPrimerosPicosPos[2]);
     
 
+    int picosusado[5];
+    for (int i = 0 ; i < 5 ; i++) picosusado[i]=0;  
     int con=0;
-    for (int i = 0 ; i < 3 ; i++) {
-      for (int p=0; p<=4; p++){
-        if( ((picosConocidosDeMemoria[p]-2)<= tresPrimerosPicosPos[i]) && ((picosConocidosDeMemoria[p]+2)>= tresPrimerosPicosPos[i]) )
+    int delta=1;
+    
+    for (int i = 0 ; i < 3 ; i++) { //los picos
+      for (int p=0; p<=4; p++){// la memo
+        if( 
+              ((picosConocidosDeMemoria[p]-delta)<= tresPrimerosPicosPos[i]) 
+              && ((picosConocidosDeMemoria[p]+delta)>= tresPrimerosPicosPos[i]) 
+              && (picosusado[i]==0) 
+        ){
           con++;
+          picosusado[i]=1;
+          continue;
+        }
       }
     }
     
     if (con>=3){
+      for (int i = 0 ; i < 5 ; i++) Serial.println(picosusado[i]);  
+    
       //Prendo led
       digitalWrite(ledPin1, HIGH);
       //Envio sms x blue
