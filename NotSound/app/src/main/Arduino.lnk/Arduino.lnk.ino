@@ -38,7 +38,20 @@ void setFast(){
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
   normal=0;
-  
+
+  //  ADCSRA |= bit (ADPS0);                               //   2  
+  //  ADCSRA |= bit (ADPS1);                               //   4  
+  //  ADCSRA |= bit (ADPS0) | bit (ADPS1);                 //   8  
+  //  ADCSRA |= bit (ADPS2);                               //  16 
+  //  ADCSRA |= bit (ADPS0) | bit (ADPS2);                 //  32 
+  //  ADCSRA |= bit (ADPS1) | bit (ADPS2);                 //  64 
+  //  ADCSRA |= bit (ADPS0) | bit (ADPS1) | bit (ADPS2);   // 128
+
+  // Set A/D prescale factor to 128
+    // 16 MHz / 128 = 125 KHz, inside the desired 50-200 KHz range.
+    // XXX: this will not work properly for other clock speeds, and
+    // this code should use F_CPU to determine the prescale factor.
+    
   //ojo delay en modo fast
   //delay(100.000); 1s y noarmal 1.000=1s
 }
@@ -56,26 +69,7 @@ void setup()
   Timer1.attachInterrupt(callback);
 
   Serial.begin(BAUDRATE); // use the serial port
-
   setFast();
-  //TIMSK0 = 0; // turn off timer0 for lower jitter -->Problemas con el sleep
-  //ADCSRA = 0xe5; // set the adc to free running mode -->Problemas con el analogRead
-  //ADMUX = 0x40; // use adc0
-  //DIDR0 = 0x01; // turn off the digital input for adc0
-
-  //  ADCSRA |= bit (ADPS0);                               //   2  
-  //  ADCSRA |= bit (ADPS1);                               //   4  
-  //  ADCSRA |= bit (ADPS0) | bit (ADPS1);                 //   8  
-  //  ADCSRA |= bit (ADPS2);                               //  16 
-  //  ADCSRA |= bit (ADPS0) | bit (ADPS2);                 //  32 
-  //  ADCSRA |= bit (ADPS1) | bit (ADPS2);                 //  64 
-  //  ADCSRA |= bit (ADPS0) | bit (ADPS1) | bit (ADPS2);   // 128
-
- // Set A/D prescale factor to 128
-    // 16 MHz / 128 = 125 KHz, inside the desired 50-200 KHz range.
-    // XXX: this will not work properly for other clock speeds, and
-    // this code should use F_CPU to determine the prescale factor.
-
 }
 
 
@@ -85,8 +79,6 @@ void callback()
 {
   if (modo!=0) return; // modo != OUT => salgo
   //if (normal==0) return; //modo fast me voy
-  
-  //Serial.println("-----Inicio callback-----");
   
   double arrayOfTops[50];
   int contArrayOfTops=0;
@@ -108,7 +100,7 @@ void callback()
     arrayOfTops[contArrayOfTops]=k;
     contArrayOfTops++;
   }
-//Serial.println("-----callback Listo lecturas-----");
+
   //Hago burbuja para ordenarlos
   double temp=0;
   for (int i=0; i<50; i++){
@@ -135,28 +127,28 @@ void callback()
 }
 
 void reccmd(String buf){
-        /*
-                 'G|'->Comenzar Grabación (x milisegundos máximos)
-                'P1|'<-Sonido PRE Guardado con ID
+  /*
+      'G|'->Comenzar Grabación (x milisegundos máximos)
+      'P1|'<-Sonido PRE Guardado con ID
 
-                'G1|'->Guardar Sonido ID
-                'G1|'<-Sonido Guardado con ID 1
+      'G1|'->Guardar Sonido ID
+      'G1|'<-Sonido Guardado con ID 1
 
-                'B1|'->Borrar Sonido ID
-                'B1|'<-Sonido Borrado ID
+      'B1|'->Borrar Sonido ID
+      'B1|'<-Sonido Borrado ID
 
-                'T0|'->TEST ID
-                'T0|'<-TEST ID
+      'T0|'->TEST ID
+      'T0|'<-TEST ID
 
-                'C1|'->CONFIG ID NIVEL
-                'C1|'<-CONFIG ID OK
+      'C1|'->CONFIG ID NIVEL
+      'C1|'<-CONFIG ID OK
 
-                ‘C2|'->CONFIG ID NIVEL
-                'C2|'<-CONFIG ID OK
+      ‘C2|'->CONFIG ID NIVEL
+      'C2|'<-CONFIG ID OK
 
-                'NA|'<-Notificación Alerta
-                'N1|'<-Notificación ID
-     */    
+      'NA|'<-Notificación Alerta
+      'N1|'<-Notificación ID
+  */    
   if (buf=="T0"){
     BT1.write("T0|");
   }
@@ -192,18 +184,18 @@ void reccmd(String buf){
 void loop()
 {
   while(1){
-     //lectura del blue
-     if (BT1.available()){
-       c= BT1.read();
-       //Serial.write(c);
-       if( c != '|')    //Hasta que el caracter sea END_CMD_CHAR
-          buf += c;
-       else{
-          reccmd(buf);
-          buf="";
-       } 
-       delay(25) ;
-     }
+    //lectura del blue
+    if (BT1.available()){
+      c= BT1.read();
+      //Serial.write(c);
+      if( c != '|')    //Hasta que el caracter sea END_CMD_CHAR
+         buf += c;
+      else{
+        reccmd(buf);
+        buf="";
+      } 
+      delay(25) ;
+    }
     //Serial.println("Antes modo 0");
     if (modo==0){ // modo OUT
       //Serial.println("modo 0");
@@ -435,179 +427,121 @@ delay(200000);
 
 void modoPatron() {
 
-Serial.println("----Comienza la escucha-----");
-/*
- * //Ejemplo alarma
-  int picosConocidos[3];
-  picosConocidos[0]=30;
-  picosConocidos[1]=48;
-  picosConocidos[2]=122;
-*/
-//setFast();
-//Serial.println("----SetFast-----");
-    cli();  // UDRE interrupt slows this way down on arduino1.0
-    for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
-      while(!(ADCSRA & 0x10)); // wait for adc to be ready
-      ADCSRA = 0xf5; // restart adc
-      byte m = ADCL; // fetch adc data
-      byte j = ADCH;
-      int k = (j << 8) | m; // form into an int
-      k -= 0x0200; // form into a signed int
-      k <<= 6; // form into a 16b signed int
-      fht_input[i] = k; // put real data into bins
-      delayMicroseconds(DELAY_ANCHO_BANDA);      //
-    }
-    fht_window(); // window the data for better frequency response
-    fht_reorder(); // reorder the data before doing the fht
-    fht_run(); // process the data in the fht
-    fht_mag_log(); // take the output of the fht
-    sei();
-    //Serial.write(255); // send a start byte
-    //Serial.write(fht_log_out, FHT_N/2); // send out the data
-Serial.println("----Ya Tome las Lecturas-----");
-//setNormal();  
-//Serial.println("----SetNormal-----");  
+  Serial.println("----Comienza la escucha-----");
+
+  cli();  // UDRE interrupt slows this way down on arduino1.0
+  for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
+    while(!(ADCSRA & 0x10)); // wait for adc to be ready
+    ADCSRA = 0xf5; // restart adc
+    byte m = ADCL; // fetch adc data
+    byte j = ADCH;
+    int k = (j << 8) | m; // form into an int
+    k -= 0x0200; // form into a signed int
+    k <<= 6; // form into a 16b signed int
+    fht_input[i] = k; // put real data into bins
+    delayMicroseconds(DELAY_ANCHO_BANDA);      //
+  }
+  fht_window(); // window the data for better frequency response
+  fht_reorder(); // reorder the data before doing the fht
+  fht_run(); // process the data in the fht
+  fht_mag_log(); // take the output of the fht
+  sei();
+    
+  Serial.println("----Ya Tome las Lecturas-----");
   
-    //int picos[128];
-    int tresPrimerosPicos[3];
-    tresPrimerosPicos[0]=0;
-    tresPrimerosPicos[1]=0;
-    tresPrimerosPicos[2]=0;
-    int tresPrimerosPicosPos[3];
-    tresPrimerosPicosPos[0]=0;
-    tresPrimerosPicosPos[1]=0;
-    tresPrimerosPicosPos[2]=0;
-    for (int i = 0 ; i < FHT_N/2 ; i++) {
-      
-//Serial.println(fht_log_out[i]);
-      
-      //picos[i]=0;
-      //Obtengo los picos
-      if(i!=0){
-        if(fht_log_out[i]>fht_log_out[i-1] && fht_log_out[i]>fht_log_out[i+1] && fht_log_out[i]>35){//AHI PUSE 40 DE REFERENCIA
-          if(fht_log_out[i]>tresPrimerosPicos[0]){
+  //int picos[128];
+  int tresPrimerosPicos[3];
+  tresPrimerosPicos[0]=0;
+  tresPrimerosPicos[1]=0;
+  tresPrimerosPicos[2]=0;
+  int tresPrimerosPicosPos[3];
+  tresPrimerosPicosPos[0]=0;
+  tresPrimerosPicosPos[1]=0;
+  tresPrimerosPicosPos[2]=0;
+  
+  for (int i = 0 ; i < FHT_N/2 ; i++) {
+    //picos[i]=0;
+    //Obtengo los picos
+    if(i!=0){
+      if(fht_log_out[i]>fht_log_out[i-1] && fht_log_out[i]>fht_log_out[i+1] && fht_log_out[i]>35){//AHI PUSE 40 DE REFERENCIA
+        if(fht_log_out[i]>tresPrimerosPicos[0]){
+          tresPrimerosPicos[2]=tresPrimerosPicos[1];
+          tresPrimerosPicosPos[2]=tresPrimerosPicosPos[1];            
+          tresPrimerosPicos[1]=tresPrimerosPicos[0]; 
+          tresPrimerosPicosPos[1]=tresPrimerosPicosPos[0];                       
+          tresPrimerosPicos[0]=fht_log_out[i];
+          tresPrimerosPicosPos[0]=i;
+        }else{
+          if(fht_log_out[i]>tresPrimerosPicos[1]){
             tresPrimerosPicos[2]=tresPrimerosPicos[1];
-            tresPrimerosPicosPos[2]=tresPrimerosPicosPos[1];            
-            tresPrimerosPicos[1]=tresPrimerosPicos[0]; 
-            tresPrimerosPicosPos[1]=tresPrimerosPicosPos[0];                       
-            tresPrimerosPicos[0]=fht_log_out[i];
-            tresPrimerosPicosPos[0]=i;
+            tresPrimerosPicosPos[2]=tresPrimerosPicosPos[1];              
+            tresPrimerosPicos[1]=fht_log_out[i];
+            tresPrimerosPicosPos[1]=i;
           }else{
-            if(fht_log_out[i]>tresPrimerosPicos[1]){
-              tresPrimerosPicos[2]=tresPrimerosPicos[1];
-              tresPrimerosPicosPos[2]=tresPrimerosPicosPos[1];              
-              tresPrimerosPicos[1]=fht_log_out[i];
-              tresPrimerosPicosPos[1]=i;
-            }else{
-              if(fht_log_out[i]>tresPrimerosPicos[2]){
-                tresPrimerosPicos[2]=fht_log_out[i];
-                tresPrimerosPicosPos[2]=i;
-              }
+            if(fht_log_out[i]>tresPrimerosPicos[2]){
+              tresPrimerosPicos[2]=fht_log_out[i];
+              tresPrimerosPicosPos[2]=i;
             }
           }
-          //picos[i]=fht_log_out[i];
         }
+        //picos[i]=fht_log_out[i];
       }
     }
+  }
 
 
-/*Serial.println("-----Picos escuchados------");
-//delay(300000);
+  /*Serial.println("-----Picos escuchados------");
+  //delay(300000);
   for (int i = 0 ; i < 3 ; i++) {
    //Serial.println(tresPrimerosPicosPos[i]);
   }*/
 
 
-  bool boolDeCoincidencia[5];
-  boolDeCoincidencia[0]=false;
-  boolDeCoincidencia[1]=false;
-  boolDeCoincidencia[2]=false;
-  boolDeCoincidencia[3]=false;
-  boolDeCoincidencia[4]=false;
+  int valorHastaDondeLeoDeLaEEPROM=ultimaPosLlenaEEPROM();
+  Serial.println("Hasta donde leo de la EEPROM");
+  Serial.println(valorHastaDondeLeoDeLaEEPROM);
 
-int valorHastaDondeLeoDeLaEEPROM=ultimaPosLlenaEEPROM();
-Serial.println("Hasta donde leo de la EEPROM");
-Serial.println(valorHastaDondeLeoDeLaEEPROM);
+  //bool CantCoicidencia[valorHastaDondeLeoDeLaEEPROM]; //vector que guardara la cantida de coincidencias por patron ? tiene sentido, o si le pega a 3 listo adentro?
+  
+  //Comparo lo que escuché recién con algo conocido
+  for (int i = 0 ; i <= valorHastaDondeLeoDeLaEEPROM ; i=i+5) {
+    //Me guardo de a 5
+    int picosConocidosDeMemoria[5];
+    picosConocidosDeMemoria[0]=EEPROM.read(i);
+    picosConocidosDeMemoria[1]=EEPROM.read(i+1);
+    picosConocidosDeMemoria[2]=EEPROM.read(i+2);
+    picosConocidosDeMemoria[3]=EEPROM.read(i+3);
+    picosConocidosDeMemoria[4]=EEPROM.read(i+4);
 
-    //Comparo lo que escuché recién con algo conocido
-    for (int i = 0 ; i <= valorHastaDondeLeoDeLaEEPROM ; i=i+5) {
-      //Me guardo de a 5
-        int picosConocidosDeMemoria[5];
-        picosConocidosDeMemoria[0]=EEPROM.read(i);
-        picosConocidosDeMemoria[1]=EEPROM.read(i+1);
-        picosConocidosDeMemoria[2]=EEPROM.read(i+2);
-        picosConocidosDeMemoria[3]=EEPROM.read(i+3);
-        picosConocidosDeMemoria[4]=EEPROM.read(i+4);
-
-
-
-        //Lo que leo de la EEPROM:
-        Serial.println("VOy a comparar contra esto de la eeprom:");
-        Serial.println(picosConocidosDeMemoria[0]);
-        Serial.println(picosConocidosDeMemoria[1]);
-        Serial.println(picosConocidosDeMemoria[2]);
-        Serial.println(picosConocidosDeMemoria[3]);
-        Serial.println(picosConocidosDeMemoria[4]);
-        //delay(1000000);
+    //Lo que leo de la EEPROM:
+    Serial.println("VOy a comparar contra esto de la eeprom:");
+    Serial.println(picosConocidosDeMemoria[0]);
+    Serial.println(picosConocidosDeMemoria[1]);
+    Serial.println(picosConocidosDeMemoria[2]);
+    Serial.println(picosConocidosDeMemoria[3]);
+    Serial.println(picosConocidosDeMemoria[4]);
+    //delay(1000000);
 
 
-        for (int i = 0 ; i < 3 ; i++) {
-    
-          if( ((picosConocidosDeMemoria[0]-4)<= tresPrimerosPicosPos[i]) && ((picosConocidosDeMemoria[0]+4)>= tresPrimerosPicosPos[i]) && boolDeCoincidencia[0]==false ){
-            //Encontró
-            boolDeCoincidencia[0]=true;
-          }else{
-            if( ((picosConocidosDeMemoria[1]-4)<= tresPrimerosPicosPos[i]) && ((picosConocidosDeMemoria[1]+4)>= tresPrimerosPicosPos[i]) && boolDeCoincidencia[1]==false ){
-              //Encontro
-              boolDeCoincidencia[1]=true;
-            }else{
-              if( ((picosConocidosDeMemoria[2]-4)<= tresPrimerosPicosPos[i]) && ((picosConocidosDeMemoria[2]+4)>= tresPrimerosPicosPos[i]) && boolDeCoincidencia[2]==false ){
-                //Encontro
-                boolDeCoincidencia[2]=true;
-              }else{
-                if( ((picosConocidosDeMemoria[3]-4)<= tresPrimerosPicosPos[i]) && ((picosConocidosDeMemoria[3]+4)>= tresPrimerosPicosPos[i]) && boolDeCoincidencia[3]==false ){
-                  //Encontro
-                  boolDeCoincidencia[3]=true;
-                }else{
-                  if( ((picosConocidosDeMemoria[4]-4)<= tresPrimerosPicosPos[i]) && ((picosConocidosDeMemoria[4]+4)>= tresPrimerosPicosPos[i]) && boolDeCoincidencia[4]==false ){
-                    //Encontro
-                    boolDeCoincidencia[4]=true;
-                  }
-                }
-              }
-            }
-          }
-        }
-    }
-
-
-    
-
-    int contCoincidencia=0;
-    //Me fijo si hubo o no coincidencia
-
-//Serial.println("-----booles---");
-    
-    for (int i = 0 ; i < 5 ; i++) {
-
-//Serial.println(tresPrimerosPicosPos[i]);
-//Serial.println(boolDeCoincidencia[i]);
-
-      //Serial.println(boolDeCoincidencia[i]);
-      if(boolDeCoincidencia[i]==true){
-        contCoincidencia=contCoincidencia+1;
+    int con=0;
+    for (int i = 0 ; i < 3 ; i++) {
+      for (int p=0; p<=4; p++){
+        if( ((picosConocidosDeMemoria[p]-2)<= tresPrimerosPicosPos[i]) && ((picosConocidosDeMemoria[p]+2)>= tresPrimerosPicosPos[i]) )
+          con++;
       }
     }
-
-    //Serial.println("--------------");
-    //delay(100000);
-
-    if(contCoincidencia>=3){
+    
+    if (con>=3){
       //Prendo led
       digitalWrite(ledPin1, HIGH);
-      delay(1000000);
+      //Envio sms x blue
+      BT1.write('N');
+      BT1.print(i);
+      BT1.write('|');
+      delay(500000);
       digitalWrite(ledPin1, LOW);
+      break;
     }
-//digitalWrite(ledPin1, HIGH);
+  }
   
 }

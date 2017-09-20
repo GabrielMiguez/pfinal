@@ -184,11 +184,11 @@ public class MiServiceIBinder extends Service {
         }
     }
 
-    private void Notificar(){
+    private void Notificar(int idsound){
         long[] vibratePattern = {0, 800};
 
         Intent i = new Intent(getApplicationContext(), SonidoAlertaActivity.class);
-        i.putExtra("sonidoSeleccionado", 99);
+        i.putExtra("sonidoSeleccionado", idsound);
 
         PendingIntent viewPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, i, PendingIntent.FLAG_ONE_SHOT);
 
@@ -213,7 +213,16 @@ public class MiServiceIBinder extends Service {
     {
         try {
             if (s.equals("NA"))
-                Notificar();
+                Notificar(99);
+            else  if (s.charAt(0)=='N'){
+                s=s.substring(1);
+                try{
+                    int i=  Integer.valueOf(s);
+                    Notificar(i);
+                } catch (Exception e) {
+                    Toast.makeText(this, "Error al Notificar Patron", Toast.LENGTH_SHORT).show();
+                }
+            }
 
             sebdbroadcast(s);
         } catch (Exception e) {
