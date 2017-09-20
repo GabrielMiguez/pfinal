@@ -108,6 +108,10 @@ public class ConfigActivity extends Menu {
         sendMSGSRV("T0|");
     }
 
+    public void ClearEPPROM(View view){
+        sendMSGSRV("CE|");
+    }
+
     public void btnOnBluetooth() {
         Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(turnOn, 0);
