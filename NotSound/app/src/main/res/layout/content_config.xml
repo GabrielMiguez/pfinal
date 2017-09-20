@@ -100,11 +100,13 @@
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/btnBuscar"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:clickable="true"
-                app:fabSize="mini"
-                app:srcCompat="@drawable/ic_search_black_24dp" />
+                app:fabSize="normal"
+                app:srcCompat="@drawable/ic_search_black_24dp"
+                android:theme="@style/style_image_button"/>
+                <!--app:backgroundTint="@color/colorSecondary"
+                app:rippleColor="@color/colorPrimary" />-->
 
             <Button
                 android:id="@+id/btnTestcnx"

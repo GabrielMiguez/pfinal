@@ -8,46 +8,85 @@
     tools:context="com.example.gabys.notsound.SonidosEdicionActivity"
     tools:showIn="@layout/activity_sonidos_edicion">
 
-    <TextView
-        android:id="@+id/textView11"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/edtxt_sonidoNombre"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:gravity="center_vertical"
-        android:text="ID de Sonido:"
-        android:textColor="@android:color/black" />
+    <ImageView
+        android:id="@+id/img_ImagenSonido"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentTop="false"
+        android:layout_alignWithParentIfMissing="false"
+        android:layout_below="@+id/ly_Habilitado"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="false"
+        android:layout_centerVertical="false"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        app:srcCompat="@android:drawable/ic_menu_report_image" />
 
-    <TextView
-        android:id="@+id/txtvw_sonidoID"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/ly_ID"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/edtxt_sonidoNombre"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/textView11"
-        android:layout_toRightOf="@+id/textView11"
-        android:gravity="center_vertical"
-        android:paddingLeft="5dp"
-        android:text="(Desconocido)" />
+        android:orientation="horizontal">
 
-    <CheckBox
-        android:id="@+id/chk_Habilitado"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/textView11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentTop="false"
+            android:gravity="center_vertical"
+            android:text="ID de Sonido:"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/txtvw_sonidoID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/edtxt_sonidoNombre"
+            android:layout_alignParentTop="false"
+            android:layout_toEndOf="@+id/textView11"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingLeft="5dp"
+            android:text="(Desconocido)" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ly_Habilitado"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:checked="true"
-        android:text="Habilitado" />
+        android:layout_below="@+id/edtxt_sonidoNombre"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/chk_Habilitado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="Habilitado" />
+    </LinearLayout>
 
     <EditText
         android:id="@+id/edtxt_sonidoNombre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/chk_Habilitado"
+        android:layout_below="@+id/ly_ID"
         android:layout_marginTop="20dp"
         android:elevation="10dp"
         android:ems="10"
@@ -61,89 +100,22 @@
         android:layout_height="50dp"
         android:layout_alignParentBottom="false"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/linearLayout2"
+        android:layout_below="@+id/img_ImagenSonido"
         android:adjustViewBounds="true"
         android:background="@null"
-        android:cropToPadding="false"
-        android:onClick="grabarAudio"
         android:scaleType="centerCrop"
         app:srcCompat="@android:drawable/presence_audio_online" />
 
-    <Button
-        android:id="@+id/btn_Cancelar"
-        style="@style/style_button"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_Guardar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="false"
-        android:layout_weight="1"
-        android:layoutDirection="rtl"
-        android:onClick="cancelarSonidoEdicion"
-        android:text="Cancelar" />
-
-    <Button
-        android:id="@+id/btn_Guardar"
-        style="@style/style_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_weight="1"
-        android:layoutDirection="rtl"
-        android:onClick="guardarSonidoEdicion"
-        android:text="Guardar" />
-
-    <ImageView
-        android:id="@+id/img_ImagenSonido"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_alignParentBottom="false"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentStart="false"
-        android:layout_alignParentTop="false"
-        android:layout_alignWithParentIfMissing="false"
-        android:layout_below="@+id/edtxt_sonidoNombre"
-        android:layout_centerHorizontal="true"
-        android:layout_centerInParent="false"
-        android:layout_centerVertical="false"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
-        app:srcCompat="@android:drawable/ic_menu_report_image" />
-
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/img_ImagenSonido"
-        android:layout_centerHorizontal="true"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btn_CargarImagen"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/img_ImagenSonido"
-            android:layout_weight="1"
-            android:text="Cargar Imagen" />
-
-        <Button
-            android:id="@+id/btn_TomarFoto"
-            android:layout_width="125dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/img_ImagenSonido"
-            android:layout_toRightOf="@+id/btn_CargarImagen"
-            android:layout_weight="1"
-            android:text="Tomar Foto"
-            android:onClick="tomarFoto"
-            style="@style/style_button"/>
-    </LinearLayout>
+        android:clickable="true"
+        android:theme="@style/style_image_button"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/ic_check_black_24dp" />
 
 </RelativeLayout>

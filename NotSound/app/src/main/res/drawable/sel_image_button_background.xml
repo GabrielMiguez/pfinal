@@ -7,13 +7,6 @@
                 android:startColor="@color/color_link_bodyStart"
                 android:endColor="@color/color_link_bodyEnd"
                 android:angle="270" />
-            <corners
-                android:radius="19dp"/>
-            <padding
-                android:left="10dp"
-                android:top="10dp"
-                android:right="5dp"
-                android:bottom="10dp"/>
         </shape>
     </item>
 
@@ -24,13 +17,6 @@
                 android:startColor="@color/color_link_pressed_bodyStart"
                 android:endColor="@color/color_link_pressed_bodyEnd"
                 android:angle="270" />
-            <corners
-                android:radius="19dp"/>
-            <padding
-                android:left="10dp"
-                android:top="10dp"
-                android:right="5dp"
-                android:bottom="10dp"/>
         </shape>
     </item>
 </selector>

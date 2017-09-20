@@ -2,14 +2,6 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="false">
         <layer-list>
-            <!-- SHADOW -->
-            <item>
-                <shape>
-                    <solid android:color="@color/color_link_shadow"/>
-                    <!-- alttan gölge -->
-                    <corners android:radius="19dp"/>
-                </shape>
-            </item>
             <!-- BUTTON alttan gölge
               android:right="5px" to make it round-->
             <item
@@ -21,8 +13,6 @@
                         android:startColor="@color/color_link_bodyStart"
                         android:endColor="@color/color_link_bodyEnd"
                         android:angle="270" />
-                    <corners
-                        android:radius="19dp"/>
                     <padding
                         android:left="10dp"
                         android:top="10dp"
@@ -35,14 +25,6 @@
 
     <item android:state_pressed="true">
         <layer-list>
-            <!-- SHADOW -->
-            <item>
-                <shape>
-                    <solid android:color="@color/color_link_pressed_shadow"/>
-                    <corners android:radius="19dp"/>
-
-                </shape>
-            </item>
             <!-- BUTTON -->
             <item android:bottom="5px">
                 <shape>
@@ -51,8 +33,7 @@
                         android:startColor="@color/color_link_pressed_bodyStart"
                         android:endColor="@color/color_link_pressed_bodyEnd"
                         android:angle="270" />
-                    <corners
-                        android:radius="19dp"/>
+
                     <padding
                         android:left="10dp"
                         android:top="10dp"

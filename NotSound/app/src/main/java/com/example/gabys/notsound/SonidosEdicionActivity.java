@@ -1,18 +1,24 @@
 package com.example.gabys.notsound;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewDebug;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -37,7 +43,6 @@ public class SonidosEdicionActivity extends Menu {
     private EditText txt_sonidoNombre;
     private CheckBox chk_habilitado;
     private ImageView img_imagenSonido;
-    private ImageButton botonGuardar;
     private ImageButton btn_GrabarAudio;
 
     @Override
@@ -46,6 +51,24 @@ public class SonidosEdicionActivity extends Menu {
         setContentView(R.layout.activity_sonidos_edicion);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_Guardar);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                guardarSonidoEdicion(view);
+            }
+        });
+
+        ImageView img = (ImageView) findViewById(R.id.img_ImagenSonido);
+        // set a onclick listener for when the button gets clicked
+        img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openContextMenu(v);
+            }
+        });
+        registerForContextMenu(img);
 
         txt_sonidoID = (TextView)findViewById(R.id.txtvw_sonidoID);
         txt_sonidoNombre = (EditText)findViewById(R.id.edtxt_sonidoNombre);
@@ -86,6 +109,29 @@ public class SonidosEdicionActivity extends Menu {
     }
 
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        if (v.getId() == R.id.img_ImagenSonido) {
+            getMenuInflater().inflate(R.menu.menu_ctx_sonido, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.CtxOpEditar:
+                tomarFoto();
+                break;
+            case R.id.CtxOpBorrar:
+                break;
+        }
+
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
 
         if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
@@ -122,12 +168,8 @@ public class SonidosEdicionActivity extends Menu {
             startActivity(i);
         }
     }
-    public void cancelarSonidoEdicion (View v) {
-        this.onBackPressed();
-    }
 
-
-    public void tomarFoto (View v){
+    public void tomarFoto (){
 
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, CAMERA_REQUEST);

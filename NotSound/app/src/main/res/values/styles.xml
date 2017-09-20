@@ -27,9 +27,10 @@
         <item name="android:layout_marginBottom" >8dp</item>
     </style>
 
-    <style name="style_image_button" >
-        <item name="android:tint" >@drawable/sel_image_button_vector</item>
-        <item name="android:background" >@drawable/sel_image_button_background</item>
+    <style name="style_image_button">
+        <item name="android:tint" >@color/color_text</item>
+        <item name="colorAccent">@color/colorSecondary</item>
+        <item name="colorControlHighlight">@color/colorPrimary</item>
         <item name="android:gravity" >center</item>
         <item name="android:layout_marginLeft" >8dp</item>
         <item name="android:layout_marginRight" >8dp</item>
