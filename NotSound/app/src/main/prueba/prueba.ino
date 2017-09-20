@@ -25,10 +25,11 @@ double procentajeSuperacionPromedio=30;
 char c;
 
 void setNormal(){
-  TIMSK0 = 1; // turn off timer0 for lower jitter -->Problemas con el sleep
-  ADCSRA |= bit (ADPS1);    
-  ADMUX = 0x40; // use adc0
-  DIDR0 = 0x01; // turn off the digital input for adc0
+  //TIMSK0 = 1; // turn off timer0 for lower jitter -->Problemas con el sleep
+  //ADCSRA |= bit (ADPS1);    
+  //ADMUX = 0x40; // use adc0
+  //DIDR0 = 0x01; // turn off the digital input for adc0
+  //delay(1000);
   normal=1;
 }
 void setFast(){
@@ -36,6 +37,7 @@ void setFast(){
   ADCSRA = 0xe5; // set the adc to free running mode -->Problemas con el analogRead
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
+  //delay(1000);
   normal=0;
 }
 
@@ -53,6 +55,7 @@ void setup()
 
   Serial.begin(BAUDRATE); // use the serial port
 
+  setFast();
  
   //TIMSK0 = 0; // turn off timer0 for lower jitter -->Problemas con el sleep
   //ADCSRA = 0xe5; // set the adc to free running mode -->Problemas con el analogRead
@@ -82,7 +85,7 @@ void callback()
   if (modo!=0) return; // modo != OUT => salgo
   if (normal==0) return; //modo fast me voy
   
-  Serial.println("-----Inicio callback-----");
+  Serial.println("**");
   
 }
 
@@ -116,7 +119,7 @@ void reccmd(String buf){
   }
   
   if (buf=="CE"){
-    cleanEEPROM();
+    //cleanEEPROM();
     BT1.write("CE|"); // Format EEPROM
   }
 
@@ -150,9 +153,28 @@ void loop()
        } 
        delay(25) ;
      }
-    Serial.println("Antes modo 0");
+    Serial.println("A0");
+    delay(100000);
     if (modo==0){ // modo OUT
-      Serial.println("modo 0");
+      Serial.println("M0");
+      //int lecturaMic=analogRead(A0);
+      //Serial.println(lecturaMic);
+
+      //setFast();
+      //Serial.println("----SetFast-----");
+      
+          while(!(ADCSRA & 0x10)); // wait for adc to be ready
+          ADCSRA = 0xf5; // restart adc
+          byte m = ADCL; // fetch adc data
+          byte j = ADCH;
+          int k = (j << 8) | m; // form into an int
+          Serial.println(k);
+          
+      //Serial.println("----Ya Tome las Lecturas-----");
+      //setNormal();  
+      //Serial.println("----SetNormal-----");
+      
+      //delay(1000);
       
     }else{ //modo IN
       Serial.println("modo 1");
@@ -161,41 +183,22 @@ void loop()
   }
 }
 
-int primeraPosVaciaEEPROM(){
-   for (int i = 0 ; i < EEPROM.length() ; i++) {
-    if(EEPROM.read(i)==0)	return i;
-   }
-   
-   //EEPROM LLENA
-   return 0;
-}
-
-
-int ultimaPosLlenaEEPROM(){
-  if(EEPROM.read(0)==0)	return 0;
-
-  for (int i = 0 ; i < EEPROM.length() ; i++) {
-    if(EEPROM.read(i+1)==0)	return i; 
-  }  
-  return EEPROM.length();
-}
-
-void cleanEEPROM(){
-  for (int i = 0 ; i < EEPROM.length() ; i++) {
-    EEPROM.write(i, 0);
-  }
-}
-
 void grabar(){  
 }
 
 void modoPatron() {
-	Serial.println("----Comienza la escucha-----");
+	//setFast();
+	//Serial.println("----SetFast-----");
 	
-	setFast();
-	Serial.println("----SetFast-----");
-		
-	Serial.println("----Ya Tome las Lecturas-----");
-	setNormal();  
-	Serial.println("----SetNormal-----");  
+	    while(!(ADCSRA & 0x10)); // wait for adc to be ready
+      ADCSRA = 0xf5; // restart adc
+      byte m = ADCL; // fetch adc data
+      byte j = ADCH;
+      int k = (j << 8) | m; // form into an int
+      Serial.println(k);
+    	
+	//Serial.println("----Ya Tome las Lecturas-----");
+	//setNormal();  
+	//Serial.println("----SetNormal-----");
+  //delay(1000);  
 }

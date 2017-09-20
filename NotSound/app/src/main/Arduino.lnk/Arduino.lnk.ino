@@ -8,6 +8,7 @@
 #define DELAY_ANCHO_BANDA 74  //74 para B.W=6400Hz y Resolucion=50Hz.   75 para simulacion Proteus
 SoftwareSerial BT1(4,2); // RX, TX recorder que se cruzan
 
+
 String rea="";
 String buf="";
 
@@ -37,6 +38,9 @@ void setFast(){
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
   normal=0;
+  
+  //ojo delay en modo fast
+  //delay(100.000); 1s y noarmal 1.000=1s
 }
 
 void setup()
@@ -95,8 +99,8 @@ void callback()
     byte m = ADCL; // fetch adc data
     byte j = ADCH;
     int k = (j << 8) | m; // form into an int
-    k -= 0x0200; // form into a signed int
-    k <<= 6; // form into a 16b signed int
+    //k -= 0x0200; // form into a signed int
+    //k <<= 6; // form into a 16b signed int
     
     //if (lecturaMic <=1023) 
       //Serial.println(lecturaMic);
@@ -210,8 +214,8 @@ void loop()
       byte m = ADCL; // fetch adc data
       byte j = ADCH;
       int k = (j << 8) | m; // form into an int
-      k -= 0x0200; // form into a signed int
-      k <<= 6; // form into a 16b signed int
+      //k -= 0x0200; // form into a signed int
+      //k <<= 6; // form into a 16b signed int
       
       
       //if(lecturaMic>(GLOBAL_ruidoPromedio*procentajeSuperacionPromedio)){
@@ -222,7 +226,7 @@ void loop()
         BT1.write("NA|");
         
         callback();
-        delay(2000);
+        delay(200000);
       }else{
         digitalWrite(ledPin1, LOW);
       }
