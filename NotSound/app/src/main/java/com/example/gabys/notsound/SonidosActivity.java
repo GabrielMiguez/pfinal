@@ -23,7 +23,6 @@ public class SonidosActivity extends Menu {
     public static int SONIDO_NUEVO = 98;
 
     private AdaptadorSonidos adaptador;
-    private FloatingActionButton fab;
 
     private Sonidos sonidos;
     private ArrayList<Sonido> sonidosSinAlertaExterna;
@@ -33,17 +32,6 @@ public class SonidosActivity extends Menu {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sonidos);
         super.CreateMenu();
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_SonidoNuevo);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), SonidosEdicionActivity.class);
-                //i.putExtra("sonidos", sonidos);
-                i.putExtra("sonidoSeleccionado", SONIDO_NUEVO);
-                startActivity(i);
-            }
-        });
 
         sonidos = new Sonidos();
         sonidos.loadSonidos(getApplicationContext());
@@ -128,5 +116,11 @@ public class SonidosActivity extends Menu {
 
             return(item);
         }
+    }
+
+    public void CrearNuevoSonido(View view){
+        Intent i = new Intent(getApplicationContext(), SonidosEdicionActivity.class);
+        i.putExtra("sonidoSeleccionado", SONIDO_NUEVO);
+        startActivity(i);
     }
 }

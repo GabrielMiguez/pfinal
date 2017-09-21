@@ -104,7 +104,7 @@
                 android:clickable="true"
                 app:fabSize="normal"
                 app:srcCompat="@drawable/ic_search_black_24dp"
-                android:theme="@style/style_image_button"/>
+                android:theme="@style/style_fab_button_ok"/>
                 <!--app:backgroundTint="@color/colorSecondary"
                 app:rippleColor="@color/colorPrimary" />-->
 

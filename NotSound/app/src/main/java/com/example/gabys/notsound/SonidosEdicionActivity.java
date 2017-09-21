@@ -23,6 +23,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,33 +33,20 @@ import java.io.OutputStream;
 
 public class SonidosEdicionActivity extends Menu {
     private static final int CAMERA_REQUEST = 1888;
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private Sonidos sonidos;
     private int itemSeleccionado;
     private int IDSonido_grabado=-1;
-    //private Bitmap imagen;
 
     private TextView txt_sonidoID;
     private EditText txt_sonidoNombre;
-    private CheckBox chk_habilitado;
+    private Switch chk_habilitado;
     private ImageView img_imagenSonido;
-    private ImageButton btn_GrabarAudio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sonidos_edicion);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_Guardar);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                guardarSonidoEdicion(view);
-            }
-        });
 
         ImageView img = (ImageView) findViewById(R.id.img_ImagenSonido);
         // set a onclick listener for when the button gets clicked
@@ -70,16 +58,19 @@ public class SonidosEdicionActivity extends Menu {
         });
         registerForContextMenu(img);
 
-        txt_sonidoID = (TextView)findViewById(R.id.txtvw_sonidoID);
-        txt_sonidoNombre = (EditText)findViewById(R.id.edtxt_sonidoNombre);
-        chk_habilitado = (CheckBox) findViewById(R.id.chk_Habilitado);
-        img_imagenSonido = (ImageView)findViewById(R.id.img_ImagenSonido);
-        btn_GrabarAudio = (ImageButton) findViewById(R.id.btn_GrabarAudio);
-        sonidos = new Sonidos();
-        sonidos.loadSonidos(getApplicationContext());
-
         //Levanto los parametros con los datos del Sonido a Editar
         itemSeleccionado = (int) getIntent().getSerializableExtra("sonidoSeleccionado");
+
+        if (itemSeleccionado == Sonidos.POSICION_SONIDO_ALERTA_EXTERNA){
+            super.CreateMenu();
+        }
+
+        txt_sonidoID = (TextView)findViewById(R.id.txtvw_sonidoID);
+        txt_sonidoNombre = (EditText)findViewById(R.id.edtxt_sonidoNombre);
+        chk_habilitado = (Switch) findViewById(R.id.sw_Habilitado);
+        img_imagenSonido = (ImageView)findViewById(R.id.img_ImagenSonido);
+        sonidos = new Sonidos();
+        sonidos.loadSonidos(getApplicationContext());
 
         if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO){
             Sonido sonido = sonidos.getSonidoByPosition(itemSeleccionado);
@@ -113,7 +104,7 @@ public class SonidosEdicionActivity extends Menu {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         if (v.getId() == R.id.img_ImagenSonido) {
-            getMenuInflater().inflate(R.menu.menu_ctx_sonido, menu);
+            getMenuInflater().inflate(R.menu.menu_ctx_imagen, menu);
         }
     }
 
@@ -121,10 +112,10 @@ public class SonidosEdicionActivity extends Menu {
     public boolean onContextItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.CtxOpEditar:
+            case R.id.CtxOpTomarFoto:
                 tomarFoto();
                 break;
-            case R.id.CtxOpBorrar:
+            case R.id.CtxOpCargarImagen:
                 break;
         }
 
