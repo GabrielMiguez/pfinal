@@ -2,22 +2,14 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="false">
         <layer-list>
-            <!-- BUTTON alttan gölge
+           <!-- BUTTON alttan gölge
               android:right="5px" to make it round-->
             <item
                 android:bottom="5px"
                 >
-                <shape>
-                    <padding android:bottom="5dp"/>
-                    <gradient
-                        android:startColor="@color/color_link_bodyStart"
-                        android:endColor="@color/color_link_bodyEnd"
-                        android:angle="270" />
-                    <padding
-                        android:left="10dp"
-                        android:top="10dp"
-                        android:right="5dp"
-                        android:bottom="10dp"/>
+                <shape xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:shape="rectangle">
+                    <solid android:color="#e7fafafa"/>
                 </shape>
             </item>
         </layer-list>
@@ -25,14 +17,14 @@
 
     <item android:state_pressed="true">
         <layer-list>
-            <!-- BUTTON -->
             <item android:bottom="5px">
                 <shape>
                     <padding android:bottom="5dp"/>
                     <gradient
-                        android:startColor="@color/color_link_pressed_bodyStart"
-                        android:endColor="@color/color_link_pressed_bodyEnd"
-                        android:angle="270" />
+                        android:startColor="@android:color/white"
+                        android:endColor="@color/colorSecondaryLight"
+                        android:gradientRadius="500"
+                        android:type="radial"/>
 
                     <padding
                         android:left="10dp"

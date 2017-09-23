@@ -85,12 +85,12 @@
 
         <Switch
             android:id="@+id/sw_Habilitado"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.08"
             android:checked="true"
             android:splitTrack="false"
-            android:text="Habilitado:"
+            android:text="Habilitado"
             android:textSize="18sp"
             tools:checked="false" />
     </LinearLayout>
@@ -132,7 +132,7 @@
         android:layout_centerHorizontal="true"
         android:clickable="true"
         android:onClick="grabarAudio"
-        android:theme="@style/style_fab_button_action"
+        android:theme="@style/style_fab_button_search"
         app:fabSize="normal"
         app:srcCompat="@drawable/ic_mic_black_24dp" />
 

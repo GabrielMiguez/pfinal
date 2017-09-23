@@ -9,109 +9,122 @@
     tools:showIn="@layout/activity_config">
 
     <LinearLayout
-        android:id="@+id/ly_bluetooth"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:orientation="horizontal"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp">
-
-        <TextView
-            android:id="@+id/textView15"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:text="Bluetooth  "
-            android:textSize="18sp" />
-
-        <Switch
-            android:id="@+id/swB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            tools:checked="false" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ly_modo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/ly_bluetooth"
-        android:orientation="horizontal"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp">
-
-        <TextView
-            android:id="@+id/textView18"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:text="Modo OUT"
-            android:textSize="18sp" />
-
-        <Switch
-            android:id="@+id/swM"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            tools:checked="false" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="IN"
-            android:textSize="18sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ly_dispositivos"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/ly_modo"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/textView16"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="Dispositivo"
-            android:textSize="18sp" />
+        <LinearLayout
+            android:id="@+id/ly_bluetooth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
+
+            <Switch
+                android:id="@+id/swB"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:text="Bluetooth"
+                android:textSize="18sp"
+                tools:checked="false" />
+
+        </LinearLayout>
+
+        <View style="@style/style_linea_divisora" />
 
         <LinearLayout
+            android:id="@+id/ly_modo"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ly_bluetooth"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
 
-            <Spinner
-                android:id="@+id/lstDispos"
+            <Switch
+                android:id="@+id/swM"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:text="Modo"
+                android:textOff="Exterior"
+                android:textOn="Interior"
+                android:textSize="18sp"
+                tools:checked="false" />
+
+        </LinearLayout>
+
+        <View style="@style/style_linea_divisora" />
+
+        <LinearLayout
+            android:id="@+id/ly_dispositivos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ly_modo"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView16"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="10"
-                android:spinnerMode="dialog"
-                android:visibility="visible" />
+                android:gravity="center_vertical"
+                android:text="Dispositivo"
+                android:textColor="@color/color_text"
+                android:textSize="18sp" />
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/btnBuscar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                app:fabSize="normal"
-                app:srcCompat="@drawable/ic_search_black_24dp"
-                android:theme="@style/style_fab_button_ok"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/lstDispos"
+                    style="@style/spinner_style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="10"
+                    android:spinnerMode="dialog"
+                    android:visibility="visible" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/btnBuscar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:clickable="true"
+                    android:onClick="btnBuscar"
+                    android:theme="@style/style_fab_button_search"
+                    app:backgroundTint="@android:color/white"
+                    app:borderWidth="2dp"
+                    app:fabSize="normal"
+                    app:srcCompat="@drawable/ic_search_black_24dp" />
                 <!--app:backgroundTint="@color/colorSecondary"
                 app:rippleColor="@color/colorPrimary" />-->
+
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btnTestcnx"
                 style="@style/style_button"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:onClick="test"
@@ -119,73 +132,74 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+        <View style="@style/style_linea_divisora" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/ly_dispositivos"
-        android:layout_marginTop="7dp"
-        android:orientation="horizontal"
-        android:id="@+id/linearLayout3">
-
-        <Button
-            android:id="@+id/btnClearEPPROM"
-            style="@style/style_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_weight="1"
-            android:layoutDirection="rtl"
-            android:onClick="ClearEPPROM"
-            android:text="Clear EP" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/btnCancelar"
-        android:layout_alignStart="@+id/btnCancelar"
-        android:layout_below="@+id/linearLayout3"
-        android:layout_marginLeft="25dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/txtInfo"
+        <LinearLayout
+            android:id="@+id/ly_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/ly_dispositivos"
-            android:layout_weight="1" />
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="Info"
+                android:textColor="@color/color_text"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/txtInfo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/ly_dispositivos" />
+
+        </LinearLayout>
+
+        <View style="@style/style_linea_divisora" />
+
+        <LinearLayout
+            android:id="@+id/ly_reset"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/ly_info"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btnClearEPPROM"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="?android:attr/colorBackground"
+                android:onClick="ClearEPPROM"
+                android:text="Restablecer valores por defecto " />
+
+        </LinearLayout>
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btnCancelar"
-        style="@style/style_button"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="false"
-        android:layout_weight="1"
-        android:layoutDirection="rtl"
-        android:onClick="cancelar"
-        android:text="Cancelar" />
-
-    <Button
-        android:id="@+id/btnGuardar"
-        style="@style/style_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_weight="1"
-        android:layoutDirection="rtl"
+        android:clickable="true"
         android:onClick="guardar"
-        android:text="Guardar" />
+        android:theme="@style/style_fab_button_ok"
+        app:fabSize="normal"
+        app:srcCompat="@drawable/ic_check_black_24dp" />
 
 </RelativeLayout>

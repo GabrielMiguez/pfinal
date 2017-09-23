@@ -10,9 +10,9 @@
     <color name="color_link_bodyStart">@color/colorSecondaryLight</color>
     <color name="color_link_bodyEnd">@color/colorSecondary</color>
     <color name="color_link_shadow">@color/colorSecondaryDark</color>
-    <color name="color_link_pressed_bodyStart">@color/colorPrimaryLight</color>
-    <color name="color_link_pressed_bodyEnd">@color/colorPrimary</color>
-    <color name="color_link_pressed_shadow">@color/colorPrimaryDark</color>
+    <color name="color_link_pressed_bodyStart">@color/colorSecondary</color>
+    <color name="color_link_pressed_bodyEnd">@color/colorSecondaryDark</color>
+    <color name="color_link_pressed_shadow">@color/colorSecondaryDark</color>
 
     <color name="color_text">#000000</color>
     <color name="color_text_pressed">#ffffff</color>

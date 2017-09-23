@@ -27,7 +27,7 @@
         android:layout_marginRight="16dp"
         android:clickable="true"
         android:onClick="CrearNuevoSonido"
-        android:theme="@style/style_fab_button_action"
+        android:theme="@style/style_fab_button_new"
         app:fabSize="normal"
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="bottom|right"

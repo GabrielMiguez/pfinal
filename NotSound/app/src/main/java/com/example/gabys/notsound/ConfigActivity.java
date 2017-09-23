@@ -65,12 +65,6 @@ public class ConfigActivity extends Menu {
             }
         }
 
-        btnBuscar.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                btnBuscar();
-            }
-        });
-
         swB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -137,7 +131,7 @@ public class ConfigActivity extends Menu {
         }
     }
 
-    public void btnBuscar() {
+    public void btnBuscar(View view) {
         Toast notificacion = Toast.makeText(this, "Buscando...", Toast.LENGTH_LONG);
         notificacion.show();
 
@@ -217,9 +211,5 @@ public class ConfigActivity extends Menu {
 
         Intent i = new Intent(this, MainActivity.class );
         startActivity(i);
-    }
-
-    public void cancelar (View v) {
-        this.onBackPressed();
     }
 }
