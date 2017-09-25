@@ -128,7 +128,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:onClick="test"
-                android:text="Test" />
+                android:text="Probar conexión" />
 
         </LinearLayout>
 
