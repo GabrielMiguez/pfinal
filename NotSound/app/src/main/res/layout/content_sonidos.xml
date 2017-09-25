@@ -27,12 +27,13 @@
         android:layout_marginRight="16dp"
         android:clickable="true"
         android:onClick="CrearNuevoSonido"
+        android:scaleType="center"
         android:theme="@style/style_fab_button_new"
         app:fabSize="normal"
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="bottom|right"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_add" />
+        app:srcCompat="@android:drawable/ic_input_add" />
 
 </android.support.constraint.ConstraintLayout>

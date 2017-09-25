@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 /**
@@ -80,6 +81,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         // se configura quien atender el eventero selected
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     @Override
@@ -179,16 +181,24 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
         if (id == R.id.nav_sonidos) {
             Intent i = new Intent(this, SonidosActivity.class );
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
         } else if (id == R.id.nav_alerta_externa) {
             Intent i = new Intent(this, SonidosEdicionActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             i.putExtra("sonidoSeleccionado", Sonidos.POSICION_SONIDO_ALERTA_EXTERNA); // Sonido Alerta
             startActivity(i);
         } else if (id == R.id.nav_configuracion) {
             Intent i = new Intent(this, ConfigActivity.class );
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
         } else if (id == R.id.nav_nosotros) {
             Intent i = new Intent(this, NosotrosActivity.class );
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
 
         }
@@ -204,12 +214,19 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            //super.onBackPressed();
-
-            Intent i = new Intent(this, MainActivity.class );
-            startActivity(i);
+            if(this.getClass().getSimpleName().equals("MainActivity") ){
+                finish();
+            } else {
+                Intent i = new Intent(this, MainActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(i);
+            }
         }
     }
 
+    public void abrirAyuda(View view){
+
+    }
 
 }

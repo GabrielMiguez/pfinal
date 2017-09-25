@@ -7,8 +7,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.Button;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
+import android.widget.Toast;;
+import android.view.Gravity;
+import android.view.ViewGroup.LayoutParams;
 
 public class MainActivity extends Menu {
 
@@ -55,4 +62,34 @@ public class MainActivity extends Menu {
 */
     }
 
+    @Override
+    public void abrirAyuda(View view) {
+
+        // Initialize a new instance of LayoutInflater service
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        // Inflate the custom layout/view
+        View customView = inflater.inflate(R.layout.popup_element,null);
+
+
+        // Initialize a new instance of popup window
+        final PopupWindow mPopupWindow = new PopupWindow(
+                customView,
+                LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT
+        );
+
+        // Set a click listener for the popup window close button
+        Button closeButton = (Button) customView.findViewById(R.id.end_data_send_button);
+
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Dismiss the popup window
+                mPopupWindow.dismiss();
+            }
+        });
+
+        mPopupWindow.showAtLocation((DrawerLayout) findViewById(R.id.drawer_layout), Gravity.CENTER,0,0);
+    }
 }

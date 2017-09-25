@@ -4,11 +4,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.IntegerRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -33,6 +35,7 @@ import java.io.OutputStream;
 
 public class SonidosEdicionActivity extends Menu {
     private static final int CAMERA_REQUEST = 1888;
+    private static int RESULT_LOAD_IMAGE = 1;
 
     private Sonidos sonidos;
     private int itemSeleccionado;
@@ -60,10 +63,6 @@ public class SonidosEdicionActivity extends Menu {
 
         //Levanto los parametros con los datos del Sonido a Editar
         itemSeleccionado = (int) getIntent().getSerializableExtra("sonidoSeleccionado");
-
-        if (itemSeleccionado == Sonidos.POSICION_SONIDO_ALERTA_EXTERNA){
-            super.CreateMenu();
-        }
 
         txt_sonidoID = (TextView)findViewById(R.id.txtvw_sonidoID);
         txt_sonidoNombre = (EditText)findViewById(R.id.edtxt_sonidoNombre);
@@ -116,6 +115,7 @@ public class SonidosEdicionActivity extends Menu {
                 tomarFoto();
                 break;
             case R.id.CtxOpCargarImagen:
+                cargarImagen();
                 break;
         }
 
@@ -129,6 +129,22 @@ public class SonidosEdicionActivity extends Menu {
             Bitmap imagen = (Bitmap) data.getExtras().get("data");
             img_imagenSonido.setImageBitmap(imagen);
         }
+
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+            Cursor cursor = getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+
+            img_imagenSonido.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+
+        }
     }
 
     public void guardarSonidoEdicion (View v){
@@ -136,7 +152,7 @@ public class SonidosEdicionActivity extends Menu {
         if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){ IDSonido = Integer.parseInt(txt_sonidoID.getText().toString()); }
         String nombreSonido = txt_sonidoNombre.getText().toString();
         Boolean estaHabilitado = chk_habilitado.isChecked();
-        String rutaFoto = getExternalFilesDir(null) + "/" + nombreSonido + ".png";
+        String rutaFoto = getExternalFilesDir(null) + "/" + Integer.toString(IDSonido) + "_" + nombreSonido + ".png";
 
         img_imagenSonido.buildDrawingCache();
         Bitmap imagen = img_imagenSonido.getDrawingCache();
@@ -154,10 +170,7 @@ public class SonidosEdicionActivity extends Menu {
             sonidos.addSonido(getApplicationContext(), sonidoNuevo);
         }
 
-        if (itemSeleccionado != Sonidos.POSICION_SONIDO_ALERTA_EXTERNA) {
-            Intent i = new Intent(getApplicationContext(), SonidosActivity.class );
-            startActivity(i);
-        }
+        this.onBackPressed();
     }
 
     public void tomarFoto (){
@@ -167,6 +180,15 @@ public class SonidosEdicionActivity extends Menu {
 
     }
 
+    public void cargarImagen (){
+
+        Intent i = new Intent(
+                Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        startActivityForResult(i, RESULT_LOAD_IMAGE);
+
+    }
 
     public boolean saveImage(Bitmap image, String fullPathFile) {
 
