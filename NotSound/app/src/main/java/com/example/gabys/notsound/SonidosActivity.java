@@ -33,6 +33,23 @@ public class SonidosActivity extends Menu {
         setContentView(R.layout.activity_sonidos);
         super.CreateMenu();
 
+        String menuAyuda_titulo1="Agregar";
+        String menuAyuda_cuerpo1="Presione el botón flotante para añadir un sonido a la lista.";
+        String menuAyuda_titulo2="Editar";
+        String menuAyuda_cuerpo2="Mantenga presionado el sonido que desea editar y luego elija la opción \"Editar\".";
+        String menuAyuda_titulo3="Borrar";
+        String menuAyuda_cuerpo3="Mantenga presionado el sonido que desea borrar y luego elija la opción \"Borrar\".";
+
+        super.setAyudaParametros(
+                menuAyuda_titulo1,
+                menuAyuda_cuerpo1,
+                menuAyuda_titulo2,
+                menuAyuda_cuerpo2,
+                menuAyuda_titulo3,
+                menuAyuda_cuerpo3,
+                null,
+                null);
+
         sonidos = new Sonidos();
         sonidos.loadSonidos(getApplicationContext());
         // Cargo la lista de sonidos sin el Alerta Externa. Este arraylist va a servir solo para mostrar visualmente los sonidos. No actualiza el archivo de sonidos
@@ -74,7 +91,7 @@ public class SonidosActivity extends Menu {
                 dialogo1.setCancelable(false);
                 dialogo1.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogo1, int id) {
-                        sonidos.removeSonido(getApplicationContext(), itemSelected_sonidosCompleto); // Actualizo la lista completa de los sonidos guardados
+                        sonidos.removeSonidoByPosition(getApplicationContext(), itemSelected_sonidosCompleto); // Actualizo la lista completa de los sonidos guardados
                         sonidosSinAlertaExterna.remove(itemSelected_sonidosSinAlertaExterna); // Actualizo la lista de los sonidos que se visualizan
                         adaptador.notifyDataSetChanged();
                     }

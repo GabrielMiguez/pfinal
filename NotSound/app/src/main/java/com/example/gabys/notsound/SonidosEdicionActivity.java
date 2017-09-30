@@ -51,6 +51,8 @@ public class SonidosEdicionActivity extends Menu {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sonidos_edicion);
 
+        super.CreateMenu();
+
         ImageView img = (ImageView) findViewById(R.id.img_ImagenSonido);
         // set a onclick listener for when the button gets clicked
         img.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +65,40 @@ public class SonidosEdicionActivity extends Menu {
 
         //Levanto los parametros con los datos del Sonido a Editar
         itemSeleccionado = (int) getIntent().getSerializableExtra("sonidoSeleccionado");
+
+        //Seteo el texto del menu de ayuda
+        String menuAyuda_titulo1="";
+        String menuAyuda_cuerpo1="";
+        String menuAyuda_titulo2="";
+        String menuAyuda_cuerpo2="";
+        String menuAyuda_titulo3="";
+        String menuAyuda_cuerpo3="";
+        String menuAyuda_titulo4="";
+        String menuAyuda_cuerpo4="";
+
+        if (itemSeleccionado == Sonidos.POSICION_SONIDO_ALERTA_EXTERNA) {
+            menuAyuda_titulo1="Imagen";
+            menuAyuda_cuerpo1="Presione el recuadro de imagen que identifique al alerta externa. Al detectarse un alerta externa se mostrará esta imagen como notificación.";
+        } else {
+            menuAyuda_titulo1="ID de Sonido";
+            menuAyuda_cuerpo1="Informa el número que identifica al Sonido.";
+            menuAyuda_titulo2="Habilitado";
+            menuAyuda_cuerpo2="Habilite o deshabilite la detección de este Sonido.";
+            menuAyuda_titulo3="Imagen";
+            menuAyuda_cuerpo3="Presione el recuadro de imagen que identifique al alerta externa. Al detectarse un alerta externa se mostrará esta imagen como notificación.";
+            menuAyuda_titulo4="Grabar Sonido";
+            menuAyuda_cuerpo4="Presione el botón para iniciar la grabación del Sonido en el dispositivo electrónico.";
+        }
+
+        super.setAyudaParametros(
+                menuAyuda_titulo1,
+                menuAyuda_cuerpo1,
+                menuAyuda_titulo2,
+                menuAyuda_cuerpo2,
+                menuAyuda_titulo3,
+                menuAyuda_cuerpo3,
+                menuAyuda_titulo4,
+                menuAyuda_cuerpo4);
 
         txt_sonidoID = (TextView)findViewById(R.id.txtvw_sonidoID);
         txt_sonidoNombre = (EditText)findViewById(R.id.edtxt_sonidoNombre);
@@ -157,9 +193,12 @@ public class SonidosEdicionActivity extends Menu {
         img_imagenSonido.buildDrawingCache();
         Bitmap imagen = img_imagenSonido.getDrawingCache();
 
-        saveImage(imagen, rutaFoto);
 
         if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO) {
+
+            File file = new File(sonidos.getSonidoByPosition(itemSeleccionado).getRutaFoto());
+            file.delete();
+
             sonidos.setSonido(itemSeleccionado,(new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado)));
             sonidos.saveSonidos(getApplicationContext());
         }
@@ -169,6 +208,8 @@ public class SonidosEdicionActivity extends Menu {
             Sonido sonidoNuevo = new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado);
             sonidos.addSonido(getApplicationContext(), sonidoNuevo);
         }
+
+        saveImage(imagen, rutaFoto);
 
         this.onBackPressed();
     }

@@ -42,6 +42,25 @@ public class ConfigActivity extends Menu {
         setContentView(R.layout.activity_config);
         super.CreateMenu();
 
+        String menuAyuda_titulo1="Bluetooth";
+        String menuAyuda_cuerpo1="Habilite el bluetooth para que la aplicación funcione correctamente. La función de deshabilitarlo no está permitida";
+        String menuAyuda_titulo2="Modo";
+        String menuAyuda_cuerpo2="Intercambie los modos de funcionamiente según en el ambiente en que se encuentre.";
+        String menuAyuda_titulo3="Dispositivo";
+        String menuAyuda_cuerpo3="Busque el dispositivo electrónico al que quiere conectarse.";
+        String menuAyuda_titulo4="Restablecer valores por defecto";
+        String menuAyuda_cuerpo4="Borre los sonidos almacenados en el dispositivo electrónico y en la aplicación mobile.";
+
+        super.setAyudaParametros(
+                menuAyuda_titulo1,
+                menuAyuda_cuerpo1,
+                menuAyuda_titulo2,
+                menuAyuda_cuerpo2,
+                menuAyuda_titulo3,
+                menuAyuda_cuerpo3,
+                menuAyuda_titulo4,
+                menuAyuda_cuerpo4);
+
         swB = (Switch) findViewById(R.id.swB);
         swM = (Switch) findViewById(R.id.swM);
         lstdispos = (Spinner) findViewById(R.id.lstDispos);
@@ -103,6 +122,15 @@ public class ConfigActivity extends Menu {
     }
 
     public void ClearEPPROM(View view){
+
+        // Limpio los sonidos y vuelvo a insertar el sonido de alerta externa por defecto
+        Sonidos sonidos = new Sonidos();
+        sonidos.loadSonidos(getApplicationContext());
+        sonidos.cleanSonidos(getApplicationContext());
+        if (sonidos.getSonidoByID(Sonidos.ID_SONIDO_ALERTA_EXTERNA) == null){
+            sonidos.addSonido(getApplicationContext(),new Sonido(Sonidos.ID_SONIDO_ALERTA_EXTERNA,"Alerta Externa", null, true));
+        }
+
         sendMSGSRV("CE|");
     }
 

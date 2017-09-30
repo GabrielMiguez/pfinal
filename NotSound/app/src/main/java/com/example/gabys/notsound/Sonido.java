@@ -35,4 +35,5 @@ public class Sonido implements Serializable {
     }
 
     public Bitmap getImagen() { return (Bitmap) BitmapFactory.decodeFile(this.getRutaFoto());}
+
 }

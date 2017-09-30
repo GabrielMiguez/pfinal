@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -113,9 +114,25 @@ public class Sonidos extends Application{
         this.saveSonidos(context);
     }
 
-    public void removeSonido(Context context, int itemIndex){
+    public void removeSonidoByPosition(Context context, int itemIndex){
+
+        String rutaFoto = listasonidos.get(itemIndex).getRutaFoto();
+        if (rutaFoto != null){
+            File file = new File(listasonidos.get(itemIndex).getRutaFoto());
+            file.delete();
+        }
+
         listasonidos.remove(itemIndex);
+
         this.saveSonidos(context);
     }
 
+    public void cleanSonidos(Context context){
+        if (listasonidos.size() != 0){
+            while(listasonidos.size()>0) {
+                this.removeSonidoByPosition(context,0);
+            }
+
+        }
+    }
 }

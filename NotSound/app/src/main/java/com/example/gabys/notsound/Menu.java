@@ -18,8 +18,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -31,6 +37,15 @@ import android.widget.Toast;
 public class Menu extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     BroadcastReceiver receiver = null ;
     IntentFilter intentFilter;
+
+    String ayuda_titulo1="";
+    String ayuda_cuerpo1="";
+    String ayuda_titulo2="";
+    String ayuda_cuerpo2="";
+    String ayuda_titulo3="";
+    String ayuda_cuerpo3="";
+    String ayuda_titulo4="";
+    String ayuda_cuerpo4="";
 
     //private MiServiceIBinder mServiceIBinder;
     boolean mBound;
@@ -49,6 +64,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         }
     };
     */
+
 
     Messenger mService = null;
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -81,6 +97,10 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         // se configura quien atender el eventero selected
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+
+
 
     }
 
@@ -225,8 +245,83 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         }
     }
 
-    public void abrirAyuda(View view){
+    public void setAyudaParametros(String titulo1, String cuerpo1, String titulo2, String cuerpo2, String titulo3, String cuerpo3, String titulo4, String cuerpo4){
+        this.ayuda_titulo1=titulo1;
+        this.ayuda_cuerpo1=cuerpo1;
 
+        this.ayuda_titulo2=titulo2;
+        this.ayuda_cuerpo2=cuerpo2;
+
+        this.ayuda_titulo3=titulo3;
+        this.ayuda_cuerpo3=cuerpo3;
+
+        this.ayuda_titulo4=titulo4;
+        this.ayuda_cuerpo4=cuerpo4;
     }
 
+    public void InflateAyuda(){
+
+        // Initialize a new instance of LayoutInflater service
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        // Inflate the custom layout/view
+        View customView = inflater.inflate(R.layout.ayuda,null);
+
+
+        // Initialize a new instance of popup window
+        final PopupWindow mPopupWindow = new PopupWindow(
+                customView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        TextView t1 = (TextView) customView.findViewById(R.id.txtvw_titulo1);
+        TextView c1 = (TextView) customView.findViewById(R.id.txtvw_cuerpo1);
+        TextView t2 = (TextView) customView.findViewById(R.id.txtvw_titulo2);
+        TextView c2 = (TextView) customView.findViewById(R.id.txtvw_cuerpo2);
+        TextView t3 = (TextView) customView.findViewById(R.id.txtvw_titulo3);
+        TextView c3 = (TextView) customView.findViewById(R.id.txtvw_cuerpo3);
+        TextView t4 = (TextView) customView.findViewById(R.id.txtvw_titulo4);
+        TextView c4 = (TextView) customView.findViewById(R.id.txtvw_cuerpo4);
+
+        t1.setText(this.ayuda_titulo1);
+        c1.setText(this.ayuda_cuerpo1);
+        t2.setText(this.ayuda_titulo2);
+        c2.setText(this.ayuda_cuerpo2);
+        t3.setText(this.ayuda_titulo3);
+        c3.setText(this.ayuda_cuerpo3);
+        t4.setText(this.ayuda_titulo4);
+        c4.setText(this.ayuda_cuerpo4);
+
+        // Set a click listener for the popup window close button
+        Button closeButton = (Button) customView.findViewById(R.id.btn_cerrar);
+
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Dismiss the popup window
+                mPopupWindow.dismiss();
+            }
+        });
+
+        mPopupWindow.showAtLocation((DrawerLayout) findViewById(R.id.drawer_layout), Gravity.CENTER,0,0);
+    }
+
+    public void abrirAyuda(View view){
+        //this.setTextoAyuda();
+        this.InflateAyuda();
+    }
+/*
+    public void setTextoAyuda(String titulo1, String cuerpo1, String titulo2, String cuerpo2){
+        TextView t1 = (TextView) findViewById(R.id.txtvw_titulo1);
+        t1.setText(titulo1);
+        TextView c1 = (TextView) findViewById(R.id.txtvw_cuerpo1);
+        c1.setText(cuerpo1);
+
+        TextView t2 = (TextView) findViewById(R.id.txtvw_titulo2);
+        t2.setText(titulo2);
+        TextView c2 = (TextView) findViewById(R.id.txtvw_cuerpo2);
+        c2.setText(cuerpo2);
+    }
+*/
 }

@@ -24,6 +24,7 @@ public class MainActivity extends Menu {
         setContentView(R.layout.activity_main);
         super.CreateMenu();
 
+
         // Get instance of Vibrator from current Context
         Vibrator mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         // Vibrates for 300 Milliseconds
@@ -40,6 +41,25 @@ public class MainActivity extends Menu {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         super.CreateMenu();
+
+        String menuAyuda_titulo1="Sonidos";
+        String menuAyuda_cuerpo1="Edita la lista de sonidos que podrás detectar en el modo interior.";
+        String menuAyuda_titulo2="Alerta Externa";
+        String menuAyuda_cuerpo2="Personaliza la notificación que recibirás en el modo exterior.";
+        String menuAyuda_titulo3="Configuación";
+        String menuAyuda_cuerpo3="Ajusta los parámetros de la solución.";
+        String menuAyuda_titulo4="Nosotros";
+        String menuAyuda_cuerpo4="Envianos dudas y sugerencias.";
+
+        super.setAyudaParametros(
+                menuAyuda_titulo1,
+                menuAyuda_cuerpo1,
+                menuAyuda_titulo2,
+                menuAyuda_cuerpo2,
+                menuAyuda_titulo3,
+                menuAyuda_cuerpo3,
+                menuAyuda_titulo4,
+                menuAyuda_cuerpo4);
 
         Sonidos sonidos = new Sonidos();
         sonidos.loadSonidos(getApplicationContext());
@@ -61,7 +81,7 @@ public class MainActivity extends Menu {
         }
 */
     }
-
+/*
     @Override
     public void abrirAyuda(View view) {
 
@@ -69,7 +89,7 @@ public class MainActivity extends Menu {
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
 
         // Inflate the custom layout/view
-        View customView = inflater.inflate(R.layout.popup_element,null);
+        View customView = inflater.inflate(R.layout.ayuda,null);
 
 
         // Initialize a new instance of popup window
@@ -92,4 +112,5 @@ public class MainActivity extends Menu {
 
         mPopupWindow.showAtLocation((DrawerLayout) findViewById(R.id.drawer_layout), Gravity.CENTER,0,0);
     }
+    */
 }
