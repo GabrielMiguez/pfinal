@@ -207,6 +207,9 @@ public class MiServiceIBinder extends Service {
                 .setAutoCancel(true);
 
         nManager.notify(12345, builder.build());
+
+
+
     }
 
     public void procesarMsg(String s)//procesa sms que llega al servicio, desde el bt
@@ -215,9 +218,8 @@ public class MiServiceIBinder extends Service {
             if (s.equals("NA"))
                 Notificar(99);
             else  if (s.charAt(0)=='N'){
-                s=s.substring(1);
                 try{
-                    int i=  Integer.valueOf(s);
+                    int i=  Integer.valueOf(s.substring(1));
                     Notificar(i);
                 } catch (Exception e) {
                     Toast.makeText(this, "Error al Notificar Patron", Toast.LENGTH_SHORT).show();

@@ -56,7 +56,7 @@ void setup()
   setFast();
 
   modo=0;
-  //iniDemo();
+  iniDemo();
   //grabar();
 }
 

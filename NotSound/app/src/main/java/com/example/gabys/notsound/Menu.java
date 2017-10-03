@@ -146,12 +146,30 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
     public void processReceive(Context context, Intent intent) {
         Log.i("DESARROLLO","processReceive ");
-        Toast.makeText(context, intent.getExtras().getSerializable("sms").toString(), Toast.LENGTH_LONG).show();
-        this.ActionRecive(intent.getExtras().getSerializable("sms").toString());
+        String s=intent.getExtras().getSerializable("sms").toString();
+        Toast.makeText(context, s, Toast.LENGTH_LONG).show();
+        this.ActionRecive(s);
+        try{
+            int i=-1;
+            if (s.equals("NA"))
+                i=99;
+            else  if (s.charAt(0)=='N'){
+                i=  Integer.valueOf(s.substring(1));
+            }
+            if (i>=0){
+                //puebo si puedo abrir el activity directamete
+                Intent inte = new Intent(getApplicationContext(), SonidoAlertaActivity.class);
+                inte.putExtra("sonidoSeleccionado", i);
+                startActivity(inte);
+            }
+        }catch (Exception e ){
+            Toast.makeText(this, "Error al Notificar Activity Patron", Toast.LENGTH_SHORT).show();
+        }
     }
 
     //Metodo para Implememtar Accion en cada Activity
     public void ActionRecive(String s){
+
     }
 
     public void sendMSGSRV(String s) {
