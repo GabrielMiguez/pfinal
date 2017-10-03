@@ -6,8 +6,7 @@
 #define FHT_N 256 // set to 256 point fht
 #define BAUDRATE 19200 // set to 256 point fht
 #define DELAY_ANCHO_BANDA 74  //74 para B.W=6400Hz y Resolucion=50Hz.   75 para simulacion Proteus
-SoftwareSerial BT1(4,2); // RX, TX recorder que se cruzan
-
+SoftwareSerial BT1(4,7); // RX, TX recorder que se cruzan
 
 String rea="";
 String buf="";
@@ -21,8 +20,8 @@ int ledPin = 10;
 int ledPin1 = 13;
 /*char palanca[3]="A0";*/
 char mic[3]="A0";
-double GLOBAL_ruidoPromedio=0;
-double procentajeSuperacionPromedio=30;
+volatile double GLOBAL_ruidoPromedio=0;  //volatile, por que se cambian en interrupciones
+volatile double procentajeSuperacionPromedio=30;
 char c;
 
 void setNormal(){
@@ -39,21 +38,6 @@ void setFast(){
   DIDR0 = 0x01; // turn off the digital input for adc0
   normal=0;
 
-  //  ADCSRA |= bit (ADPS0);                               //   2  
-  //  ADCSRA |= bit (ADPS1);                               //   4  
-  //  ADCSRA |= bit (ADPS0) | bit (ADPS1);                 //   8  
-  //  ADCSRA |= bit (ADPS2);                               //  16 
-  //  ADCSRA |= bit (ADPS0) | bit (ADPS2);                 //  32 
-  //  ADCSRA |= bit (ADPS1) | bit (ADPS2);                 //  64 
-  //  ADCSRA |= bit (ADPS0) | bit (ADPS1) | bit (ADPS2);   // 128
-
-  // Set A/D prescale factor to 128
-    // 16 MHz / 128 = 125 KHz, inside the desired 50-200 KHz range.
-    // XXX: this will not work properly for other clock speeds, and
-    // this code should use F_CPU to determine the prescale factor.
-    
-  //ojo delay en modo fast
-  //delay(100.000); 1s y noarmal 1.000=1s
 }
 
 void setup()
@@ -65,15 +49,79 @@ void setup()
   pinMode(ledPin, OUTPUT);
   pinMode(ledPin1, OUTPUT);
   pinMode(A0,INPUT);
-  Timer1.initialize(2000000);
+  Timer1.initialize(7000000);
   Timer1.attachInterrupt(callback);
 
   Serial.begin(BAUDRATE); // use the serial port
   setFast();
-  BT1.flush();
+
+  modo=0;
+  //iniDemo();
+  //grabar();
 }
 
+void loop()
+{  
+  Serial.println("------------- LOOP -------------- ");
+  
+  while(1){
+  //BT1.write(1);
+    //lectura del blue
+    //delay(500);
+    
+    //if (BT1.peek()>0)
+      //Serial.println("BT ");
+    if (BT1.available()){
+      //Serial.println("BT ");
+      //delay(100000);
+      c= BT1.read();
+      //Serial.write(c);
+      if( c != '|')    //Hasta que el caracter sea END_CMD_CHAR
+         buf += c;
+      else{
+        reccmd(buf);
+        buf="";
+      } 
+      //delay(25);
+      //Serial.println("BT ");
+      Serial.println(c);
+    }
 
+    //Serial.println("Antes modo 0");
+    if (modo==0){ // modo OUT
+      //Serial.println("modo 0");
+      //Vamos leyendo lo que capta el mic
+      //si supera valor promedio, prendemos led
+      while(!(ADCSRA & 0x10)); // wait for adc to be ready
+      ADCSRA = 0xf5; // restart adc
+      byte m = ADCL; // fetch adc data
+      byte j = ADCH;
+      int k = (j << 8) | m; // form into an int
+      //k -= 0x0200; // form into a signed int
+      //k <<= 6; // form into a 16b signed int
+      
+      
+      //if(lecturaMic>(GLOBAL_ruidoPromedio*procentajeSuperacionPromedio)){
+      if(k>(GLOBAL_ruidoPromedio +  procentajeSuperacionPromedio)){
+        //Prendo led
+        digitalWrite(ledPin1, HIGH);
+        //Envio sms x blue
+        BT1.write("NA|");
+        
+        Serial.println("supero");
+        
+        callback();
+        delay(200000);
+      }else{
+        digitalWrite(ledPin1, LOW);
+      }
+    }else{ //modo IN
+      //Serial.println("modo 1");
+      modoPatron();
+    }
+    
+  }
+}
 
 //Esta funcion toma 500 muestras y promedia el ruido para setear nuevo ruido promedio
 void callback()
@@ -122,8 +170,8 @@ void callback()
     sum=sum+arrayOfTops[i];
   }
   GLOBAL_ruidoPromedio=sum/20;
-  Serial.println("PROMEDIO DIO:");
-  Serial.println(GLOBAL_ruidoPromedio);
+  //Serial.println("PROMEDIO DIO:");
+  //Serial.println(GLOBAL_ruidoPromedio);
   
 }
 
@@ -152,14 +200,17 @@ void reccmd(String buf){
   */    
   if (buf=="T0"){
     BT1.write("T0|");
+    BT1.flush();
   }
   if (buf=="C1"){//out
     modo=0;
+    Timer1.attachInterrupt(callback);
     BT1.write("C1|"); //out
     BT1.flush();
   }
   if (buf=="C2"){//in
     modo=1;
+    Timer1.detachInterrupt();
     BT1.write("C2|"); // in
     BT1.flush();
   }
@@ -184,11 +235,61 @@ void reccmd(String buf){
     
 }
 
-void loop()
-{
+void iniDemo(){
+  cleanEEPROM();  
+  //Sonido 1 TIMBRE
+  //https://www.youtube.com/watch?v=h46qbBy45Gg  
+  int i=0;
+  EEPROM.write(i, 94);  
+  i++;
+  EEPROM.write(i, 48);  
+  i++;
+  EEPROM.write(i, 55);  
+  i++;
+  EEPROM.write(i, 122);  
+  i++;
+  EEPROM.write(i, 124);  
+  i++;
+  
+  
+  //Sonido 2 PAVA
+  //https://www.youtube.com/watch?v=w1nb1lYfc8o
+
+  
+  EEPROM.write(i, 38);  
+  i++;
+  EEPROM.write(i, 77);  
+  i++;
+  EEPROM.write(i, 91);  
+  i++;
+  EEPROM.write(i, 95);  
+  i++;
+  EEPROM.write(i, 111);  
+  i++;
+ 
+  //Sonido 3
+  //https://www.youtube.com/watch?v=ErLji-xsnTQ
+  EEPROM.write(i, 84);  
+  i++;
+  EEPROM.write(i, 49);  
+  i++;
+  EEPROM.write(i, 59);  
+  i++;
+  EEPROM.write(i, 42);  
+  i++;
+  EEPROM.write(i, 31);  
+  i++;  
+}  
+
+void _loop()
+{  
+  Serial.println("------------- LOOP -------------- ");
+  
   while(1){
     //lectura del blue
+    delay(5000);
     if (BT1.available()){
+      
       c= BT1.read();
       //Serial.write(c);
       if( c != '|')    //Hasta que el caracter sea END_CMD_CHAR
@@ -197,7 +298,12 @@ void loop()
         reccmd(buf);
         buf="";
       } 
-      delay(25) ;
+      delay(2500);
+      
+      Serial.println("BT ");
+      Serial.println(c);
+      
+      
     }
     //Serial.println("Antes modo 0");
     if (modo==0){ // modo OUT
@@ -232,6 +338,7 @@ void loop()
   }
 }
 
+//---- Funciones EEPROM ----
 int primeraPosVaciaEEPROM(){
    for (int i = 0 ; i < EEPROM.length() ; i++) {
     if(EEPROM.read(i)==0){
@@ -246,22 +353,30 @@ int primeraPosVaciaEEPROM(){
 int ultimaPosLlenaEEPROM(){
   if(EEPROM.read(0)==0){
     return 0;
+  }    
+  for (int i = 0 ; i < EEPROM.length() ; i++) {
+  if(EEPROM.read(i+1)==0){
+    return i;
   }
-    
-   for (int i = 0 ; i < EEPROM.length() ; i++) {
-    if(EEPROM.read(i+1)==0){
-      return i;
-    }
-   }
-  
-   return EEPROM.length();
+  }  
+  return EEPROM.length();
 }
 
 void cleanEEPROM(){
+            //1024bytes: 1 int => 2 bytes, por ende como maximo
+            //arduino value: the value to write, from 0 to 255 (byte)
+            //Nosotros guardos el valor de las frecuencias, y son de 0a128 
   for (int i = 0 ; i < EEPROM.length() ; i++) {
     EEPROM.write(i, 0);
   }
 }
+
+//eSaveSound(int vec[])
+//eDeleteSound(int vec[])
+//3RenameSound(int vec[])
+
+//---- Funciones EEPROM ----
+
 
 void grabar(){
   //PROCESO GRABACION
@@ -271,15 +386,38 @@ void grabar(){
     picosDeMuestrasGrabacion[i]=0;
   }
 
-
+  
+  
   Serial.println("Comenzado a grabar el sonido en 2 segundos");
   delay(200000);
   Serial.println("Comenzado a grabar YA");
+
+  /*
+  bool comenzo=false;
+  int valorInicial=200;
+
+  cli();
+  while(!comenzo){
+    while(!(ADCSRA & 0x10)); // wait for adc to be ready
+    ADCSRA = 0xf5; // restart adc
+    byte m = ADCL; // fetch adc data
+    byte j = ADCH;
+    int k = (j << 8) | m; // form into an int
+    k -= 0x0200; // form into a signed int
+    k <<= 6; // form into a 16b signed int
+    Serial.println(k);
+    if (k > valorInicial){
+      Serial.println("SIIIII");
+      comenzo=true;
+    }
+    delayMicroseconds(DELAY_ANCHO_BANDA);      //
+  } 
+  */    
   
   //Uso los primeros segundos para grabar un sonido y usarlo después para los picos.
-  int cantidadDeCiclos=100;
+  int cantidadDeCiclos=400;
+  cli();  // UDRE interrupt slows this way down on arduino1.0
   while(cantidadDeCiclos>=0) { // reduces jitter
-    cli();  // UDRE interrupt slows this way down on arduino1.0
     for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
       while(!(ADCSRA & 0x10)); // wait for adc to be ready
       ADCSRA = 0xf5; // restart adc
@@ -430,9 +568,9 @@ delay(200000);
 
 void modoPatron() {
 
-  Serial.println("----Comienza la escucha-----");
+  //Serial.println("----Comienza la escucha-----");
 
-  cli();  // UDRE interrupt slows this way down on arduino1.0
+  //cli();  // UDRE interrupt slows this way down on arduino1.0
   for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
     while(!(ADCSRA & 0x10)); // wait for adc to be ready
     ADCSRA = 0xf5; // restart adc
@@ -448,19 +586,21 @@ void modoPatron() {
   fht_reorder(); // reorder the data before doing the fht
   fht_run(); // process the data in the fht
   fht_mag_log(); // take the output of the fht
-  sei();
+  //sei();
     
-  Serial.println("----Ya Tome las Lecturas-----");
+  //Serial.println("----Ya Tome las Lecturas-----");
   
   //int picos[128];
-  int tresPrimerosPicos[3];
+  int tresPrimerosPicos[4];
   tresPrimerosPicos[0]=0;
   tresPrimerosPicos[1]=0;
   tresPrimerosPicos[2]=0;
-  int tresPrimerosPicosPos[3];
+  tresPrimerosPicos[3]=0;
+  int tresPrimerosPicosPos[4];
   tresPrimerosPicosPos[0]=0;
   tresPrimerosPicosPos[1]=0;
   tresPrimerosPicosPos[2]=0;
+  tresPrimerosPicosPos[3]=0;
   
   for (int i = 0 ; i < FHT_N/2 ; i++) {
     //picos[i]=0;
@@ -468,6 +608,8 @@ void modoPatron() {
     if(i!=0){
       if(fht_log_out[i]>fht_log_out[i-1] && fht_log_out[i]>fht_log_out[i+1] && fht_log_out[i]>35){//AHI PUSE 40 DE REFERENCIA
         if(fht_log_out[i]>tresPrimerosPicos[0]){
+          tresPrimerosPicos[3]=tresPrimerosPicos[2];
+          tresPrimerosPicosPos[3]=tresPrimerosPicosPos[2];  
           tresPrimerosPicos[2]=tresPrimerosPicos[1];
           tresPrimerosPicosPos[2]=tresPrimerosPicosPos[1];            
           tresPrimerosPicos[1]=tresPrimerosPicos[0]; 
@@ -476,14 +618,23 @@ void modoPatron() {
           tresPrimerosPicosPos[0]=i;
         }else{
           if(fht_log_out[i]>tresPrimerosPicos[1]){
+            tresPrimerosPicos[3]=tresPrimerosPicos[2];
+            tresPrimerosPicosPos[3]=tresPrimerosPicosPos[2];  
             tresPrimerosPicos[2]=tresPrimerosPicos[1];
             tresPrimerosPicosPos[2]=tresPrimerosPicosPos[1];              
             tresPrimerosPicos[1]=fht_log_out[i];
             tresPrimerosPicosPos[1]=i;
           }else{
             if(fht_log_out[i]>tresPrimerosPicos[2]){
+              tresPrimerosPicos[3]=tresPrimerosPicos[2];
+              tresPrimerosPicosPos[3]=tresPrimerosPicosPos[2]; 
               tresPrimerosPicos[2]=fht_log_out[i];
               tresPrimerosPicosPos[2]=i;
+            }else{
+              if(fht_log_out[i]>tresPrimerosPicos[3]){
+                tresPrimerosPicos[3]=fht_log_out[i];
+                tresPrimerosPicosPos[3]=i;
+              }
             }
           }
         }
@@ -501,8 +652,8 @@ void modoPatron() {
 
 
   int valorHastaDondeLeoDeLaEEPROM=ultimaPosLlenaEEPROM();
-  Serial.println("Hasta donde leo de la EEPROM");
-  Serial.println(valorHastaDondeLeoDeLaEEPROM);
+  //Serial.println("Hasta donde leo de la EEPROM");
+  //Serial.println(valorHastaDondeLeoDeLaEEPROM);
 
   //bool CantCoicidencia[valorHastaDondeLeoDeLaEEPROM]; //vector que guardara la cantida de coincidencias por patron ? tiene sentido, o si le pega a 3 listo adentro?
   if (valorHastaDondeLeoDeLaEEPROM <= 0) return;
@@ -517,6 +668,7 @@ void modoPatron() {
     picosConocidosDeMemoria[3]=EEPROM.read(i+3);
     picosConocidosDeMemoria[4]=EEPROM.read(i+4);
 
+/*
     //Lo que leo de la EEPROM:
     Serial.println("VOy a comparar contra esto de la eeprom:");
     Serial.println(picosConocidosDeMemoria[0]);
@@ -525,33 +677,62 @@ void modoPatron() {
     Serial.println(picosConocidosDeMemoria[3]);
     Serial.println(picosConocidosDeMemoria[4]);
     //delay(1000000);
-    Serial.println("Vs picos:");
+    Serial.println("------------Vs picos:-------------");
     Serial.println(tresPrimerosPicosPos[0]);
     Serial.println(tresPrimerosPicosPos[1]);
     Serial.println(tresPrimerosPicosPos[2]);
-    
+    Serial.println(tresPrimerosPicosPos[3]);
+*/    
 
     int picosusado[5];
-    for (int i = 0 ; i < 5 ; i++) picosusado[i]=0;  
+    for (int i = 0 ; i <= 4 ; i++) picosusado[i]=0;  
     int con=0;
-    int delta=1;
+    int delta=2;
+    /*int picosConocidosDeMemoriaUSADO[5];
+    for (int i = 0 ; i < 5 ; i++) picosConocidosDeMemoriaUSADO[i]=0;*/
+/*
+tresPrimerosPicosPos[0]=1;
+tresPrimerosPicosPos[1]=51;
+tresPrimerosPicosPos[2]=1;
+tresPrimerosPicosPos[3]=1;
+*/
+
+//Serial.println("------Valores del if------");
     
-    for (int i = 0 ; i < 3 ; i++) { //los picos
+    for (int i = 0 ; i <= 3 ; i++) { //los picos
       for (int p=0; p<=4; p++){// la memo
         if( 
               ((picosConocidosDeMemoria[p]-delta)<= tresPrimerosPicosPos[i]) 
               && ((picosConocidosDeMemoria[p]+delta)>= tresPrimerosPicosPos[i]) 
-              && (picosusado[i]==0) 
+              && (picosusado[p]==0) 
         ){
+
+
+    /*
+    Serial.println(picosConocidosDeMemoria[p]-delta);
+    Serial.println(tresPrimerosPicosPos[i]);
+    Serial.println(picosConocidosDeMemoria[p]+delta);
+    Serial.println(picosusado[i]);
+
+*/
+          
           con++;
-          picosusado[i]=1;
-          continue;
+          picosusado[p]=1;
+          break;
         }
       }
     }
+
+//Serial.println("------Valores del if------");
+//for (int i = 0 ; i <= 4 ; i++) Serial.println(picosusado[i]); 
+    //Serial.println("------Valores del if------");
+
+   // Serial.println("------Valores del if------");
     
     if (con>=3){
-      for (int i = 0 ; i < 5 ; i++) Serial.println(picosusado[i]);  
+      Serial.println("sonido encontrado: ");  
+      Serial.println(idsound);  
+      for (int i = 0 ; i <= 4 ; i++) Serial.println(picosusado[i]);  
     
       //Prendo led
       digitalWrite(ledPin1, HIGH);
