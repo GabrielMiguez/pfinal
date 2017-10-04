@@ -21,7 +21,7 @@ int ledPin1 = 13;
 /*char palanca[3]="A0";*/
 char mic[3]="A0";
 volatile double GLOBAL_ruidoPromedio=0;  //volatile, por que se cambian en interrupciones
-volatile double procentajeSuperacionPromedio=30;
+volatile double procentajeSuperacionPromedio=50;
 char c;
 
 void setNormal(){
@@ -55,8 +55,8 @@ void setup()
   Serial.begin(BAUDRATE); // use the serial port
   setFast();
 
-  modo=0;
-  iniDemo();
+  modo=1;
+  //iniDemo();
   //grabar();
 }
 
@@ -281,63 +281,6 @@ void iniDemo(){
   i++;  
 }  
 
-void _loop()
-{  
-  Serial.println("------------- LOOP -------------- ");
-  
-  while(1){
-    //lectura del blue
-    delay(5000);
-    if (BT1.available()){
-      
-      c= BT1.read();
-      //Serial.write(c);
-      if( c != '|')    //Hasta que el caracter sea END_CMD_CHAR
-         buf += c;
-      else{
-        reccmd(buf);
-        buf="";
-      } 
-      delay(2500);
-      
-      Serial.println("BT ");
-      Serial.println(c);
-      
-      
-    }
-    //Serial.println("Antes modo 0");
-    if (modo==0){ // modo OUT
-      //Serial.println("modo 0");
-      //Vamos leyendo lo que capta el mic
-      //si supera valor promedio, prendemos led
-      while(!(ADCSRA & 0x10)); // wait for adc to be ready
-      ADCSRA = 0xf5; // restart adc
-      byte m = ADCL; // fetch adc data
-      byte j = ADCH;
-      int k = (j << 8) | m; // form into an int
-      //k -= 0x0200; // form into a signed int
-      //k <<= 6; // form into a 16b signed int
-      
-      
-      //if(lecturaMic>(GLOBAL_ruidoPromedio*procentajeSuperacionPromedio)){
-      if(k>(GLOBAL_ruidoPromedio +  procentajeSuperacionPromedio)){
-        //Prendo led
-        digitalWrite(ledPin1, HIGH);
-        //Envio sms x blue
-        BT1.write("NA|");
-        
-        callback();
-        delay(200000);
-      }else{
-        digitalWrite(ledPin1, LOW);
-      }
-    }else{ //modo IN
-      //Serial.println("modo 1");
-      modoPatron();
-    }
-  }
-}
-
 //---- Funciones EEPROM ----
 int primeraPosVaciaEEPROM(){
    for (int i = 0 ; i < EEPROM.length() ; i++) {
@@ -378,7 +321,7 @@ void cleanEEPROM(){
 //---- Funciones EEPROM ----
 
 
-void grabar(){
+void _grabar(){
   //PROCESO GRABACION
   int picosDeMuestrasGrabacion[FHT_N/2];
   //Inicializo
@@ -433,7 +376,7 @@ void grabar(){
     fht_reorder(); // reorder the data before doing the fht
     fht_run(); // process the data in the fht
     fht_mag_log(); // take the output of the fht
-    sei();
+    
     cantidadDeCiclos=cantidadDeCiclos-1;
 
     //Obtengo los picos y sus posiciones de esa tirada de audio
@@ -454,12 +397,257 @@ void grabar(){
       if(i!=0){
         if(fht_log_out[i]>fht_log_out[i-1] && fht_log_out[i]>fht_log_out[i+1] && fht_log_out[i]>35 && i>10){//AHI PUSE 40 DE REFERENCIA
           //Es pico, incremento su pos
+           Serial.print(i);
+           Serial.print(":");
+           Serial.println(fht_log_out[i]);
           picosDeMuestrasGrabacion[i]=picosDeMuestrasGrabacion[i]+1;
         }
       }
     }    
   }
+  sei();
 
+  /*Serial.println("-----Veo picos caracteristicos------");
+for (int i = 0 ; i < FHT_N/2 ; i++) {
+  
+  Serial.println(picosDeMuestrasGrabacion[i]);
+}
+
+delay(200000);
+  Serial.println("-----Veo picos caracteristicos------");
+
+
+  Serial.println("Sonido finalizado de grabar, comenzando a escuchar en 2 segundos");
+  delay(200000);
+*/
+  int picosConocidos[5];
+  picosConocidos[0]=0;
+  picosConocidos[1]=0;
+  picosConocidos[2]=0;
+  picosConocidos[3]=0;
+  picosConocidos[4]=0;
+  int picosConocidosValor[5];
+  picosConocidosValor[0]=0;
+  picosConocidosValor[1]=0;
+  picosConocidosValor[2]=0;
+  picosConocidosValor[3]=0;
+  picosConocidosValor[4]=0;
+  
+  //Obtengo del vector aquellos 3 que tengan mas veces contabilizados y seran los 3 picos que voy a grabar
+  for (int i = 0 ; i < FHT_N/2 ; i++) {
+    if(picosDeMuestrasGrabacion[i]>0){
+      if(picosDeMuestrasGrabacion[i]>picosConocidosValor[0]){
+        //Lo grabo en la primera y corro los otros    
+        picosConocidosValor[4]=picosConocidosValor[3];
+        picosConocidosValor[3]=picosConocidosValor[2];    
+        picosConocidosValor[2]=picosConocidosValor[1];
+        picosConocidosValor[1]=picosConocidosValor[0];
+        picosConocidosValor[0]=picosDeMuestrasGrabacion[i];
+        picosConocidos[4]=picosConocidos[3];
+        picosConocidos[3]=picosConocidos[2];
+        picosConocidos[2]=picosConocidos[1];
+        picosConocidos[1]=picosConocidos[0];
+        picosConocidos[0]=i;
+      }else{
+        if(picosDeMuestrasGrabacion[i]>picosConocidosValor[1]){
+          //Lo grabo en la segunda y corro los otros dos  
+          picosConocidosValor[4]=picosConocidosValor[3];
+          picosConocidosValor[3]=picosConocidosValor[2];      
+          picosConocidosValor[2]=picosConocidosValor[1];
+          picosConocidosValor[1]=picosDeMuestrasGrabacion[i];
+          picosConocidos[4]=picosConocidos[3];
+          picosConocidos[3]=picosConocidos[2];
+          picosConocidos[2]=picosConocidos[1];
+          picosConocidos[1]=i;
+        }else{
+          if(picosDeMuestrasGrabacion[i]>picosConocidosValor[2]){
+            //Lo grabo en la segunda y corro los otros dos  
+            picosConocidosValor[4]=picosDeMuestrasGrabacion[3];
+            picosConocidosValor[3]=picosDeMuestrasGrabacion[2];      
+            picosConocidosValor[2]=picosDeMuestrasGrabacion[i];
+            picosConocidos[4]=picosConocidos[3];
+            picosConocidos[3]=picosConocidos[2];
+            picosConocidos[2]=i;
+          }else{
+            if(picosDeMuestrasGrabacion[i]>picosConocidosValor[3]){
+              picosConocidosValor[4]=picosDeMuestrasGrabacion[3];
+              picosConocidosValor[3]=picosDeMuestrasGrabacion[i]; 
+              picosConocidos[4]=picosConocidos[3];
+              picosConocidos[3]=i;
+            }else{
+              if(picosDeMuestrasGrabacion[i]>picosConocidosValor[4]){
+                picosConocidosValor[4]=picosDeMuestrasGrabacion[i]; 
+                picosConocidos[4]=i;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  //Serial.println("Picos grabados");
+  //Finalizado esto ya tengo en picosconocidos las pos de los 3 picos mas caracterisiticos del sonido recien escuchado
+
+  int getPrimeraPosParaGrabarLas5=primeraPosVaciaEEPROM();
+  Serial.println("Voy a grabar eeprom a partir de aca:");
+  Serial.println(getPrimeraPosParaGrabarLas5);
+
+
+  Serial.println("Grabo en la eeprom:");
+  for (int i = 0 ; i < 5 ; i++) {
+    /*if(EEPROM.length()==0){
+      Serial.println("eprom vacia");
+      EEPROM.write(EEPROM.length()+i, picosConocidos[i]);
+      Serial.println(EEPROM.read(EEPROM.length()+i));
+    }else{*/
+      
+      EEPROM.write(getPrimeraPosParaGrabarLas5+i, picosConocidos[i]);
+      Serial.println(EEPROM.read(getPrimeraPosParaGrabarLas5+i));
+   /* }*/
+  }
+
+  IDSoundGrab=getPrimeraPosParaGrabarLas5;
+  
+  //TERMINO PROCESO GRABACION
+}
+
+void grabar(){  
+    //grabo picos no count de frecuencias, ya que en la lectura me quedo con los picos en aplitud de las 3 frecuencias mas altas en amp
+    //por ende cambio el grabar, para que tenga en cuenta la cantidad de frecuencias picos, pero no solo con el filtro, sino siempre guardo la frecuencia de los 3 pcios mas altos.
+    
+  //PROCESO GRABACION
+  int picosDeMuestrasGrabacion[FHT_N/2];
+  //Inicializo
+  for (int i = 0 ; i < FHT_N/2 ; i++) {
+    picosDeMuestrasGrabacion[i]=0;
+  }
+
+  
+  
+  Serial.println("Comenzado a grabar el sonido en 2 segundos");
+  delay(200000);
+  Serial.println("Comenzado a grabar YA");
+
+  /*
+  bool comenzo=false;
+  int valorInicial=200;
+
+  cli();
+  while(!comenzo){
+    while(!(ADCSRA & 0x10)); // wait for adc to be ready
+    ADCSRA = 0xf5; // restart adc
+    byte m = ADCL; // fetch adc data
+    byte j = ADCH;
+    int k = (j << 8) | m; // form into an int
+    k -= 0x0200; // form into a signed int
+    k <<= 6; // form into a 16b signed int
+    Serial.println(k);
+    if (k > valorInicial){
+      Serial.println("SIIIII");
+      comenzo=true;
+    }
+    delayMicroseconds(DELAY_ANCHO_BANDA);      //
+  } 
+  */    
+  
+  //Uso los primeros segundos para grabar un sonido y usarlo después para los picos.
+  int cantidadDeCiclos=400;
+  cli();  // UDRE interrupt slows this way down on arduino1.0
+  while(cantidadDeCiclos>=0) { // reduces jitter
+    for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
+      while(!(ADCSRA & 0x10)); // wait for adc to be ready
+      ADCSRA = 0xf5; // restart adc
+      byte m = ADCL; // fetch adc data
+      byte j = ADCH;
+      int k = (j << 8) | m; // form into an int
+      k -= 0x0200; // form into a signed int
+      k <<= 6; // form into a 16b signed int
+      fht_input[i] = k; // put real data into bins
+      delayMicroseconds(DELAY_ANCHO_BANDA);      //
+    }
+    fht_window(); // window the data for better frequency response
+    fht_reorder(); // reorder the data before doing the fht
+    fht_run(); // process the data in the fht
+    fht_mag_log(); // take the output of the fht
+    
+    cantidadDeCiclos=cantidadDeCiclos-1;
+
+    //Obtengo los picos y sus posiciones de esa tirada de audio
+    int tresPrimerosPicos[4];
+    tresPrimerosPicos[0]=0;
+    tresPrimerosPicos[1]=0;
+    tresPrimerosPicos[2]=0;
+    tresPrimerosPicos[3]=0;
+    int tresPrimerosPicosPos[4];
+    tresPrimerosPicosPos[0]=0;
+    tresPrimerosPicosPos[1]=0;
+    tresPrimerosPicosPos[2]=0;
+    tresPrimerosPicosPos[3]=0;
+    int f1=-1;
+    int f2=-1;
+    int f3=-1;
+    int f4=-1;
+    
+    for (int i = 0 ; i < FHT_N/2 ; i++) {
+      //Obtengo los picos
+      if(i!=0){
+        if(fht_log_out[i]>fht_log_out[i-1] && fht_log_out[i]>fht_log_out[i+1] && fht_log_out[i]>45 && i>10){//AHI PUSE 40 DE REFERENCIA
+          //Es pico, incremento su pos
+           //Serial.print(i);
+           //Serial.print(":");
+           //Serial.println(fht_log_out[i]);
+
+//------------------------------------------------------------------------ me quedo con los 3 mas altos
+        if(fht_log_out[i]>tresPrimerosPicos[0]){
+          tresPrimerosPicos[3]=tresPrimerosPicos[2];
+          tresPrimerosPicosPos[3]=tresPrimerosPicosPos[2];  
+          tresPrimerosPicos[2]=tresPrimerosPicos[1];
+          tresPrimerosPicosPos[2]=tresPrimerosPicosPos[1];            
+          tresPrimerosPicos[1]=tresPrimerosPicos[0]; 
+          tresPrimerosPicosPos[1]=tresPrimerosPicosPos[0];                       
+          tresPrimerosPicos[0]=fht_log_out[i];
+          tresPrimerosPicosPos[0]=i;
+          f1=i;
+        }else{
+          if(fht_log_out[i]>tresPrimerosPicos[1]){
+            tresPrimerosPicos[3]=tresPrimerosPicos[2];
+            tresPrimerosPicosPos[3]=tresPrimerosPicosPos[2];  
+            tresPrimerosPicos[2]=tresPrimerosPicos[1];
+            tresPrimerosPicosPos[2]=tresPrimerosPicosPos[1];              
+            tresPrimerosPicos[1]=fht_log_out[i];
+            tresPrimerosPicosPos[1]=i;
+            f2=i;
+          }else{
+            if(fht_log_out[i]>tresPrimerosPicos[2]){
+              tresPrimerosPicos[3]=tresPrimerosPicos[2];
+              tresPrimerosPicosPos[3]=tresPrimerosPicosPos[2]; 
+              tresPrimerosPicos[2]=fht_log_out[i];
+              tresPrimerosPicosPos[2]=i;
+              f3=i;
+            }else{
+              if(fht_log_out[i]>tresPrimerosPicos[3]){
+                tresPrimerosPicos[3]=fht_log_out[i];
+                tresPrimerosPicosPos[3]=i;
+                f4=i;
+              }
+            }
+          }
+        }
+        
+
+//--------------------------------------------------------------------------------------------------
+          //contar la canidad de veces que un pico es encontrado
+          if (f1>=0)  picosDeMuestrasGrabacion[f1]++;
+          if (f2>=0)  picosDeMuestrasGrabacion[f2]++;
+          if (f3>=0)  picosDeMuestrasGrabacion[f3]++;
+          if (f4>=0)  picosDeMuestrasGrabacion[f4]++;
+        }
+      }
+    }//for de 1 muestra de 256 valores
+    
+  } //del while de n muetras
+  sei();
 
   /*Serial.println("-----Veo picos caracteristicos------");
 for (int i = 0 ; i < FHT_N/2 ; i++) {
@@ -606,7 +794,7 @@ void modoPatron() {
     //picos[i]=0;
     //Obtengo los picos
     if(i!=0){
-      if(fht_log_out[i]>fht_log_out[i-1] && fht_log_out[i]>fht_log_out[i+1] && fht_log_out[i]>35){//AHI PUSE 40 DE REFERENCIA
+      if(fht_log_out[i]>fht_log_out[i-1] && fht_log_out[i]>fht_log_out[i+1] && fht_log_out[i]>45 && i>10){//AHI PUSE 40 DE REFERENCIA
         if(fht_log_out[i]>tresPrimerosPicos[0]){
           tresPrimerosPicos[3]=tresPrimerosPicos[2];
           tresPrimerosPicosPos[3]=tresPrimerosPicosPos[2];  
@@ -687,7 +875,7 @@ void modoPatron() {
     int picosusado[5];
     for (int i = 0 ; i <= 4 ; i++) picosusado[i]=0;  
     int con=0;
-    int delta=2;
+    int delta=1;
     /*int picosConocidosDeMemoriaUSADO[5];
     for (int i = 0 ; i < 5 ; i++) picosConocidosDeMemoriaUSADO[i]=0;*/
 /*
