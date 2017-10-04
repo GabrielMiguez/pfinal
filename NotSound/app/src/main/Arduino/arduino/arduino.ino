@@ -584,10 +584,7 @@ void grabar(){
     tresPrimerosPicosPos[1]=0;
     tresPrimerosPicosPos[2]=0;
     tresPrimerosPicosPos[3]=0;
-    int f1=-1;
-    int f2=-1;
-    int f3=-1;
-    int f4=-1;
+    
     
     for (int i = 0 ; i < FHT_N/2 ; i++) {
       //Obtengo los picos
@@ -608,7 +605,7 @@ void grabar(){
           tresPrimerosPicosPos[1]=tresPrimerosPicosPos[0];                       
           tresPrimerosPicos[0]=fht_log_out[i];
           tresPrimerosPicosPos[0]=i;
-          f1=i;
+         
         }else{
           if(fht_log_out[i]>tresPrimerosPicos[1]){
             tresPrimerosPicos[3]=tresPrimerosPicos[2];
@@ -617,19 +614,19 @@ void grabar(){
             tresPrimerosPicosPos[2]=tresPrimerosPicosPos[1];              
             tresPrimerosPicos[1]=fht_log_out[i];
             tresPrimerosPicosPos[1]=i;
-            f2=i;
+            
           }else{
             if(fht_log_out[i]>tresPrimerosPicos[2]){
               tresPrimerosPicos[3]=tresPrimerosPicos[2];
               tresPrimerosPicosPos[3]=tresPrimerosPicosPos[2]; 
               tresPrimerosPicos[2]=fht_log_out[i];
               tresPrimerosPicosPos[2]=i;
-              f3=i;
+              
             }else{
               if(fht_log_out[i]>tresPrimerosPicos[3]){
                 tresPrimerosPicos[3]=fht_log_out[i];
                 tresPrimerosPicosPos[3]=i;
-                f4=i;
+                
               }
             }
           }
@@ -638,10 +635,10 @@ void grabar(){
 
 //--------------------------------------------------------------------------------------------------
           //contar la canidad de veces que un pico es encontrado
-          if (f1>=0)  picosDeMuestrasGrabacion[f1]++;
-          if (f2>=0)  picosDeMuestrasGrabacion[f2]++;
-          if (f3>=0)  picosDeMuestrasGrabacion[f3]++;
-          if (f4>=0)  picosDeMuestrasGrabacion[f4]++;
+          if (tresPrimerosPicosPos[0]>0)  picosDeMuestrasGrabacion[tresPrimerosPicosPos[0]]++;
+          if (tresPrimerosPicosPos[1]>0)  picosDeMuestrasGrabacion[tresPrimerosPicosPos[1]]++;
+          if (tresPrimerosPicosPos[2]>0)  picosDeMuestrasGrabacion[tresPrimerosPicosPos[2]]++;
+          if (tresPrimerosPicosPos[3]>0)  picosDeMuestrasGrabacion[tresPrimerosPicosPos[3]]++;
         }
       }
     }//for de 1 muestra de 256 valores
