@@ -194,7 +194,7 @@ public class MiServiceIBinder extends Service {
 
         // Instanciamos e inicializamos nuestro manager.
         NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
+        //nManager.cancel(1);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 getApplicationContext())
                 .setSmallIcon(android.R.drawable.ic_dialog_alert)
@@ -206,7 +206,7 @@ public class MiServiceIBinder extends Service {
                 .setPriority(2) //Maxima prioridad
                 .setAutoCancel(true);
 
-        nManager.notify(12345, builder.build());
+        nManager.notify(1, builder.build());
 
 
 

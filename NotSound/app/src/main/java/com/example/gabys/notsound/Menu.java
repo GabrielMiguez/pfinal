@@ -1,5 +1,6 @@
 package com.example.gabys.notsound;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -161,6 +162,9 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                 Intent inte = new Intent(getApplicationContext(), SonidoAlertaActivity.class);
                 inte.putExtra("sonidoSeleccionado", i);
                 startActivity(inte);
+
+                NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                nManager.cancel(1);
             }
         }catch (Exception e ){
             Toast.makeText(this, "Error al Notificar Activity Patron", Toast.LENGTH_SHORT).show();
