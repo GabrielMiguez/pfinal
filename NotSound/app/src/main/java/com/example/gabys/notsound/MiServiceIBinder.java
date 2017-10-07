@@ -216,7 +216,7 @@ public class MiServiceIBinder extends Service {
     {
         try {
             if (s.equals("NA"))
-                Notificar(99);
+                Notificar(Sonidos.ID_SONIDO_ALERTA_EXTERNA);
             else  if (s.charAt(0)=='N'){
                 try{
                     int i=  Integer.valueOf(s.substring(1));

@@ -196,8 +196,10 @@ public class SonidosEdicionActivity extends Menu {
 
         if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO) {
 
-            File file = new File(sonidos.getSonidoByPosition(itemSeleccionado).getRutaFoto());
-            file.delete();
+            if (sonidos.getSonidoByPosition(itemSeleccionado).getRutaFoto() != null){
+                File file = new File(sonidos.getSonidoByPosition(itemSeleccionado).getRutaFoto());
+                file.delete();
+            }
 
             sonidos.setSonido(itemSeleccionado,(new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado)));
             sonidos.saveSonidos(getApplicationContext());
@@ -210,7 +212,6 @@ public class SonidosEdicionActivity extends Menu {
         }
 
         saveImage(imagen, rutaFoto);
-
         this.onBackPressed();
     }
 

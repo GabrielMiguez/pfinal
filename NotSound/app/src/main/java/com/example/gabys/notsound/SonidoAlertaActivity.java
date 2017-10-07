@@ -7,7 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SonidoAlertaActivity extends AppCompatActivity {
+public class SonidoAlertaActivity extends Menu {
 
     private int itemSeleccionado;
     private TextView txt_sonidoNombre;
@@ -17,8 +17,20 @@ public class SonidoAlertaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sonido_alerta);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        super.CreateMenu();
+
+        String menuAyuda_titulo1="Alerta de Sonido";
+        String menuAyuda_cuerpo1="Se ha detectado un Sonido.";
+
+        super.setAyudaParametros(
+                menuAyuda_titulo1,
+                menuAyuda_cuerpo1,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
 
         txt_sonidoNombre = (TextView)findViewById(R.id.txtvw_sonidoNombre);
         img_imagenSonido = (ImageView)findViewById(R.id.img_ImagenSonido);

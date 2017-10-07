@@ -82,6 +82,6 @@
     <string name="title_activity_nosotros">Nosotros</string>
     <string name="title_activity_sonidos">Sonidos</string>
     <string name="title_activity_sonidos_edicion">Edición de Sonidos</string>
-    <string name="title_activity_sonido_alerta">SonidoAlertaActivity</string>
+    <string name="title_activity_sonido_alerta">Sonido detectado</string>
 
 </resources>
