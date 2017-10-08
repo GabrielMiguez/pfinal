@@ -1,29 +1,19 @@
 package com.example.gabys.notsound;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.IntegerRes;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewDebug;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -37,14 +27,19 @@ public class SonidosEdicionActivity extends Menu {
     private static final int CAMERA_REQUEST = 1888;
     private static int RESULT_LOAD_IMAGE = 1;
 
+    private static Boolean estaGrabando = false;
+
     private Sonidos sonidos;
     private int itemSeleccionado;
     private int IDSonido_grabado=-1;
 
+    private TextView txt_sonidoID_texto;
     private TextView txt_sonidoID;
     private EditText txt_sonidoNombre;
     private Switch chk_habilitado;
+    private TextView txt_imagen_texto;
     private ImageView img_imagenSonido;
+    private FloatingActionButton fab_grabarAudio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,10 +95,14 @@ public class SonidosEdicionActivity extends Menu {
                 menuAyuda_titulo4,
                 menuAyuda_cuerpo4);
 
+        txt_sonidoID_texto = (TextView)findViewById(R.id.txtvw_sonidoID_texto);
         txt_sonidoID = (TextView)findViewById(R.id.txtvw_sonidoID);
         txt_sonidoNombre = (EditText)findViewById(R.id.edtxt_sonidoNombre);
         chk_habilitado = (Switch) findViewById(R.id.sw_Habilitado);
-        img_imagenSonido = (ImageView)findViewById(R.id.img_ImagenSonido);
+        txt_imagen_texto = (TextView)findViewById(R.id.txtvw_imagen_texto);
+        img_imagenSonido = (ImageView) findViewById(R.id.img_ImagenSonido);
+        fab_grabarAudio = (FloatingActionButton) findViewById(R.id.fab_GrabarAudio);
+
         sonidos = new Sonidos();
         sonidos.loadSonidos(getApplicationContext());
 
@@ -116,10 +115,15 @@ public class SonidosEdicionActivity extends Menu {
             if (sonido.getImagen() != null) {img_imagenSonido.setImageBitmap(sonido.getImagen());}
         }
 
-        //Deshabilito algunos objetos para el sonidos "Alerta Externa"
+        //Oculto o muestro algunos objetos para el sonidos "Alerta Externa"
         if (itemSeleccionado == Sonidos.POSICION_SONIDO_ALERTA_EXTERNA) {
-            txt_sonidoNombre.setEnabled(false);
-            chk_habilitado.setEnabled(false);
+            txt_sonidoID_texto.setVisibility(View.INVISIBLE);
+            txt_sonidoID.setVisibility(View.INVISIBLE);
+            txt_sonidoNombre.setVisibility(View.INVISIBLE);
+            chk_habilitado.setVisibility(View.INVISIBLE);
+            fab_grabarAudio.setVisibility(View.INVISIBLE);
+
+            txt_imagen_texto.setVisibility(View.VISIBLE);
         }
     }
 
@@ -248,17 +252,42 @@ public class SonidosEdicionActivity extends Menu {
     }
 
     public void grabarAudio (View v) {
-        sendMSGSRV("G|");
+
+        if(estaGrabando) {
+            // Cambia el icono para volver a grabar
+            fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
+            fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
+
+            // Cancela la grabación
+            estaGrabando = false;
+            Toast.makeText(this, "Grabación cancelada", Toast.LENGTH_SHORT).show();
+        } else {
+            // Cambia el icono cuando empieza a grabar
+            fab_grabarAudio.setImageResource(R.drawable.ic_stop_black_24dp);
+            fab_grabarAudio.setColorFilter(Color.rgb(218,0,0));
+
+            estaGrabando = true;
+
+            //Metodo para Implememtar Accion en cada Activity
+            sendMSGSRV("G|");
+        }
     };
 
-    //Metodo para Implememtar Accion en cada Activity
     @Override
     public void ActionRecive(String s){
+
         //'G1|'<-Sonido Guardado con ID 1
         if (s.charAt(0)=='G'){
             s=s.substring(1);
             IDSonido_grabado =  Integer.valueOf(s);
+
+            // Cambia el icono si el guardado fue exitoso
+            fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
+            fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
+            estaGrabando = false;
+            Toast.makeText(this, "Grabación exitosa", Toast.LENGTH_SHORT).show();
         }
+
     }
 
 }

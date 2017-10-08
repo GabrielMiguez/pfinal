@@ -8,6 +8,79 @@
     tools:context="com.example.gabys.notsound.SonidosEdicionActivity"
     tools:showIn="@layout/activity_sonidos_edicion">
 
+    <TextView
+        android:id="@+id/txtvw_imagen_texto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ly_imagen"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentTop="false"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:text="Imagen para Alertas Externas"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:visibility="invisible" />
+
+    <LinearLayout
+        android:id="@+id/ly_ID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="5dp">
+
+        <TextView
+            android:id="@+id/txtvw_sonidoID_texto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentTop="false"
+            android:gravity="center_vertical"
+            android:text="ID de Sonido:"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/txtvw_sonidoID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/edtxt_sonidoNombre"
+            android:layout_alignParentTop="false"
+            android:layout_toEndOf="@+id/txtvw_sonidoID_texto"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingLeft="5dp"
+            android:text="(Desconocido)"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ly_Habilitado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtxt_sonidoNombre"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:paddingLeft="5dp"
+        android:weightSum="1">
+
+        <Switch
+            android:id="@+id/sw_Habilitado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.08"
+            android:checked="true"
+            android:splitTrack="false"
+            android:text="Habilitado"
+            android:textSize="18sp"
+            tools:checked="false" />
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/ly_imagen"
         android:layout_width="200dp"
@@ -33,60 +106,6 @@
             app:srcCompat="@android:drawable/ic_menu_report_image" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/ly_ID"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/textView11"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentStart="false"
-            android:layout_alignParentTop="false"
-            android:gravity="center_vertical"
-            android:text="ID de Sonido:"
-            android:textColor="@android:color/black"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/txtvw_sonidoID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/edtxt_sonidoNombre"
-            android:layout_alignParentTop="false"
-            android:layout_toEndOf="@+id/textView11"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:paddingLeft="5dp"
-            android:text="(Desconocido)"
-            android:textSize="18sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ly_Habilitado"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/edtxt_sonidoNombre"
-        android:layout_marginTop="20dp"
-        android:orientation="horizontal"
-        android:weightSum="1">
-
-        <Switch
-            android:id="@+id/sw_Habilitado"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.08"
-            android:checked="true"
-            android:splitTrack="false"
-            android:text="Habilitado"
-            android:textSize="18sp"
-            tools:checked="false" />
-    </LinearLayout>
-
     <EditText
         android:id="@+id/edtxt_sonidoNombre"
         android:layout_width="match_parent"
@@ -94,9 +113,8 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/ly_ID"
         android:layout_marginTop="20dp"
-        android:elevation="10dp"
-        android:ems="10"
         android:inputType="textPersonName"
+        android:paddingLeft="5dp"
         android:selectAllOnFocus="false"
         android:text="Sonido Nuevo" />
 
