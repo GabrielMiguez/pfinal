@@ -14,6 +14,31 @@ public class NosotrosActivity extends Menu {
         setContentView(R.layout.activity_nosotros);
         super.CreateMenu();
 
+        //Seteo el texto del menu de ayuda
+        String menuAyuda_titulo1="";
+        String menuAyuda_cuerpo1="";
+        String menuAyuda_titulo2="";
+        String menuAyuda_cuerpo2="";
+        String menuAyuda_titulo3="";
+        String menuAyuda_cuerpo3="";
+        String menuAyuda_titulo4="";
+        String menuAyuda_cuerpo4="";
+
+        menuAyuda_titulo1="Integrantes";
+        menuAyuda_cuerpo1="Presione sobre el nombre del integrante para redireccionar al perfil de LinkedIn.";
+        menuAyuda_titulo2="Consultas y Sugerencias";
+        menuAyuda_cuerpo2="Presione sobre el correo electrónico para enviar un mail.";
+
+        super.setAyudaParametros(
+                menuAyuda_titulo1,
+                menuAyuda_cuerpo1,
+                menuAyuda_titulo2,
+                menuAyuda_cuerpo2,
+                null,
+                null,
+                null,
+                null);
+
         TextView txtMauro = (TextView) findViewById(R.id.txtvw_mauro);
         TextView txtMauricio = (TextView) findViewById(R.id.txtvw_mauricio);
         TextView txtLucas = (TextView) findViewById(R.id.txtvw_lucas);

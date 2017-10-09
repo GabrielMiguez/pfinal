@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:paddingBottom="20dp"
+            android:paddingRight="5dp"
             android:text="Somos un equipo de futuros ingenieros de la Universidad Tecnológica Nacional, Facultad Regional de Buenos Aires (UTN, FRBA):"
             android:textAlignment="textStart"
             android:textColor="@color/color_text"
