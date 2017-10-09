@@ -1,5 +1,8 @@
 package com.example.gabys.notsound;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -7,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
@@ -27,7 +31,7 @@ public class SonidosEdicionActivity extends Menu {
     private static final int CAMERA_REQUEST = 1888;
     private static int RESULT_LOAD_IMAGE = 1;
 
-    private static Boolean estaGrabando = false;
+    private Boolean grabacionExitosa = false;
 
     private Sonidos sonidos;
     private int itemSeleccionado;
@@ -40,6 +44,11 @@ public class SonidosEdicionActivity extends Menu {
     private TextView txt_imagen_texto;
     private ImageView img_imagenSonido;
     private FloatingActionButton fab_grabarAudio;
+
+    AlertDialog.Builder dialogo1;
+    ProgressDialog progress;
+    Runnable progressRunnable;
+    Handler pdCanceller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -253,24 +262,62 @@ public class SonidosEdicionActivity extends Menu {
 
     public void grabarAudio (View v) {
 
-        if(estaGrabando) {
-            // Cambia el icono para volver a grabar
-            fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
-            fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
+        // Cambia el icono cuando empieza a grabar
+        fab_grabarAudio.setImageResource(R.drawable.ic_stop_black_24dp);
+        fab_grabarAudio.setColorFilter(Color.rgb(218,0,0));
 
-            // Cancela la grabación
-            estaGrabando = false;
-            Toast.makeText(this, "Grabación cancelada", Toast.LENGTH_SHORT).show();
-        } else {
-            // Cambia el icono cuando empieza a grabar
-            fab_grabarAudio.setImageResource(R.drawable.ic_stop_black_24dp);
-            fab_grabarAudio.setColorFilter(Color.rgb(218,0,0));
+        //Metodo para Implememtar Accion en cada Activity
+        sendMSGSRV("G|");
 
-            estaGrabando = true;
+        grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
 
-            //Metodo para Implememtar Accion en cada Activity
-            sendMSGSRV("G|");
-        }
+        progress = new ProgressDialog(this);
+        progress.setTitle("Grabando");
+        progress.setMessage("Grabación en proceso. Espere...");
+        progress.setCancelable(false);
+        progress.show();
+
+        // Se crea un proceso para que al superar el TIMEOUT de GRABACION se ejecute.
+        // Si la grabacion no fue exitosa: se va a cerrar el ProgressDialog y va a mostrar un mensaje de error.
+        progressRunnable = new Runnable() {
+            @Override
+            public void run() {
+
+                progress.cancel();
+                if (!grabacionExitosa) {
+                    AlertDialog.Builder dialogo1 = new AlertDialog.Builder(SonidosEdicionActivity.this);
+                    dialogo1.setTitle("Atención");
+                    dialogo1.setMessage("El Sonido no fue grabado debido a que se superó el tiempo de espera.");
+                    dialogo1.setCancelable(false);
+                    dialogo1.setNegativeButton("Cerrar", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialogo1, int id) {
+                        }
+                    });
+
+                    dialogo1.show();
+
+                    // Cambia el icono si el guardado NO fue exitoso
+                    fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
+                    fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
+                }
+            }
+        };
+
+        pdCanceller = new Handler();
+        pdCanceller.postDelayed(progressRunnable, ConfigActivity.GRABACION_TIMEOUT); // Se setea el tiempo de espera antes de que llame al proceso de arriba.
+
+        /* CODIGO PARA PROBAR LA INTERRUPCION DEL BLUETOOTH. BORRAR!!!*/
+        /* INICIO */
+        /*
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                SonidosEdicionActivity.this.ActionRecive("G1");
+            }
+        }, 5000);
+        */
+        /* FIN */
     };
 
     @Override
@@ -281,10 +328,13 @@ public class SonidosEdicionActivity extends Menu {
             s=s.substring(1);
             IDSonido_grabado =  Integer.valueOf(s);
 
+            // Seccion de validacion del ID del sonido
+            grabacionExitosa = true;
+            progress.cancel(); // Se cierra el ProgressDialog porque el bluetooth le devolvio el ID del sonido
+
             // Cambia el icono si el guardado fue exitoso
             fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
             fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
-            estaGrabando = false;
             Toast.makeText(this, "Grabación exitosa", Toast.LENGTH_SHORT).show();
         }
 

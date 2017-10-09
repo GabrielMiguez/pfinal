@@ -30,6 +30,8 @@ public class ConfigActivity extends Menu {
     public BluetoothAdapter BA;
     public BluetoothDevice BD;
 
+    public static int GRABACION_TIMEOUT = 5000 + 1000; // Extiendo un segundo mas el Timeout para que no coinicda con el tiempo de grabacion.
+
     Set<BluetoothDevice> pairedDevices;
     ArrayAdapter mArrayAdapter;
     private Spinner lstdispos;
@@ -91,8 +93,11 @@ public class ConfigActivity extends Menu {
                 if (!isChecked) {
                     //isChecked = true;
                     swB.setChecked(true); //coloca como antes, no deja desactivar
-                } else
+
+                } else {
                     btnOnBluetooth();
+                    swB.setEnabled(false); // una vez activado, se deshabilita el switch para que no pueda desactivar el bluetooth
+                }
             }
         });
 
