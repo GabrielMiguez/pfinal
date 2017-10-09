@@ -272,7 +272,7 @@ public class SonidosEdicionActivity extends Menu {
         grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
 
         progress = new ProgressDialog(this);
-        progress.setTitle("Grabando");
+        //progress.setTitle("Grabando");
         progress.setMessage("Grabación en proceso. Espere...");
         progress.setCancelable(false);
         progress.show();
