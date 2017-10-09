@@ -84,4 +84,13 @@
     <string name="title_activity_sonidos_edicion">Edición de Sonidos</string>
     <string name="title_activity_sonido_alerta">Sonido detectado</string>
 
+    <!-- Nosotros subrayado -->
+    <string name="nosotros_lucas"> <u>Lucas Lavrencic</u> </string>
+    <string name="nosotros_mauro"> <u>Mauro Gonzalez</u> </string>
+    <string name="nosotros_mauricio"> <u>Mauricio Fernandez</u> </string>
+    <string name="nosotros_maximiliano"> <u>Maximiliano Sarli</u> </string>
+    <string name="nosotros_gabriel"> <u>Gabriel Miguez</u> </string>
+    <string name="nosotros_mail"> <u>MesaDeAyuda@NotSound.com.ar</u> </string>
+
+
 </resources>

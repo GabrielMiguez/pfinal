@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -134,6 +135,8 @@ public class SonidosEdicionActivity extends Menu {
 
             txt_imagen_texto.setVisibility(View.VISIBLE);
         }
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); // Al iniciar, abro el teclado para editar el nombre del Sonido
     }
 
     @Override
