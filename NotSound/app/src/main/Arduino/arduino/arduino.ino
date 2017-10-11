@@ -28,6 +28,7 @@ char c;
 
 void(* resetFunc) (void) = 0;//declare reset function at address 0
 byte oldADCSRA;
+byte oldTIMSK0;
 // Define various ADC prescaler a different way...
 const unsigned char PS_16 = (1 << ADPS2);
 const unsigned char PS_32 = (1 << ADPS2) | (1 << ADPS0);
@@ -43,7 +44,7 @@ void setNormal(){
   // PS_16, PS_32, PS_64 or PS_128
     //ADCSRA |= PS_128;    // set our own prescaler to 32 
   
-  TIMSK0 = 1; // turn off timer0 for lower jitter -->Problemas con el sleep
+  TIMSK0 = oldTIMSK0; // turn off timer0 for lower jitter -->Problemas con el sleep
   ADCSRA = oldADCSRA;
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
@@ -57,6 +58,30 @@ void setFast(){
   normal=0;
 
 }
+void setModoOut(){
+    if (modo==0) return;
+    
+    modo=0;
+    setNormal();
+    Timer1.attachInterrupt(callback);
+    EEPROM.write(0, 1);
+    delay(200);
+    //resetFunc();  //call reset
+    //delay(100);
+    //Serial.println("never happens");
+}
+void setModoIn(){
+    if (modo==1) return;
+    
+    modo=1;
+    Timer1.detachInterrupt();
+    setFast();
+    EEPROM.write(0, 2);
+    delay(200);
+    //resetFunc();  //call reset
+    //delay(100);
+    //Serial.println("never happens");
+}
 
 void setup()
 {
@@ -69,11 +94,14 @@ void setup()
   pinMode(A0,INPUT);
   
   oldADCSRA=ADCSRA;
+  oldTIMSK0=TIMSK0;
   Serial.println("---- SETUP ----");
-  //setFast();
-  //setNormal();
-  //modo=0;
   
+  //iniDemo();
+  //grabar();
+  initEEPROM();
+  
+  modo=1;
   if (EEPROM.read(0)==2){
     Timer1.detachInterrupt();
     setFast();
@@ -82,15 +110,13 @@ void setup()
     setNormal();
     Timer1.initialize(30000000);
     Timer1.attachInterrupt(callback);
-    
     modo=0;
   }
 
+
   Serial.print("Modo:");
   Serial.println(modo);
-  //iniDemo();
-  //grabar();
-  initEEPROM();
+  
 }
 
 void loop()
@@ -125,9 +151,7 @@ grabar();
     //Serial.println("Antes modo 0");
     if (modo==0){ // modo OUT
 
-Serial.println("---- ANTES A0 ----");
       int k=analogRead(A0);
-Serial.println("---- DESPUES A0 ----");      
 cantidadTotales++;
 /*
       
@@ -298,34 +322,14 @@ void reccmd(String sms){
     BT1.flush();
   }
   if (sms=="C1"){//out
-    modo=0;
-    setNormal();
-    delay(2000);
-    Timer1.attachInterrupt(callback);
-    EEPROM.write(0, 1);
-    
+    setModoOut();
     BT1.write("C1|"); //out
-    BT1.flush();
-    
-    delay(200);
-    //resetFunc();  //call reset
-    //delay(100);
-    //Serial.println("never happens");
-  
-     
+    BT1.flush(); 
   }
   if (sms=="C2"){//in
-    modo=1;
-    Timer1.detachInterrupt();
-    setFast();
-    delay(2000);
-    EEPROM.write(0, 2);
+    setModoIn();
     BT1.write("C2|"); // in
     BT1.flush();
-    delay(200);
-    //resetFunc();  //call reset
-    //delay(100);
-    //Serial.println("never happens");
   }
   
   if (sms=="CE"){
@@ -334,7 +338,6 @@ void reccmd(String sms){
   }
 
   if (sms[0]=='B'){
-    modo=1; //modo 0: out, 1: in
     estado=1;  //0 lecturea, 1 grabando
     
     String ss=sms.substring(1 ,sms.length());
@@ -350,7 +353,7 @@ void reccmd(String sms){
   }
   
   if (sms[0]=='R'){
-    modo=1; //modo 0: out, 1: in
+    setModoIn();
     estado=1;  //0 lecturea, 1 grabando
     
     String ss=sms.substring(1 ,sms.length());
@@ -367,7 +370,7 @@ void reccmd(String sms){
   }
   
   if (sms=="G"){
-    modo=1; //modo 0: out, 1: in
+    setModoIn();    
     estado=1;  //0 lecturea, 1 grabando
     IDSoundGrab=-1;
     grabar(-1);
