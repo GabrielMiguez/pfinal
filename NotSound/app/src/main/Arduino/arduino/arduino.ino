@@ -26,9 +26,25 @@ volatile double GLOBAL_ruidoPromedio=0;  //volatile, por que se cambian en inter
 volatile double procentajeSuperacionPromedio=30;
 char c;
 
+void(* resetFunc) (void) = 0;//declare reset function at address 0
+byte oldADCSRA;
+// Define various ADC prescaler a different way...
+const unsigned char PS_16 = (1 << ADPS2);
+const unsigned char PS_32 = (1 << ADPS2) | (1 << ADPS0);
+const unsigned char PS_64 = (1 << ADPS2) | (1 << ADPS1);
+const unsigned char PS_128 = (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+
+
 void setNormal(){
+  
+  // set up the ADC
+    //ADCSRA &= ~PS_32;  // remove bits set by Arduino library
+  // you can choose a prescaler from above.
+  // PS_16, PS_32, PS_64 or PS_128
+    //ADCSRA |= PS_128;    // set our own prescaler to 32 
+  
   TIMSK0 = 1; // turn off timer0 for lower jitter -->Problemas con el sleep
-  ADCSRA |= bit (ADPS1);    
+  ADCSRA = oldADCSRA;
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
   normal=1;
@@ -46,18 +62,32 @@ void setup()
 {
   BT1.begin(9600);
   BT1.flush();
+  Serial.begin(BAUDRATE); // use the serial port
   
-  //Serial.begin(9600);
   pinMode(ledPin, OUTPUT);
   pinMode(ledPin1, OUTPUT);
   pinMode(A0,INPUT);
-  Timer1.initialize(30000000);
-  //Timer1.attachInterrupt(callback);
+  
+  oldADCSRA=ADCSRA;
+  Serial.println("---- SETUP ----");
+  //setFast();
+  //setNormal();
+  //modo=0;
+  
+  if (EEPROM.read(0)==2){
+    Timer1.detachInterrupt();
+    setFast();
+    modo=1;
+  }else{
+    setNormal();
+    Timer1.initialize(30000000);
+    Timer1.attachInterrupt(callback);
+    
+    modo=0;
+  }
 
-  Serial.begin(BAUDRATE); // use the serial port
-  setFast();
-
-  modo=1;
+  Serial.print("Modo:");
+  Serial.println(modo);
   //iniDemo();
   //grabar();
   initEEPROM();
@@ -73,16 +103,12 @@ grabar();
 */
 
   while(1){
-  //BT1.write(1);
-    //lectura del blue
     //delay(500);
-    
-    //if (BT1.peek()>0)
-      //Serial.println("BT ");
     if (BT1.available()){
       //Serial.println("BT ");
       //delay(100000);
       c= BT1.read();
+      
       //Serial.write(c);
       if( c != '|')    //Hasta que el caracter sea END_CMD_CHAR
          buf += c;
@@ -99,8 +125,9 @@ grabar();
     //Serial.println("Antes modo 0");
     if (modo==0){ // modo OUT
 
-
+Serial.println("---- ANTES A0 ----");
       int k=analogRead(A0);
+Serial.println("---- DESPUES A0 ----");      
 cantidadTotales++;
 /*
       
@@ -192,7 +219,6 @@ void callback()
   //Serial.println("--------------Muestras-----------");
   double acumuladorPromedio=0;
   for (int i=0; i<topeMuestras; i++) {
-    //Obtengo todos los valores y los aguardo para tomar lods 20 mas altos
     
     
     int k=analogRead(A0);
@@ -244,7 +270,7 @@ void callback()
   
 }
 
-void reccmd(String buf){
+void reccmd(String sms){
   /*
       'G|'->Comenzar Grabación (x milisegundos máximos)
       'P1|'<-Sonido PRE Guardado con ID
@@ -267,33 +293,51 @@ void reccmd(String buf){
       'NA|'<-Notificación Alerta
       'N1|'<-Notificación ID
   */    
-  if (buf=="T0"){
+  if (sms=="T0"){
     BT1.write("T0|");
     BT1.flush();
   }
-  if (buf=="C1"){//out
+  if (sms=="C1"){//out
     modo=0;
+    setNormal();
+    delay(2000);
     Timer1.attachInterrupt(callback);
+    EEPROM.write(0, 1);
+    
     BT1.write("C1|"); //out
     BT1.flush();
+    
+    delay(200);
+    //resetFunc();  //call reset
+    //delay(100);
+    //Serial.println("never happens");
+  
+     
   }
-  if (buf=="C2"){//in
+  if (sms=="C2"){//in
     modo=1;
     Timer1.detachInterrupt();
+    setFast();
+    delay(2000);
+    EEPROM.write(0, 2);
     BT1.write("C2|"); // in
     BT1.flush();
+    delay(200);
+    //resetFunc();  //call reset
+    //delay(100);
+    //Serial.println("never happens");
   }
   
-  if (buf=="CE"){
+  if (sms=="CE"){
     cleanEEPROM();
     BT1.write("CE|"); // Format EEPROM
   }
 
-  if (buf[0]=='B'){
+  if (sms[0]=='B'){
     modo=1; //modo 0: out, 1: in
     estado=1;  //0 lecturea, 1 grabando
     
-    String ss=buf.substring(1 ,buf.length());
+    String ss=sms.substring(1 ,sms.length());
     IDSoundGrab = ss.toInt();
     
     eDeleteSound(IDSoundGrab);
@@ -305,11 +349,11 @@ void reccmd(String buf){
     estado=0;  //0 lecturea, 1 grabando
   }
   
-  if (buf[0]=='R'){
+  if (sms[0]=='R'){
     modo=1; //modo 0: out, 1: in
     estado=1;  //0 lecturea, 1 grabando
     
-    String ss=buf.substring(1 ,buf.length());
+    String ss=sms.substring(1 ,sms.length());
     IDSoundGrab = ss.toInt();
     
     grabar(IDSoundGrab);
@@ -319,9 +363,10 @@ void reccmd(String buf){
     
     IDSoundGrab=-1;
     estado=0;  //0 lecturea, 1 grabando
+    delay(2000);
   }
   
-  if (buf=="G"){
+  if (sms=="G"){
     modo=1; //modo 0: out, 1: in
     estado=1;  //0 lecturea, 1 grabando
     IDSoundGrab=-1;
@@ -332,6 +377,7 @@ void reccmd(String buf){
     
     IDSoundGrab=-1;
     estado=0;  //0 lecturea, 1 grabando
+    delay(2000);
   }
     
 }
@@ -413,9 +459,9 @@ void iniDemo(){
         int CalcularultPOSeeprom(){                     
            for (int i = EEPROM.length()-1; i >= priPOSeeprom ; i--)
            {
-              Serial.print(i);
-              Serial.print(":");
-              Serial.println(EEPROM.read(i));
+              //Serial.print(i);
+              //Serial.print(":");
+              //Serial.println(EEPROM.read(i));
                 if (EEPROM.read(i) != 0)
                     return (i+1);
            }
@@ -1126,11 +1172,11 @@ Serial.println(cantidadEncuentros);
       BT1.flush();*/
 
       
-      //BT1.write('N');
+      BT1.write('N');
       delay(400000);
-      //BT1.print(idsound);
+      BT1.print(idsound);
       delay(400000);
-      //BT1.write('|');
+      BT1.write('|');
 
 
       
