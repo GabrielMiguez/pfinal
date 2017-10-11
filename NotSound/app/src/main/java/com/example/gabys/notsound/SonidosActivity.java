@@ -91,9 +91,16 @@ public class SonidosActivity extends Menu {
                 dialogo1.setCancelable(false);
                 dialogo1.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogo1, int id) {
+
+                        Sonido sonido = sonidos.getSonidoByPosition(itemSelected_sonidosCompleto);
+                        sendMSGSRV("B" + Integer.toString(sonido.getID()) + "|");
+
                         sonidos.removeSonidoByPosition(getApplicationContext(), itemSelected_sonidosCompleto); // Actualizo la lista completa de los sonidos guardados
                         sonidosSinAlertaExterna.remove(itemSelected_sonidosSinAlertaExterna); // Actualizo la lista de los sonidos que se visualizan
                         adaptador.notifyDataSetChanged();
+
+
+
                     }
                 });
                 dialogo1.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {

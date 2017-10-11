@@ -14,14 +14,16 @@ String buf="";
 bool  modo=0; //modo 0: out, 1: in
 bool estado=0;  //0 lecturea, 1 grabando
 bool normal=1; //SetNormal or fast
-
+int priPOSeeprom=5;   //los primeros 5 son de config
+int ultPOSeeprom=5;   //se actualizara con el maximo puede haber espacios en el medio
+        
 int IDSoundGrab=-1;
 int ledPin = 10;
 int ledPin1 = 13;
 /*char palanca[3]="A0";*/
 char mic[3]="A0";
 volatile double GLOBAL_ruidoPromedio=0;  //volatile, por que se cambian en interrupciones
-volatile double procentajeSuperacionPromedio=50;
+volatile double procentajeSuperacionPromedio=30;
 char c;
 
 void setNormal(){
@@ -49,8 +51,8 @@ void setup()
   pinMode(ledPin, OUTPUT);
   pinMode(ledPin1, OUTPUT);
   pinMode(A0,INPUT);
-  Timer1.initialize(7000000);
-  Timer1.attachInterrupt(callback);
+  Timer1.initialize(30000000);
+  //Timer1.attachInterrupt(callback);
 
   Serial.begin(BAUDRATE); // use the serial port
   setFast();
@@ -58,12 +60,18 @@ void setup()
   modo=1;
   //iniDemo();
   //grabar();
+  initEEPROM();
 }
 
 void loop()
 {  
   Serial.println("------------- LOOP -------------- ");
-  
+  int cantidadTotales=0;
+/*
+cleanEEPROM();
+grabar();
+*/
+
   while(1){
   //BT1.write(1);
     //lectura del blue
@@ -87,8 +95,15 @@ void loop()
       Serial.println(c);
     }
 
+
     //Serial.println("Antes modo 0");
     if (modo==0){ // modo OUT
+
+
+      int k=analogRead(A0);
+cantidadTotales++;
+/*
+      
       //Serial.println("modo 0");
       //Vamos leyendo lo que capta el mic
       //si supera valor promedio, prendemos led
@@ -100,18 +115,61 @@ void loop()
       //k -= 0x0200; // form into a signed int
       //k <<= 6; // form into a 16b signed int
       
-      
+      */
       //if(lecturaMic>(GLOBAL_ruidoPromedio*procentajeSuperacionPromedio)){
       if(k>(GLOBAL_ruidoPromedio +  procentajeSuperacionPromedio)){
-        //Prendo led
-        digitalWrite(ledPin1, HIGH);
-        //Envio sms x blue
-        BT1.write("NA|");
+
+Serial.println("---SE SUPERO EL PROMEDIO UNA VEZ---");
+//Serial.println(cantidadTotales);
         
-        Serial.println("supero");
+        int cantidadSuperaciones=0;
+        double acumuladorMuestras=0;
+        //Se supero el ruido promedio, una unica vez, entonces voy a ver si las siguientes muestras
+        //lo siguen superando, cosa de eliminar impulsos cortos
+        for (int i = 0 ; i < 2000 ; i++) {
+
+
+
+          /*
+          while(!(ADCSRA & 0x10)); // wait for adc to be ready
+          ADCSRA = 0xf5; // restart adc
+          byte m = ADCL; // fetch adc data
+          byte j = ADCH;
+          int k = (j << 8) | m; // form into an int
+
+/¿*/
+
+k=analogRead(A0);
+//acumuladorMuestras=acumuladorMuestras+k;
+          //Serial.println(k);
+
+          if(k>(GLOBAL_ruidoPromedio +  procentajeSuperacionPromedio)){
+            cantidadSuperaciones=cantidadSuperaciones+1;
+          }
+          
+        }
+
+//Serial.println("---Fin toma muestras---");
         
-        callback();
-        delay(200000);
+        if(cantidadSuperaciones>60){
+        //if((acumuladorMuestras/100)>=GLOBAL_ruidoPromedio +  procentajeSuperacionPromedio){
+          //Prende
+          //Prendo led
+          Serial.println("Promedio global-:");
+          Serial.println(GLOBAL_ruidoPromedio +  procentajeSuperacionPromedio);
+          Serial.println("Promedio recien calculado:");
+          Serial.println(cantidadSuperaciones);
+          //Serial.println(cantidadSuperaciones);
+          digitalWrite(ledPin1, HIGH);
+          //Envio sms x blue
+          BT1.write("NA|");
+          
+          Serial.println("supero");
+          
+          callback();
+          delay(2000);
+        }
+
       }else{
         digitalWrite(ledPin1, LOW);
       }
@@ -128,13 +186,19 @@ void callback()
 {
   if (modo!=0) return; // modo != OUT => salgo
   //if (normal==0) return; //modo fast me voy
-  
-  double arrayOfTops[50];
+  int topeMuestras=100;
+  double arrayOfTops[topeMuestras];
   int contArrayOfTops=0;
   //Serial.println("--------------Muestras-----------");
-  for (int i=0; i<50; i++) {
+  double acumuladorPromedio=0;
+  for (int i=0; i<topeMuestras; i++) {
     //Obtengo todos los valores y los aguardo para tomar lods 20 mas altos
     
+    
+    int k=analogRead(A0);
+    
+    
+    /*
     while(!(ADCSRA & 0x10)); // wait for adc to be ready
     ADCSRA = 0xf5; // restart adc
     byte m = ADCL; // fetch adc data
@@ -142,18 +206,22 @@ void callback()
     int k = (j << 8) | m; // form into an int
     //k -= 0x0200; // form into a signed int
     //k <<= 6; // form into a 16b signed int
-    
+    */
     //if (lecturaMic <=1023) 
       //Serial.println(lecturaMic);
     
+    
+    
+    acumuladorPromedio=acumuladorPromedio+k;
+    /*
     arrayOfTops[contArrayOfTops]=k;
-    contArrayOfTops++;
+    contArrayOfTops++;*/
   }
-
+/*
   //Hago burbuja para ordenarlos
   double temp=0;
-  for (int i=0; i<50; i++){
-    for (int j=0 ; j<50 - 1; j++){
+  for (int i=0; i<topeMuestras; i++){
+    for (int j=0 ; j<topeMuestras - 1; j++){
       if (arrayOfTops[j] > arrayOfTops[j+1])
       {
         temp = arrayOfTops[j];
@@ -162,14 +230,15 @@ void callback()
       }
     }
   }
-
+*/
   //Tomo los ultimos 20 que son los mas altos y saco el promedio en base a esos
-  double sum=0;
-  for (int i=29; i<50; i++) {
+  /*double sum=0;
+  int cantidadAPromediar=topeMuestras-20;
+  for (int i=cantidadAPromediar-1; i<topeMuestras; i++) {
     //Serial.println(arrayOfTops[i]);
     sum=sum+arrayOfTops[i];
-  }
-  GLOBAL_ruidoPromedio=sum/20;
+  }*/
+  GLOBAL_ruidoPromedio=acumuladorPromedio/topeMuestras;
   //Serial.println("PROMEDIO DIO:");
   //Serial.println(GLOBAL_ruidoPromedio);
   
@@ -220,11 +289,43 @@ void reccmd(String buf){
     BT1.write("CE|"); // Format EEPROM
   }
 
+  if (buf[0]=='B'){
+    modo=1; //modo 0: out, 1: in
+    estado=1;  //0 lecturea, 1 grabando
+    
+    String ss=buf.substring(1 ,buf.length());
+    IDSoundGrab = ss.toInt();
+    
+    eDeleteSound(IDSoundGrab);
+    BT1.write('B');
+    BT1.print(IDSoundGrab);
+    BT1.write('|');    
+    
+    IDSoundGrab=-1;
+    estado=0;  //0 lecturea, 1 grabando
+  }
+  
+  if (buf[0]=='R'){
+    modo=1; //modo 0: out, 1: in
+    estado=1;  //0 lecturea, 1 grabando
+    
+    String ss=buf.substring(1 ,buf.length());
+    IDSoundGrab = ss.toInt();
+    
+    grabar(IDSoundGrab);
+    BT1.write('G');
+    BT1.print(IDSoundGrab);
+    BT1.write('|');    
+    
+    IDSoundGrab=-1;
+    estado=0;  //0 lecturea, 1 grabando
+  }
+  
   if (buf=="G"){
     modo=1; //modo 0: out, 1: in
     estado=1;  //0 lecturea, 1 grabando
     IDSoundGrab=-1;
-    grabar();
+    grabar(-1);
     BT1.write('G');
     BT1.print(IDSoundGrab);
     BT1.write('|');    
@@ -239,7 +340,7 @@ void iniDemo(){
   cleanEEPROM();  
   //Sonido 1 TIMBRE
   //https://www.youtube.com/watch?v=h46qbBy45Gg  
-  int i=0;
+  int i=priPOSeeprom;
   EEPROM.write(i, 94);  
   i++;
   EEPROM.write(i, 48);  
@@ -282,42 +383,118 @@ void iniDemo(){
 }  
 
 //---- Funciones EEPROM ----
-int primeraPosVaciaEEPROM(){
-   for (int i = 0 ; i < EEPROM.length() ; i++) {
-    if(EEPROM.read(i)==0){
-      return i;
-    }
-   }
-   //EEPROM LLENA
-   return 0;
-}
-
-
-int ultimaPosLlenaEEPROM(){
-  if(EEPROM.read(0)==0){
-    return 0;
-  }    
-  for (int i = 0 ; i < EEPROM.length() ; i++) {
-  if(EEPROM.read(i+1)==0){
-    return i;
-  }
-  }  
-  return EEPROM.length();
-}
-
-void cleanEEPROM(){
-            //1024bytes: 1 int => 2 bytes, por ende como maximo
+        /*
+            //1024bytes:
             //arduino value: the value to write, from 0 to 255 (byte)
-            //Nosotros guardos el valor de las frecuencias, y son de 0a128 
-  for (int i = 0 ; i < EEPROM.length() ; i++) {
-    EEPROM.write(i, 0);
-  }
-}
+            //Nosotros guardos el valor de las frecuencias, y son de 0a128
+          
+            -el grabar , busca la primer posiicon libre"0", cuando la encuentra graba las siguiente 5 (utilizando simempre la primer parte de la memoria)
+              -el reemplazar marca los casilleros borrados con el valor 0. y quizas actualiza la ultimaposicionusada de la epprom
+              -para recorrer se utilizan todos los valores distintos de (0) y que eesten entre el min y el max de la epprom.
+         */
+         //int priPOSeeprom=5;   //los primeros 5 son de config
+            //0: modo funcionamiento 1, 2
+            //1: nivel Sensibilidad  1, 2, 3
+            //2: reservado
+            //3: reservado
+            //4: reservado
+ 
+        //int ultPOSeeprom=5;   //se actualizara con el maximo puede haber espacios en el medio               
+ 
+        int CalcularpriPOSVaciaeeprom(){
+           for (int i = priPOSeeprom; i <= EEPROM.length()-1; i++)
+           {
+                if (EEPROM.read(i) == 0)
+                    return i;               
+           }          
+           return -1;   //EEPROM LLENA
+        }
+ 
+        int CalcularultPOSeeprom(){                     
+           for (int i = EEPROM.length()-1; i >= priPOSeeprom ; i--)
+           {
+              Serial.print(i);
+              Serial.print(":");
+              Serial.println(EEPROM.read(i));
+                if (EEPROM.read(i) != 0)
+                    return (i+1);
+           }
+           return priPOSeeprom;  //EEPROM VACIA
+        }
+ 
+        int eSaveSound(int s[5]){
+            int i=CalcularpriPOSVaciaeeprom();
 
-//eSaveSound(int vec[])
-//eDeleteSound(int vec[])
-//3RenameSound(int vec[])
-
+            Serial.print(i);
+            Serial.print("e save :");
+            Serial.println(s[0]);
+            Serial.println(s[1]);
+            Serial.println(s[2]);
+              
+            EEPROM.write(i, s[0]);
+            EEPROM.write(i+1, s[1]);
+            EEPROM.write(i+2, s[2]);
+            EEPROM.write(i+3, s[3]);
+            EEPROM.write(i+4, s[4]);
+ 
+            if (ultPOSeeprom < (i+5)) //si grabo un sonido actualizo el puntero si es menor
+                ultPOSeeprom=i+5;
+            return i;
+        }
+ 
+        int eDeleteSound(int i){
+            EEPROM.write(i, 0);
+            EEPROM.write(i+1, 0);
+            EEPROM.write(i+2, 0);
+            EEPROM.write(i+3, 0);
+            EEPROM.write(i+4, 0);
+           
+            if (ultPOSeeprom == i+5) //si borre el ultimo sonido actulizo el puntero a fin
+                ultPOSeeprom=i;
+            return i;
+        }
+ 
+        int eUpdateSound(int i, int s[5]){
+            EEPROM.write(i, s[0]);
+            EEPROM.write(i+1, s[1]);
+            EEPROM.write(i+2, s[2]);
+            EEPROM.write(i+3, s[3]);
+            EEPROM.write(i+4, s[4]);
+            return i;
+        }
+ 
+        void cleanEEPROM()
+        {           
+            for (int i = priPOSeeprom; i < EEPROM.length(); i++)
+                EEPROM.write(i, 0);           
+            
+            ultPOSeeprom=priPOSeeprom;
+ 
+        }
+        void initEEPROM(){
+            if ( (EEPROM.read(0)!=1) && (EEPROM.read(0)!=2) ){ //nunca inicio el programa
+                cleanEEPROM();
+                if (modo==0)
+                  EEPROM.write(0,1);
+                else
+                  EEPROM.write(0,2);  
+            }
+            else{
+                ultPOSeeprom=CalcularultPOSeeprom();
+                Serial.println("ultima pos eeprom ");
+                Serial.println(ultPOSeeprom );
+            }
+        }
+       
+        //usos
+            //en el setup : initEEPROM();
+            //en operacion
+                //eSaveSound([1,2,3,4]);
+                //eDeleteSound(idsound);
+                //eRenameSound(idsound, [1,2,3,4]);
+                //cleanEEPROM();
+ 
+        
 //---- Funciones EEPROM ----
 
 
@@ -489,30 +666,20 @@ delay(200000);
   //Serial.println("Picos grabados");
   //Finalizado esto ya tengo en picosconocidos las pos de los 3 picos mas caracterisiticos del sonido recien escuchado
 
-  int getPrimeraPosParaGrabarLas5=primeraPosVaciaEEPROM();
-  Serial.println("Voy a grabar eeprom a partir de aca:");
+  Serial.println("Grabo en la eeprom desde:");
+  int getPrimeraPosParaGrabarLas5=eSaveSound(picosConocidos);
+  Serial.println("valores:");
   Serial.println(getPrimeraPosParaGrabarLas5);
-
-
-  Serial.println("Grabo en la eeprom:");
+  
   for (int i = 0 ; i < 5 ; i++) {
-    /*if(EEPROM.length()==0){
-      Serial.println("eprom vacia");
-      EEPROM.write(EEPROM.length()+i, picosConocidos[i]);
-      Serial.println(EEPROM.read(EEPROM.length()+i));
-    }else{*/
-      
-      EEPROM.write(getPrimeraPosParaGrabarLas5+i, picosConocidos[i]);
       Serial.println(EEPROM.read(getPrimeraPosParaGrabarLas5+i));
-   /* }*/
   }
-
   IDSoundGrab=getPrimeraPosParaGrabarLas5;
   
   //TERMINO PROCESO GRABACION
 }
 
-void grabar(){  
+void grabar(int id){  
     //grabo picos no count de frecuencias, ya que en la lectura me quedo con los picos en aplitud de las 3 frecuencias mas altas en amp
     //por ende cambio el grabar, para que tenga en cuenta la cantidad de frecuencias picos, pero no solo con el filtro, sino siempre guardo la frecuencia de los 3 pcios mas altos.
     
@@ -728,30 +895,31 @@ delay(200000);
   //Serial.println("Picos grabados");
   //Finalizado esto ya tengo en picosconocidos las pos de los 3 picos mas caracterisiticos del sonido recien escuchado
 
-  int getPrimeraPosParaGrabarLas5=primeraPosVaciaEEPROM();
-  Serial.println("Voy a grabar eeprom a partir de aca:");
+  Serial.println("Grabo en la eeprom desde:");
+  int getPrimeraPosParaGrabarLas5=0;
+  if (id!=-1){
+    getPrimeraPosParaGrabarLas5=eUpdateSound(id, picosConocidos);
+  }else
+    getPrimeraPosParaGrabarLas5=eSaveSound(picosConocidos);
+  
+  Serial.println("valores:");
   Serial.println(getPrimeraPosParaGrabarLas5);
-
-
-  Serial.println("Grabo en la eeprom:");
+  
   for (int i = 0 ; i < 5 ; i++) {
-    /*if(EEPROM.length()==0){
-      Serial.println("eprom vacia");
-      EEPROM.write(EEPROM.length()+i, picosConocidos[i]);
-      Serial.println(EEPROM.read(EEPROM.length()+i));
-    }else{*/
-      
-      EEPROM.write(getPrimeraPosParaGrabarLas5+i, picosConocidos[i]);
       Serial.println(EEPROM.read(getPrimeraPosParaGrabarLas5+i));
-   /* }*/
   }
-
   IDSoundGrab=getPrimeraPosParaGrabarLas5;
   
   //TERMINO PROCESO GRABACION
 }
 
 void modoPatron() {
+
+int idsound=-1;
+int cantidadCiclos=0;
+int cantidadEncuentros=0;
+int cantidadCiclosEncuentro=1;
+while(cantidadCiclos<cantidadCiclosEncuentro){
 
   //Serial.println("----Comienza la escucha-----");
 
@@ -836,15 +1004,17 @@ void modoPatron() {
   }*/
 
 
-  int valorHastaDondeLeoDeLaEEPROM=ultimaPosLlenaEEPROM();
+  int valorHastaDondeLeoDeLaEEPROM=ultPOSeeprom;
   //Serial.println("Hasta donde leo de la EEPROM");
   //Serial.println(valorHastaDondeLeoDeLaEEPROM);
 
   //bool CantCoicidencia[valorHastaDondeLeoDeLaEEPROM]; //vector que guardara la cantida de coincidencias por patron ? tiene sentido, o si le pega a 3 listo adentro?
   if (valorHastaDondeLeoDeLaEEPROM <= 0) return;
   //Comparo lo que escuché recién con algo conocido
-  for (int i = 0 ; i <= valorHastaDondeLeoDeLaEEPROM ; i=i+5) {
-    int idsound=i;
+  for (int i = priPOSeeprom ; i <= valorHastaDondeLeoDeLaEEPROM ; i=i+5) {
+    if (EEPROM.read(i)==0) continue; //valor borrado
+    
+    idsound=i;
     //Me guardo de a 5
     int picosConocidosDeMemoria[5];
     picosConocidosDeMemoria[0]=EEPROM.read(i);
@@ -909,26 +1079,62 @@ tresPrimerosPicosPos[3]=1;
     }
 
 //Serial.println("------Valores del if------");
-//for (int i = 0 ; i <= 4 ; i++) Serial.println(picosusado[i]); 
+
     //Serial.println("------Valores del if------");
 
    // Serial.println("------Valores del if------");
     
     if (con>=3){
+/*
+Serial.println("Lo que lei: "); 
+for (int i = 0 ; i <= 3 ; i++) Serial.println(tresPrimerosPicosPos[i]); 
+
+Serial.println("sonido encontrado: "); 
+for (int i = 0 ; i <= 4 ; i++) Serial.println(picosConocidosDeMemoria[i]); 
+
+      
       Serial.println("sonido encontrado: ");  
       Serial.println(idsound);  
       for (int i = 0 ; i <= 4 ; i++) Serial.println(picosusado[i]);  
-    
-      //Prendo led
-      digitalWrite(ledPin1, HIGH);
-      //Envio sms x blue
-      BT1.write('N');
-      BT1.print(idsound);
-      BT1.write('|');
-      delay(500000);
-      digitalWrite(ledPin1, LOW);
+    */
+
+      //incremento el contador y voy a procesar de nuevo el while
+      cantidadCiclosEncuentro=5;
+      cantidadEncuentros++;
+    Serial.println("Encontro una vez");
+     
       break;
     }
   }
-  
+  cantidadCiclos++;
+}//While de encontrar
+  if(cantidadEncuentros>1){
+
+Serial.println("Encontro mas de una");
+Serial.println(cantidadEncuentros);
+    
+    //Prendo
+     //Prendo led
+      digitalWrite(ledPin1, HIGH);
+      //Envio sms x blue
+      //delay(500000);
+      
+      //BT1.print('N'+idsound+'|');
+      //BT1.write(idsound+'|');
+      /*BT1.write(idsound);
+      BT1.write('|');
+      BT1.flush();*/
+
+      
+      //BT1.write('N');
+      delay(400000);
+      //BT1.print(idsound);
+      delay(400000);
+      //BT1.write('|');
+
+
+      
+      delay(400000);
+      digitalWrite(ledPin1, LOW);
+  }
 }

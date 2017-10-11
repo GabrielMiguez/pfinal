@@ -211,12 +211,12 @@ public class SonidosEdicionActivity extends Menu {
 
 
         if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO) {
-
+            if (IDSonido_grabado != -1)
+                IDSonido=IDSonido_grabado;
             if (sonidos.getSonidoByPosition(itemSeleccionado).getRutaFoto() != null){
                 File file = new File(sonidos.getSonidoByPosition(itemSeleccionado).getRutaFoto());
                 file.delete();
             }
-
             sonidos.setSonido(itemSeleccionado,(new Sonido(IDSonido,nombreSonido,rutaFoto,estaHabilitado)));
             sonidos.saveSonidos(getApplicationContext());
         }
@@ -270,9 +270,16 @@ public class SonidosEdicionActivity extends Menu {
         fab_grabarAudio.setColorFilter(Color.rgb(218,0,0));
 
         //Metodo para Implememtar Accion en cada Activity
-        sendMSGSRV("G|");
-
-        grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
+        //sendMSGSRV("G|");
+        if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO) {
+            int IDSonido = sonidos.getAvailableSonidoID();
+            if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){ IDSonido = Integer.parseInt(txt_sonidoID.getText().toString()); }
+            sendMSGSRV("R" + Integer.toString(IDSonido) + "|");
+        }
+        else{
+            sendMSGSRV("G|");
+        }
+                grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
 
         progress = new ProgressDialog(this);
         //progress.setTitle("Grabando");
