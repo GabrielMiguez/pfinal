@@ -274,12 +274,19 @@ public class SonidosEdicionActivity extends Menu {
         if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO) {
             int IDSonido = sonidos.getAvailableSonidoID();
             if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){ IDSonido = Integer.parseInt(txt_sonidoID.getText().toString()); }
-            sendMSGSRV("R" + Integer.toString(IDSonido) + "|");
+            if (IDSonido==0) {
+                if (!sendMSGSRV("G|"))
+                    Toast.makeText(this, "ERROR: NO HAY CONEXION BT", Toast.LENGTH_SHORT).show();
+            }
+            else
+                if (!sendMSGSRV("R" + Integer.toString(IDSonido) + "|"))
+                    Toast.makeText(this, "ERROR: NO HAY CONEXION BT", Toast.LENGTH_SHORT).show();
         }
         else{
-            sendMSGSRV("G|");
+            if (!sendMSGSRV("G|"))
+                Toast.makeText(this, "ERROR: NO HAY CONEXION BT", Toast.LENGTH_SHORT).show();
         }
-                grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
+        grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
 
         progress = new ProgressDialog(this);
         //progress.setTitle("Grabando");

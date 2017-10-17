@@ -135,8 +135,9 @@ public class ConfigActivity extends Menu {
         if (sonidos.getSonidoByID(Sonidos.ID_SONIDO_ALERTA_EXTERNA) == null){
             sonidos.addSonido(getApplicationContext(),new Sonido(Sonidos.ID_SONIDO_ALERTA_EXTERNA,"Alerta Externa", null, true));
         }
+        if (!sendMSGSRV("CE|"))
+            Toast.makeText(this, "ERROR: NO HAY CONEXION BT", Toast.LENGTH_SHORT).show();
 
-        sendMSGSRV("CE|");
     }
 
     public void btnOnBluetooth() {

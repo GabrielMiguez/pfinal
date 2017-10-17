@@ -48,8 +48,8 @@ public class MiServiceIBinder extends Service {
         public void handleMessage(Message msg) { //recibe sms de activity y envia a bt
             switch (msg.what) {
                 case MSG_HOLA:
-                    String s =msg.getData().get("data").toString();
-                    Toast.makeText(getApplicationContext(), "Eviar: "+s, Toast.LENGTH_SHORT).show();
+                    String s = msg.getData().get("data").toString();
+                    //Toast.makeText(getApplicationContext(), "Eviar: "+s, Toast.LENGTH_SHORT).show();
                     enviarSMS(s);
                     break;
                 default:
@@ -57,6 +57,7 @@ public class MiServiceIBinder extends Service {
             }
         }
     }
+
     final Messenger mMessenger = new Messenger(new MiHandler());
 
 
@@ -75,7 +76,7 @@ public class MiServiceIBinder extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         _onBind(intent);
-        Toast.makeText(this,"Service Star...",Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Service Star...", Toast.LENGTH_LONG).show();
         return START_STICKY;
     }
 
@@ -89,11 +90,11 @@ public class MiServiceIBinder extends Service {
         @Override
         public void run() {
             try {
-                while(1==1) {
+                while (1 == 1) {
                     //tengo que poder conectarme al servicio mediante mi app y mediante el bluetooth
                     //mediante bluetooth se encarga el objeto blue
                     //mediante el servicio, seguramente tengo que exponer algun metodo de escucha(lo realizo con el Binder)
-                    if (bt.Conected()){
+                    if (bt.Conected()) {
                         bluetoothConectado(); //nofif
                         Thread.sleep(5000); //espero 5 segndo, y vuelvo a intentar conectarme, solo cuando no estoy conectado.
                         //podria llevarlo a la pantalla de configuracion.
@@ -120,10 +121,11 @@ public class MiServiceIBinder extends Service {
             }
         }
     }
+
     public IBinder _onBind(Intent arg0) {
 
-        if (bt!=null) return iBinder;
-        bt= new Bluetooth(this);
+        if (bt != null) return iBinder;
+        bt = new Bluetooth(this);
 
         hilobt = new btThread();
         hilobt.start();
@@ -132,13 +134,13 @@ public class MiServiceIBinder extends Service {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         Toast.makeText(this, "Service finalizado", Toast.LENGTH_SHORT).show();
         // se recomienda matar los hilos que el servicio inicio  ??????????????????????????????
     }
 
 
-    public void bluetoothConectado(){
+    public void bluetoothConectado() {
         // Instanciamos e inicializamos nuestro manager.
         NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -156,7 +158,7 @@ public class MiServiceIBinder extends Service {
         nManager.notify(123123, builder.build());
     }
 
-    public void bluetoothDesconectado(){
+    public void bluetoothDesconectado() {
         // Instanciamos e inicializamos nuestro manager.
         NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -174,7 +176,7 @@ public class MiServiceIBinder extends Service {
         nManager.notify(123123, builder.build());
     }
 
-    private void sebdbroadcast(String s){
+    private void sebdbroadcast(String s) {
         try {
             Intent ir = new Intent();
             ir.setAction("com.example.gabys.notsound.MyReceiver");
@@ -184,13 +186,18 @@ public class MiServiceIBinder extends Service {
         }
     }
 
-    private void Notificar(int idsound){
+    private void Notificar(int idsound) {
         long[] vibratePattern = {0, 800};
 
         Intent i = new Intent(getApplicationContext(), SonidoAlertaActivity.class);
         i.putExtra("sonidoSeleccionado", idsound);
 
-        PendingIntent viewPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, i, PendingIntent.FLAG_ONE_SHOT);
+        Sonidos sonidos = new Sonidos();
+        sonidos.loadSonidos(getApplicationContext());
+        Sonido sonido = sonidos.getSonidoByID(idsound);
+        //Sonidos.ID_SONIDO_ALERTA_EXTERNA
+
+        PendingIntent viewPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Instanciamos e inicializamos nuestro manager.
         NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -199,7 +206,7 @@ public class MiServiceIBinder extends Service {
                 getApplicationContext())
                 .setSmallIcon(android.R.drawable.ic_dialog_alert)
                 .setContentTitle("ADVERTENCIA")
-                .setContentText("Sonido detectado")
+                .setContentText(sonido.getNombre())
                 .setContentIntent(viewPendingIntent)
                 .setWhen(System.currentTimeMillis())
                 .setVibrate(vibratePattern)
@@ -209,7 +216,6 @@ public class MiServiceIBinder extends Service {
         nManager.notify(1, builder.build());
 
 
-
     }
 
     public void procesarMsg(String s)//procesa sms que llega al servicio, desde el bt
@@ -217,9 +223,9 @@ public class MiServiceIBinder extends Service {
         try {
             if (s.equals("NA"))
                 Notificar(Sonidos.ID_SONIDO_ALERTA_EXTERNA);
-            else  if (s.charAt(0)=='N'){
-                try{
-                    int i=  Integer.valueOf(s.substring(1));
+            else if (s.charAt(0) == 'N') {
+                try {
+                    int i = Integer.valueOf(s.substring(1));
                     Notificar(i);
                 } catch (Exception e) {
                     Toast.makeText(this, "Error al Notificar Patron", Toast.LENGTH_SHORT).show();
@@ -232,7 +238,11 @@ public class MiServiceIBinder extends Service {
         }
     }
 
-    public int enviarSMS(String sms){
+    public int enviarSMS(String sms) {
         return bt.EnviarSMS(sms);
+    }
+
+    public static boolean BTConected(){
+        return bt.Conected();
     }
 }

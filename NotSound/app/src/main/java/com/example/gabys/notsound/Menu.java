@@ -173,12 +173,14 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             }
             if (i>=0){
                 //puebo si puedo abrir el activity directamete
-                Intent inte = new Intent(getApplicationContext(), SonidoAlertaActivity.class);
-                inte.putExtra("sonidoSeleccionado", i);
-                startActivity(inte);
+                if (!this.getClass().getSimpleName().equals("SonidosActivity")) {
+                    Intent inte = new Intent(getApplicationContext(), SonidoAlertaActivity.class);
+                    inte.putExtra("sonidoSeleccionado", i);
+                    startActivity(inte);
 
-                NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                nManager.cancel(1);
+                    NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    nManager.cancel(1);
+                }
             }
         }catch (Exception e ){
             Toast.makeText(this, "Error al Notificar Activity Patron", Toast.LENGTH_SHORT).show();
@@ -190,8 +192,9 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
     }
 
-    public void sendMSGSRV(String s) {
-        if (!mBound) return;
+    public boolean sendMSGSRV(String s) {
+        if (!mBound) return false;
+        if (!MiServiceIBinder.BTConected())return false;
 
         //Creamos y enviamos un mensaje al servicio, asignandole como dato el nombre del EditText
         Message msg = Message.obtain(null, MiServiceIBinder.MSG_HOLA, 0, 0);
@@ -200,9 +203,14 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         msg.setData(b);
         try {
             mService.send(msg);
+
+
+
         } catch (RemoteException e) {
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
     public void onResume(){

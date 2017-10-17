@@ -66,6 +66,8 @@ public class Sonidos extends Application{
     }
 
     public int getAvailableSonidoID(){
+        int vSonidoID = 0; //simepre el ID=0, significa que nunca guardo en arduino
+        /*
         Boolean repetirBusqueda = true;
         int vSonidoID = 0;
 
@@ -78,6 +80,7 @@ public class Sonidos extends Application{
                 }
             }
         }
+        */
         return vSonidoID;
     }
 

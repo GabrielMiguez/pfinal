@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -93,13 +94,13 @@ public class SonidosActivity extends Menu {
                     public void onClick(DialogInterface dialogo1, int id) {
 
                         Sonido sonido = sonidos.getSonidoByPosition(itemSelected_sonidosCompleto);
-                        sendMSGSRV("B" + Integer.toString(sonido.getID()) + "|");
-
-                        sonidos.removeSonidoByPosition(getApplicationContext(), itemSelected_sonidosCompleto); // Actualizo la lista completa de los sonidos guardados
-                        sonidosSinAlertaExterna.remove(itemSelected_sonidosSinAlertaExterna); // Actualizo la lista de los sonidos que se visualizan
-                        adaptador.notifyDataSetChanged();
-
-
+                        if (sendMSGSRV("B" + Integer.toString(sonido.getID()) + "|")){
+                            sonidos.removeSonidoByPosition(getApplicationContext(), itemSelected_sonidosCompleto); // Actualizo la lista completa de los sonidos guardados
+                            sonidosSinAlertaExterna.remove(itemSelected_sonidosSinAlertaExterna); // Actualizo la lista de los sonidos que se visualizan
+                            adaptador.notifyDataSetChanged();
+                        }else{
+                            Toast.makeText(getApplicationContext(), "ERROR: NO HAY CONEXION BT", Toast.LENGTH_SHORT).show();
+                        }
 
                     }
                 });
