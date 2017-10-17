@@ -173,7 +173,10 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             }
             if (i>=0){
                 //puebo si puedo abrir el activity directamete
-                if (!this.getClass().getSimpleName().equals("SonidosActivity")) {
+                if (
+                        (!this.getClass().getSimpleName().equals("SonidosActivity"))
+                     && (!this.getClass().getSimpleName().equals("SonidosEdicionActivity"))
+                ) {
                     Intent inte = new Intent(getApplicationContext(), SonidoAlertaActivity.class);
                     inte.putExtra("sonidoSeleccionado", i);
                     startActivity(inte);
