@@ -25,7 +25,7 @@ int ledPin1 = 13;
 /*char palanca[3]="A0";*/
 char mic[3]="A0";
 volatile double GLOBAL_ruidoPromedio=0;  //volatile, por que se cambian en interrupciones
-volatile double procentajeSuperacionPromedio=30;
+volatile double procentajeSuperacionPromedio=50;
 char c;
 
 void(* resetFunc) (void) = 0;//declare reset function at address 0
@@ -57,8 +57,8 @@ void setModoOut(){
     
     EEPROM.write(0, 1);
     delay(2000);
-    //resetFunc();  //call reset
     Timer1.attachInterrupt(callback);
+    //resetFunc();  //call reset
 }
 void setModoIn(){
     if (modo==1) return;
@@ -70,6 +70,7 @@ void setModoIn(){
     delay(20000);
     //resetFunc();  //call reset
 }
+
 
 void setup()
 {
@@ -88,6 +89,7 @@ void setup()
   //iniDemo();
   //grabar();
   initEEPROM();
+  Serial.println("---- SET MODo ----");
   
   modo=1;
   if (EEPROM.read(0)==2){
@@ -151,7 +153,7 @@ grabar();
 
     //Serial.println("Antes modo 0");
     if (modo==0){ // modo OUT
-
+//Serial.println("AREAD 1");
       int k=analogRead(A0);
 cantidadTotales++;
 /*
@@ -190,7 +192,7 @@ Serial.println("---SE SUPERO EL PROMEDIO UNA VEZ---");
           int k = (j << 8) | m; // form into an int
 
 /¿*/
-
+//Serial.println("AREAD 2");
 k=analogRead(A0);
 //acumuladorMuestras=acumuladorMuestras+k;
           //Serial.println(k);
@@ -245,7 +247,7 @@ void callback()
   double acumuladorPromedio=0;
   for (int i=0; i<topeMuestras; i++) {
     
-    
+    //Serial.println("AREAD 3");
     int k=analogRead(A0);
     
     
@@ -859,14 +861,22 @@ void grabar(int id){
         
 
 //--------------------------------------------------------------------------------------------------
+          /*error fuera del for va
           //contar la canidad de veces que un pico es encontrado
           if (tresPrimerosPicosPos[0]>10)  picosDeMuestrasGrabacion[tresPrimerosPicosPos[0]]++;
           if (tresPrimerosPicosPos[1]>10)  picosDeMuestrasGrabacion[tresPrimerosPicosPos[1]]++;
           if (tresPrimerosPicosPos[2]>10)  picosDeMuestrasGrabacion[tresPrimerosPicosPos[2]]++;
           if (tresPrimerosPicosPos[3]>10)  picosDeMuestrasGrabacion[tresPrimerosPicosPos[3]]++;
+          */
         }
       }
     }//for de 1 muestra de 256 valores
+
+    //contar la canidad de veces que un pico es encontrado
+    if (tresPrimerosPicosPos[0]>10)  picosDeMuestrasGrabacion[tresPrimerosPicosPos[0]]++;
+    if (tresPrimerosPicosPos[1]>10)  picosDeMuestrasGrabacion[tresPrimerosPicosPos[1]]++;
+    if (tresPrimerosPicosPos[2]>10)  picosDeMuestrasGrabacion[tresPrimerosPicosPos[2]]++;
+    if (tresPrimerosPicosPos[3]>10)  picosDeMuestrasGrabacion[tresPrimerosPicosPos[3]]++;
     
   } //del while de n muetras
   sei();
