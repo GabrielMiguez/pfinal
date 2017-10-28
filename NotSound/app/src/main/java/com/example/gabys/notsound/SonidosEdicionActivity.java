@@ -47,6 +47,7 @@ public class SonidosEdicionActivity extends Menu {
     private FloatingActionButton fab_grabarAudio;
 
     AlertDialog.Builder dialogo1;
+    AlertDialog.Builder dialogo2;
     ProgressDialog progress;
     Runnable progressRunnable;
     Handler pdCanceller;
@@ -278,46 +279,29 @@ public class SonidosEdicionActivity extends Menu {
             if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){ IDSonido = Integer.parseInt(txt_sonidoID.getText().toString()); }
             if (IDSonido==0) {
                 if (!sendMSGSRV("G|")){
-
                     errorConexion = true;
-
-                    AlertDialog.Builder dialogoError = new AlertDialog.Builder(SonidosEdicionActivity.this);
-                    dialogoError.setTitle("Error");
-                    dialogoError.setMessage("El dispositivo móvil no está conectado al dispositivo electrónico.");
-                    dialogoError.setCancelable(false);
-                    dialogoError.setPositiveButton("OK", null);
-                    dialogoError.show();
                 }
             }
             else
                 if (!sendMSGSRV("R" + Integer.toString(IDSonido) + "|")){
-
                     errorConexion = true;
-
-                    AlertDialog.Builder dialogoError = new AlertDialog.Builder(SonidosEdicionActivity.this);
-                    dialogoError.setTitle("Error");
-                    dialogoError.setMessage("El dispositivo móvil no está conectado al dispositivo electrónico.");
-                    dialogoError.setCancelable(false);
-                    dialogoError.setPositiveButton("OK", null);
-                    dialogoError.show();
                 }
         }
         else{
             if (!sendMSGSRV("G|")){
-
                 errorConexion = true;
-
-                AlertDialog.Builder dialogoError = new AlertDialog.Builder(SonidosEdicionActivity.this);
-                dialogoError.setTitle("Error");
-                dialogoError.setMessage("El dispositivo móvil no está conectado al dispositivo electrónico.");
-                dialogoError.setCancelable(false);
-                dialogoError.setPositiveButton("OK", null);
-                dialogoError.show();
             }
         }
 
         // Si hubo un error en la conexion del Bluetooth aborta la grabacion
         if (errorConexion){
+
+            AlertDialog.Builder dialogoError = new AlertDialog.Builder(SonidosEdicionActivity.this);
+            dialogoError.setTitle("Error");
+            dialogoError.setMessage("El dispositivo móvil no está conectado al dispositivo electrónico.");
+            dialogoError.setCancelable(false);
+            dialogoError.setPositiveButton("OK", null);
+            dialogoError.show();
 
             // Cambia el icono si el guardado NO fue exitoso
             fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
@@ -325,42 +309,66 @@ public class SonidosEdicionActivity extends Menu {
 
             return;
         }
-        grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
+  
+        // Antes de empezar a grabar, pido silencio...
 
-        progress = new ProgressDialog(this);
-        //progress.setTitle("Grabando");
-        progress.setMessage("Grabación en proceso. Espere...");
-        progress.setCancelable(false);
-        progress.show();
+        AlertDialog.Builder dialogo2 = new AlertDialog.Builder(SonidosEdicionActivity.this);
+        dialogo2.setTitle("Importante");
+        dialogo2.setMessage("El proceso de grabación está por comenzar. Haga silencio y acerque el dispositivo electrónico al Sonido que desea grabar.");
+        dialogo2.setCancelable(false);
+        dialogo2.setPositiveButton("Comenzar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogo1, int id) {
 
-        // Se crea un proceso para que al superar el TIMEOUT de GRABACION se ejecute.
-        // Si la grabacion no fue exitosa: se va a cerrar el ProgressDialog y va a mostrar un mensaje de error.
-        progressRunnable = new Runnable() {
-            @Override
-            public void run() {
+                grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
 
-                progress.cancel();
-                if (!grabacionExitosa) {
-                    AlertDialog.Builder dialogo1 = new AlertDialog.Builder(SonidosEdicionActivity.this);
-                    dialogo1.setTitle("Atención");
-                    dialogo1.setMessage("El Sonido no fue grabado debido a que se superó el tiempo de espera.");
-                    dialogo1.setCancelable(false);
-                    dialogo1.setNegativeButton("Cerrar", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialogo1, int id) {
+                progress = new ProgressDialog(SonidosEdicionActivity.this);
+                //progress.setTitle("Grabando");
+                progress.setMessage("Grabación en proceso. Espere...");
+                progress.setCancelable(false);
+                progress.show();
+
+                // Se crea un proceso para que al superar el TIMEOUT de GRABACION se ejecute.
+                // Si la grabacion no fue exitosa: se va a cerrar el ProgressDialog y va a mostrar un mensaje de error.
+                progressRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+
+                        progress.cancel();
+                        if (!grabacionExitosa) {
+                            AlertDialog.Builder dialogo1 = new AlertDialog.Builder(SonidosEdicionActivity.this);
+                            dialogo1.setTitle("Atención");
+                            dialogo1.setMessage("El Sonido no fue grabado debido a que se superó el tiempo de espera.");
+                            dialogo1.setCancelable(false);
+                            dialogo1.setNegativeButton("Cerrar", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialogo1, int id) {
+                                }
+                            });
+
+                            dialogo1.show();
+
+                            // Cambia el icono si el guardado NO fue exitoso
+                            fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
+                            fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
                         }
-                    });
+                    }
+                };
 
-                    dialogo1.show();
+                pdCanceller = new Handler();
+                pdCanceller.postDelayed(progressRunnable, ConfigActivity.GRABACION_TIMEOUT); // Se setea el tiempo de espera antes de que llame al proceso de arriba.
 
-                    // Cambia el icono si el guardado NO fue exitoso
-                    fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
-                    fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
-                }
             }
-        };
+        });
+        dialogo2.setNegativeButton("Abortar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogo1, int id) {
 
-        pdCanceller = new Handler();
-        pdCanceller.postDelayed(progressRunnable, ConfigActivity.GRABACION_TIMEOUT); // Se setea el tiempo de espera antes de que llame al proceso de arriba.
+                // Cambia el icono si el guardado NO fue exitoso
+                fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
+                fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
+
+                return;
+            }
+        });
+        dialogo2.show();
 
         /* CODIGO PARA PROBAR LA INTERRUPCION DEL BLUETOOTH. BORRAR!!!*/
         /* INICIO */
