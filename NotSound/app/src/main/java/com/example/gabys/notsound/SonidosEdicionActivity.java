@@ -132,11 +132,11 @@ public class SonidosEdicionActivity extends Menu {
             txt_sonidoNombre.setVisibility(View.INVISIBLE);
             chk_habilitado.setVisibility(View.INVISIBLE);
             fab_grabarAudio.setVisibility(View.INVISIBLE);
-
-            txt_imagen_texto.setVisibility(View.VISIBLE);
         }
 
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); // Al iniciar, abro el teclado para editar el nombre del Sonido
+        if (itemSeleccionado != Sonidos.POSICION_SONIDO_ALERTA_EXTERNA) {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); // Al iniciar, abro el teclado para editar el nombre del Sonido
+        }
     }
 
     @Override
@@ -269,22 +269,61 @@ public class SonidosEdicionActivity extends Menu {
         fab_grabarAudio.setImageResource(R.drawable.ic_stop_black_24dp);
         fab_grabarAudio.setColorFilter(Color.rgb(218,0,0));
 
+        Boolean errorConexion = false;
+
         //Metodo para Implememtar Accion en cada Activity
         //sendMSGSRV("G|");
         if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO) {
             int IDSonido = sonidos.getAvailableSonidoID();
             if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){ IDSonido = Integer.parseInt(txt_sonidoID.getText().toString()); }
             if (IDSonido==0) {
-                if (!sendMSGSRV("G|"))
-                    Toast.makeText(this, "ERROR: NO HAY CONEXION BT", Toast.LENGTH_SHORT).show();
+                if (!sendMSGSRV("G|")){
+
+                    errorConexion = true;
+
+                    AlertDialog.Builder dialogoError = new AlertDialog.Builder(SonidosEdicionActivity.this);
+                    dialogoError.setTitle("Error");
+                    dialogoError.setMessage("El dispositivo móvil no está conectado al dispositivo electrónico.");
+                    dialogoError.setCancelable(false);
+                    dialogoError.setPositiveButton("OK", null);
+                    dialogoError.show();
+                }
             }
             else
-                if (!sendMSGSRV("R" + Integer.toString(IDSonido) + "|"))
-                    Toast.makeText(this, "ERROR: NO HAY CONEXION BT", Toast.LENGTH_SHORT).show();
+                if (!sendMSGSRV("R" + Integer.toString(IDSonido) + "|")){
+
+                    errorConexion = true;
+
+                    AlertDialog.Builder dialogoError = new AlertDialog.Builder(SonidosEdicionActivity.this);
+                    dialogoError.setTitle("Error");
+                    dialogoError.setMessage("El dispositivo móvil no está conectado al dispositivo electrónico.");
+                    dialogoError.setCancelable(false);
+                    dialogoError.setPositiveButton("OK", null);
+                    dialogoError.show();
+                }
         }
         else{
-            if (!sendMSGSRV("G|"))
-                Toast.makeText(this, "ERROR: NO HAY CONEXION BT", Toast.LENGTH_SHORT).show();
+            if (!sendMSGSRV("G|")){
+
+                errorConexion = true;
+
+                AlertDialog.Builder dialogoError = new AlertDialog.Builder(SonidosEdicionActivity.this);
+                dialogoError.setTitle("Error");
+                dialogoError.setMessage("El dispositivo móvil no está conectado al dispositivo electrónico.");
+                dialogoError.setCancelable(false);
+                dialogoError.setPositiveButton("OK", null);
+                dialogoError.show();
+            }
+        }
+
+        // Si hubo un error en la conexion del Bluetooth aborta la grabacion
+        if (errorConexion){
+
+            // Cambia el icono si el guardado NO fue exitoso
+            fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
+            fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
+
+            return;
         }
         grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
 

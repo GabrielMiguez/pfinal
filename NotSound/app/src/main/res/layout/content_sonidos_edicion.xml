@@ -20,17 +20,18 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:gravity="center_vertical"
-        android:text="Imagen para Alertas Externas"
+        android:text="Seleccione una imagen para el Sonido"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        android:visibility="invisible" />
+        android:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/ly_ID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingLeft="5dp">
+        android:paddingLeft="5dp"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/txtvw_sonidoID_texto"
@@ -67,6 +68,7 @@
         android:layout_marginTop="20dp"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
+        android:visibility="gone"
         android:weightSum="1">
 
         <Switch
@@ -79,6 +81,7 @@
             android:text="Habilitado"
             android:textSize="18sp"
             tools:checked="false" />
+
     </LinearLayout>
 
     <LinearLayout
