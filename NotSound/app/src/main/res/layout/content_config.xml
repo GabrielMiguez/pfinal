@@ -73,12 +73,12 @@
             android:id="@+id/ly_dispositivos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ly_modo"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/textView16"
@@ -121,6 +121,22 @@
 
             </LinearLayout>
 
+        </LinearLayout>
+
+        <View style="@style/style_linea_divisora" />
+
+        <LinearLayout
+            android:id="@+id/ly_probarConexion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ly_modo"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="visible">
+
             <Button
                 android:id="@+id/btnTestcnx"
                 style="@style/style_button"
@@ -138,7 +154,7 @@
             android:id="@+id/ly_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ly_dispositivos"
+            android:layout_below="@+id/ly_probarConexion"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
@@ -149,10 +165,11 @@
                 android:id="@+id/textView2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:fontFamily="sans-serif-medium"
                 android:gravity="center_vertical"
-                android:text="Info"
+                android:text="Información de la Conexión"
                 android:textColor="@color/color_text"
-                android:textSize="18sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/txtInfo"
@@ -187,19 +204,7 @@
                 android:text="Restablecer valores por defecto " />
 
         </LinearLayout>
-    </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:clickable="true"
-        android:onClick="guardar"
-        android:theme="@style/style_fab_button_ok"
-        app:fabSize="normal"
-        app:srcCompat="@drawable/ic_check_black_24dp" />
+    </LinearLayout>
 
 </RelativeLayout>

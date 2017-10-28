@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
@@ -25,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -48,6 +51,11 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     String ayuda_cuerpo3="";
     String ayuda_titulo4="";
     String ayuda_cuerpo4="";
+
+    private static Bluetooth bt;
+    private btThread hiloEstadoBT;
+    private ImageButton img_BT;
+    private ImageButton img_BT_icono;
 
     //private MiServiceIBinder mServiceIBinder;
     boolean mBound;
@@ -113,10 +121,8 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
 
-
-
-
-
+        img_BT = (ImageButton) findViewById(R.id.imgbtn_estadoBt);
+        img_BT_icono = (ImageButton) findViewById(R.id.imgbtn_estadoBt_icono);
     }
 
     @Override
@@ -156,7 +162,11 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                 startService(intent);
         //}
 
-
+        ////////////////////////////////////////////////////////////////////
+        //    Hilo que se encarga de actualizar el estado del BlueTooth   //
+        ////////////////////////////////////////////////////////////////////
+        hiloEstadoBT = new btThread();
+        hiloEstadoBT.start();
     }
 
     public void processReceive(Context context, Intent intent) {
@@ -358,6 +368,78 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         //this.setTextoAyuda();
         this.InflateAyuda();
     }
+
+
+    private class btThread extends Thread {
+
+        @Override
+        public void run() {
+
+
+            try {
+                while (1 == 1) {
+
+                    Thread.sleep(2000);
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
+                            img_BT_icono.setImageResource(R.drawable.ic_check_black_24dp);
+
+                            img_BT.getDrawable().setColorFilter(getResources().getColor(android.R.color.background_light), PorterDuff.Mode.SRC_ATOP);
+                            img_BT_icono.getDrawable().setColorFilter(getResources().getColor(android.R.color.background_light), PorterDuff.Mode.SRC_ATOP);
+                        }
+                    });
+
+                    Thread.sleep(2000);
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
+                            img_BT_icono.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+
+                            img_BT.getDrawable().setColorFilter(getResources().getColor(R.color.colorSecondary), PorterDuff.Mode.SRC_ATOP);
+                            img_BT_icono.getDrawable().setColorFilter(getResources().getColor(R.color.colorSecondary), PorterDuff.Mode.SRC_ATOP);
+                        }
+                    });
+                }
+
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
+                        img_BT_icono.setImageResource(android.R.drawable.ic_menu_help);
+
+                        img_BT.getDrawable().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.SRC_ATOP);
+                        img_BT_icono.getDrawable().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.SRC_ATOP);
+                    }
+                });
+
+            }
+        }
+    }
+
+    public void abrirConfiguracion(View view){
+        Intent i = new Intent(getApplicationContext(), ConfigActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
+    }
+
+    private Boolean estaBlueToothConectado (Context context, Intent intent){
+
+        sendMSGSRV("T0|");
+        String msgRespuesta=intent.getExtras().getSerializable("sms").toString();
+
+        if (msgRespuesta.isEmpty()){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
 /*
     public void setTextoAyuda(String titulo1, String cuerpo1, String titulo2, String cuerpo2){
         TextView t1 = (TextView) findViewById(R.id.txtvw_titulo1);

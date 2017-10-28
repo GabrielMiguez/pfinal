@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,8 +7,8 @@
     tools:context="com.example.gabys.notsound.MainActivity">
 
     <android.support.design.widget.AppBarLayout
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <RelativeLayout
@@ -23,18 +22,64 @@
                 android:background="?attr/colorPrimary"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-            <ImageButton
-                android:id="@+id/imageButton"
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="8dp"
-                android:layout_weight="1"
-                android:background="@null"
-                android:onClick="abrirAyuda"
-                app:srcCompat="@android:drawable/ic_dialog_info" />
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageButton
+                        android:id="@+id/imgbtn_estadoBt"
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentEnd="false"
+                        android:layout_alignParentRight="false"
+                        android:layout_centerVertical="true"
+                        android:layout_weight="1"
+                        android:adjustViewBounds="false"
+                        android:background="@null"
+                        android:cropToPadding="true"
+                        android:onClick="abrirConfiguracion"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@android:drawable/stat_sys_data_bluetooth" />
+
+                    <ImageButton
+                        android:id="@+id/imgbtn_estadoBt_icono"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentRight="false"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="10dp"
+                        android:layout_toEndOf="@+id/imgbtn_estadoBt"
+                        android:adjustViewBounds="false"
+                        android:background="@null"
+                        android:baselineAlignBottom="false"
+                        android:cropToPadding="false"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@android:drawable/ic_menu_help" />
+                </RelativeLayout>
+
+                <ImageButton
+                    android:id="@+id/imageButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:onClick="abrirAyuda"
+                    app:srcCompat="@android:drawable/ic_dialog_info" />
+            </LinearLayout>
 
         </RelativeLayout>
 
@@ -50,4 +95,4 @@
             android:layout_margin="@dimen/fab_margin"
             app:srcCompat="@android:drawable/ic_dialog_email" />-->
 
-    </android.support.design.widget.CoordinatorLayout>
+</android.support.design.widget.CoordinatorLayout>

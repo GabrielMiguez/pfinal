@@ -1,7 +1,9 @@
 package com.example.gabys.notsound;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -118,8 +120,18 @@ public class ConfigActivity extends Menu {
     //Metodo para Implememtar Accion en cada Activity
     @Override
     public void ActionRecive(String s){
+        String msgInfo="";
+
         s = txtInfo.getText().toString() + ((char) 10) + ((char) 13) + s;
-        txtInfo.setText(s);
+
+        switch (s) {
+            case "C1": msgInfo="Probando conexión"; break;
+            case "T0": msgInfo="Conexión exitosa. Modo: EXTERIOR"; break;
+            case "T1": msgInfo="Conexión exitosa. Modo: INTERIOR"; break;
+            default: msgInfo="Conexión exitosa"; break;
+        }
+
+        txtInfo.setText(msgInfo);
     }
 
     public void test(View view){
@@ -128,15 +140,39 @@ public class ConfigActivity extends Menu {
 
     public void ClearEPPROM(View view){
 
-        // Limpio los sonidos y vuelvo a insertar el sonido de alerta externa por defecto
-        Sonidos sonidos = new Sonidos();
-        sonidos.loadSonidos(getApplicationContext());
-        sonidos.cleanSonidos(getApplicationContext());
-        if (sonidos.getSonidoByID(Sonidos.ID_SONIDO_ALERTA_EXTERNA) == null){
-            sonidos.addSonido(getApplicationContext(),new Sonido(Sonidos.ID_SONIDO_ALERTA_EXTERNA,"Alerta Externa", null, true));
-        }
-        if (!sendMSGSRV("CE|"))
-            Toast.makeText(this, "ERROR: NO HAY CONEXION BT", Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder dialogo1 = new AlertDialog.Builder(ConfigActivity.this);
+        dialogo1.setTitle("Importante");
+        dialogo1.setMessage("¿Está seguro que desea restablecer los valores de fábrica? " +
+                            "Si confirma, perderá todos sus Sonidos guardados en su dispositivo móvil y en el dispositivo electrónico");
+        dialogo1.setCancelable(false);
+        dialogo1.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogo1, int id) {
+                if (sendMSGSRV("CE|")) {
+                    // Limpio los sonidos y vuelvo a insertar el sonido de alerta externa por defecto
+                    Sonidos sonidos = new Sonidos();
+                    sonidos.loadSonidos(getApplicationContext());
+                    sonidos.cleanSonidos(getApplicationContext());
+                    if (sonidos.getSonidoByID(Sonidos.ID_SONIDO_ALERTA_EXTERNA) == null){
+                        sonidos.addSonido(getApplicationContext(),new Sonido(Sonidos.ID_SONIDO_ALERTA_EXTERNA,"Alerta Externa", null, true));
+                    }
+                } else {
+                    AlertDialog.Builder dialogoError = new AlertDialog.Builder(ConfigActivity.this);
+                    dialogoError.setTitle("Error");
+                    dialogoError.setMessage("El dispositivo móvil no está conectado al dispositivo electrónico.");
+                    dialogoError.setCancelable(false);
+                    dialogoError.setPositiveButton("OK", null);
+                    dialogoError.show();
+                }
+            }
+        });
+        dialogo1.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogo1, int id) {
+            }
+        });
+
+        dialogo1.show();
+
+
 
     }
 
@@ -206,7 +242,11 @@ public class ConfigActivity extends Menu {
             //et1.setText(prefe.getString("mail",""));
 
             boolean e = false;
-            String dis = prefe.getString("dispositivo", "").toString();
+
+            //String dis = prefe.getString("dispositivo", "").toString();
+            String dis = "HC-05"; // fijo el nombre del arduino
+
+
             if (dis.isEmpty()) return;
             int i = 0;
             if (mArrayAdapter == null){
@@ -231,19 +271,25 @@ public class ConfigActivity extends Menu {
         }
     }
 
-    public void guardar(View view){
+    public void guardar(){
         try {
             SharedPreferences preferencias=getSharedPreferences("configuracion",Context.MODE_PRIVATE);
             SharedPreferences.Editor editor=preferencias.edit();
             editor.putString("dispositivo", lstdispos.getSelectedItem().toString());
             editor.commit();
-            Toast.makeText(this,"Datos grabados", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this,"Datos grabados", Toast.LENGTH_LONG).show();
 
         }catch (Exception e){
 
         }
 
-        Intent i = new Intent(this, MainActivity.class );
-        startActivity(i);
+        //Intent i = new Intent(this, MainActivity.class );
+        //startActivity(i);
+    }
+
+    @Override
+    protected void onStop() {
+        guardar();
+        super.onStop();
     }
 }
