@@ -133,9 +133,9 @@ void setup()
 void loop()
 {  
   
-  digitalWrite(8, LOW);
+  digitalWrite(9, LOW);
   digitalWrite(10, HIGH);
-  //digitalWrite(8, HIGH);
+  digitalWrite(8, LOW);
   
   Serial.println(F("------------- LOOP -------------- "));
   int cantidadTotales=0;
@@ -333,9 +333,9 @@ void callback()
   GLOBAL_ruidoPromedio=sum/10;
 
   if(GLOBAL_ruidoPromedio<100){
-    digitalWrite(8, HIGH);
+    digitalWrite(9, HIGH);
   }else{
-    digitalWrite(8, LOW);
+    digitalWrite(9, LOW);
   }
   
   Serial.println(F("PROMEDIO DIO:"));
