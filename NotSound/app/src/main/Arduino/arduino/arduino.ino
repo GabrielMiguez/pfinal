@@ -650,7 +650,7 @@ void grabar(int id){
   */    
   
   //Uso los primeros segundos para grabar un sonido y usarlo después para los picos.
-  int cantidadDeCiclos=400;
+  int cantidadDeCiclos=150;//original 400
   cli();  // UDRE interrupt slows this way down on arduino1.0
   while(cantidadDeCiclos>=0) { // reduces jitter
     for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
