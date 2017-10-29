@@ -2,8 +2,10 @@ package com.example.gabys.notsound;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -229,6 +231,8 @@ public class SonidosEdicionActivity extends Menu {
         }
 
         saveImage(imagen, rutaFoto);
+        Toast t = Toast.makeText(getApplicationContext(), "Guardado exitoso", Toast.LENGTH_SHORT);
+        t.show();
         this.onBackPressed();
     }
 
@@ -270,46 +274,6 @@ public class SonidosEdicionActivity extends Menu {
         fab_grabarAudio.setImageResource(R.drawable.ic_stop_black_24dp);
         fab_grabarAudio.setColorFilter(Color.rgb(218,0,0));
 
-        Boolean errorConexion = false;
-
-        //Metodo para Implememtar Accion en cada Activity
-        //sendMSGSRV("G|");
-        if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO) {
-            int IDSonido = sonidos.getAvailableSonidoID();
-            if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){ IDSonido = Integer.parseInt(txt_sonidoID.getText().toString()); }
-            if (IDSonido==0) {
-                if (!sendMSGSRV("G|")){
-                    errorConexion = true;
-                }
-            }
-            else
-                if (!sendMSGSRV("R" + Integer.toString(IDSonido) + "|")){
-                    errorConexion = true;
-                }
-        }
-        else{
-            if (!sendMSGSRV("G|")){
-                errorConexion = true;
-            }
-        }
-
-        // Si hubo un error en la conexion del Bluetooth aborta la grabacion
-        if (errorConexion){
-
-            AlertDialog.Builder dialogoError = new AlertDialog.Builder(SonidosEdicionActivity.this);
-            dialogoError.setTitle("Error");
-            dialogoError.setMessage("El dispositivo móvil no está conectado al dispositivo electrónico.");
-            dialogoError.setCancelable(false);
-            dialogoError.setPositiveButton("OK", null);
-            dialogoError.show();
-
-            // Cambia el icono si el guardado NO fue exitoso
-            fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
-            fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
-
-            return;
-        }
-  
         // Antes de empezar a grabar, pido silencio...
 
         AlertDialog.Builder dialogo2 = new AlertDialog.Builder(SonidosEdicionActivity.this);
@@ -320,6 +284,51 @@ public class SonidosEdicionActivity extends Menu {
             public void onClick(DialogInterface dialogo1, int id) {
 
                 grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
+
+                Boolean errorConexion = false;
+
+                //Metodo para Implememtar Accion en cada Activity
+                //sendMSGSRV("G|");
+                if (itemSeleccionado != SonidosActivity.SONIDO_NUEVO) {
+                    int IDSonido = sonidos.getAvailableSonidoID();
+                    if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){ IDSonido = Integer.parseInt(txt_sonidoID.getText().toString()); }
+                    if (IDSonido==0) {
+                        if (!sendMSGSRV("G|")){
+                            errorConexion = true;
+                        }
+                    }
+                    else
+                    if (!sendMSGSRV("R" + Integer.toString(IDSonido) + "|")){
+                        errorConexion = true;
+                    }
+                }
+                else{
+                    if (!sendMSGSRV("G|")){
+                        errorConexion = true;
+                    }
+                }
+
+                // Si hubo un error en la conexion del Bluetooth aborta la grabacion
+                if (errorConexion){
+
+                    AlertDialog.Builder dialogoError = new AlertDialog.Builder(SonidosEdicionActivity.this);
+                    dialogoError.setTitle("Error");
+                    dialogoError.setMessage("El dispositivo móvil no está conectado al dispositivo electrónico.");
+                    dialogoError.setCancelable(false);
+                    dialogoError.setPositiveButton("OK", null);
+                    dialogoError.show();
+
+                    // Cambia el icono si el guardado NO fue exitoso
+                    fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
+                    fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
+
+                    return;
+                }else{
+                    SharedPreferences preferencias=getSharedPreferences("configuracion", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor=preferencias.edit();
+                    editor.putString("modo", "C1");
+                    editor.commit();
+                }
 
                 progress = new ProgressDialog(SonidosEdicionActivity.this);
                 //progress.setTitle("Grabando");

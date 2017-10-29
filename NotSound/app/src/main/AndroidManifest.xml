@@ -18,11 +18,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+
         android:theme="@style/AppTheme">
         <service android:name=".MiServiceIBinder" />
 
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -33,22 +35,27 @@
         </activity>
         <activity
             android:name=".ConfigActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_config"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".NosotrosActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_nosotros"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SonidosActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_sonidos"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SonidosEdicionActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_sonidos_edicion"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SonidoAlertaActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_sonido_alerta"
             android:theme="@style/AppTheme.NoActionBar" />
 

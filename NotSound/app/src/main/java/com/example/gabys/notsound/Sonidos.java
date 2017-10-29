@@ -99,8 +99,8 @@ public class Sonidos extends Application{
         String ser  = SerializeObject.objectToString(this.listasonidos);
         if (ser != null && !ser.equalsIgnoreCase("")) {
             SerializeObject.WriteSettings(context, ser, file);
-            Toast t = Toast.makeText(context, "Guardado exitoso", Toast.LENGTH_SHORT);
-            t.show();
+            //Toast t = Toast.makeText(context, "Guardado exitoso", Toast.LENGTH_SHORT);
+            //t.show();
         } else {
             SerializeObject.WriteSettings(context, "", file);
         }

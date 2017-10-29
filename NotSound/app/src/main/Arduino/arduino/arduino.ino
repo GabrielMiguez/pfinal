@@ -36,53 +36,53 @@ byte oldTIMSK0;
 
 void setNormal(){
   noInterrupts();
-	  TIMSK0 = oldTIMSK0; // turn off timer0 for lower jitter -->Problemas con el sleep
-	  ADCSRA = oldADCSRA;
-	  ADMUX = 0x40; // use adc0
-	  DIDR0 = 0x01; // turn off the digital input for adc0
-	  normal=1;
+    TIMSK0 = oldTIMSK0; // turn off timer0 for lower jitter -->Problemas con el sleep
+    ADCSRA = oldADCSRA;
+    ADMUX = 0x40; // use adc0
+    DIDR0 = 0x01; // turn off the digital input for adc0
+    normal=1;
   interrupts();
 }
 void setFast(){
   noInterrupts();
-	  TIMSK0 = 0; // turn off timer0 for lower jitter -->Problemas con el sleep
-	  ADCSRA = 0xe5; // set the adc to free running mode -->Problemas con el analogRead
-	  ADMUX = 0x40; // use adc0
-	  DIDR0 = 0x01; // turn off the digital input for adc0
-	  normal=0;
+    TIMSK0 = 0; // turn off timer0 for lower jitter -->Problemas con el sleep
+    ADCSRA = 0xe5; // set the adc to free running mode -->Problemas con el analogRead
+    ADMUX = 0x40; // use adc0
+    DIDR0 = 0x01; // turn off the digital input for adc0
+    normal=0;
   interrupts();
 }
 void setModoOut(){
     if (modo==0) return;
     
-	modo=0;
-	setNormal();		
-	EEPROM.write(0, 1);
-	
-	delay(4000);
+  modo=0;
+  setNormal();    
+  EEPROM.write(0, 1);
+  
+  delay(4000);
  
     
-	  Timer1.attachInterrupt(callback);
-	  Timer1.restart();
+    Timer1.attachInterrupt(callback);
+    Timer1.restart();
  
-	//Timer1.start()
-	//resetFunc();  //call reset
-	
+  //Timer1.start()
+  //resetFunc();  //call reset
+  
 }
 void setModoIn(){
     if (modo==1) return;    
-	
-	modo=1;
-	
-	Timer1.stop();
-	Timer1.detachInterrupt();		
-	
-	delay(2000);
-	setFast();
-	EEPROM.write(0, 2);
-	delay(4000);
-	//resetFunc();  //call reset
-	
+  
+  modo=1;
+  
+  Timer1.stop();
+  Timer1.detachInterrupt();   
+  
+  delay(2000);
+  setFast();
+  EEPROM.write(0, 2);
+  delay(4000);
+  //resetFunc();  //call reset
+  
 }
 
 
@@ -96,40 +96,52 @@ void setup()
   pinMode(ledPin1, OUTPUT);
   pinMode(A0,INPUT);
   
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+  
   oldADCSRA=ADCSRA;
   oldTIMSK0=TIMSK0;
-  Serial.println("---- SETUP ----");
+  Serial.println(F("---- SETUP ----"));
   
   //iniDemo();
   //grabar();
   initEEPROM();
-  Serial.println("---- SET MODo ----");
+  Serial.println(F("---- SET MODo ----"));
   
   modo=1;
   Timer1.initialize(20000000);//20segundos
   
   if (EEPROM.read(0)==2){
-    Serial.println("---- INI FASt----");
+    Serial.println(F("---- INI FASt----"));
     Timer1.detachInterrupt();
     setFast();
     modo=1;
   }else{
-    Serial.println("---- INI normal ----");
+    Serial.println(F("---- INI normal ----"));
     setNormal();
     Timer1.attachInterrupt(callback);
     modo=0;
   }
 
 
-  Serial.print("Modo:");
+  Serial.print(F("Modo:"));
   Serial.println(modo);
   
 }
 
 void loop()
 {  
-  Serial.println("------------- LOOP -------------- ");
+  
+  digitalWrite(8, LOW);
+  digitalWrite(10, HIGH);
+  //digitalWrite(8, HIGH);
+  
+  Serial.println(F("------------- LOOP -------------- "));
   int cantidadTotales=0;
+
+  
+  
 /*
 cleanEEPROM();
 grabar();
@@ -151,7 +163,7 @@ grabar();
     } 
     /*
     if (BT1.available()){
-      //Serial.println("BT ");
+      //Serial.println(F("BT ");
       //delay(100000);
       c= BT1.read();
       
@@ -163,19 +175,19 @@ grabar();
         buf="";
       } 
       //delay(25);
-      //Serial.println("BT ");
-      Serial.println(c);
+      //Serial.println(F("BT ");
+      Serial.println(F(c);
     }
     */
 
-    //Serial.println("Antes modo 0");
+    //Serial.println(F("Antes modo 0");
     if (modo==0){ // modo OUT
-//Serial.println("AREAD 1");
+//Serial.println(F("AREAD 1");
       int k=analogRead(A0);
 cantidadTotales++;
 /*
       
-      //Serial.println("modo 0");
+      //Serial.println(F("modo 0");
       //Vamos leyendo lo que capta el mic
       //si supera valor promedio, prendemos led
       while(!(ADCSRA & 0x10)); // wait for adc to be ready
@@ -188,15 +200,15 @@ cantidadTotales++;
       
       */
       
-	  noInterrupts();	//info de interrupciones: http://www.educachip.com/como-y-por-que-usar-las-interrupciones-en-arduino/
-			LOCAL_ruidoPromedio=GLOBAL_ruidoPromedio;
-	  interrupts();
-		
-	  //if(lecturaMic>(LOCAL_ruidoPromedio*procentajeSuperacionPromedio)){
+    noInterrupts(); //info de interrupciones: http://www.educachip.com/como-y-por-que-usar-las-interrupciones-en-arduino/
+      LOCAL_ruidoPromedio=GLOBAL_ruidoPromedio;
+    interrupts();
+    
+    //if(lecturaMic>(LOCAL_ruidoPromedio*procentajeSuperacionPromedio)){
       if(k>(LOCAL_ruidoPromedio +  procentajeSuperacionPromedio)){
 
-Serial.println("---SE SUPERO EL PROMEDIO UNA VEZ---");
-//Serial.println(cantidadTotales);
+Serial.println(F("---SE SUPERO EL PROMEDIO UNA VEZ---"));
+//Serial.println(F(cantidadTotales);
         
         int cantidadSuperaciones=0;
         double acumuladorMuestras=0;
@@ -214,10 +226,10 @@ Serial.println("---SE SUPERO EL PROMEDIO UNA VEZ---");
           int k = (j << 8) | m; // form into an int
 
 /¿*/
-//Serial.println("AREAD 2");
+//Serial.println(F("AREAD 2");
 k=analogRead(A0);
 //acumuladorMuestras=acumuladorMuestras+k;
-          //Serial.println(k);
+          //Serial.println(F(k);
 
           if(k>(LOCAL_ruidoPromedio +  procentajeSuperacionPromedio)){
             cantidadSuperaciones=cantidadSuperaciones+1;
@@ -225,22 +237,24 @@ k=analogRead(A0);
           
         }
 
-//Serial.println("---Fin toma muestras---");
+//Serial.println(F("---Fin toma muestras---");
         
         if(cantidadSuperaciones>80){
         //if((acumuladorMuestras/100)>=LOCAL_ruidoPromedio +  procentajeSuperacionPromedio){
           //Prende
           //Prendo led
-          Serial.println("Promedio global-:");
+          Serial.println(F("Promedio global-:"));
           Serial.println(LOCAL_ruidoPromedio +  procentajeSuperacionPromedio);
-          Serial.println("Promedio recien calculado:");
+          Serial.println(F("Promedio recien calculado:"));
           Serial.println(cantidadSuperaciones);
-          //Serial.println(cantidadSuperaciones);
+          //Serial.println(F(cantidadSuperaciones);
           digitalWrite(ledPin1, HIGH);
           //Envio sms x blue
           BT1.write("NA|");
+          delay(500);
           BT1.flush();
-          Serial.println("supero");
+          delay(500);
+          Serial.println(F("supero"));
           
           callback();
           delay(2000);
@@ -250,7 +264,7 @@ k=analogRead(A0);
         digitalWrite(ledPin1, LOW);
       }
     }else{ //modo IN
-      //Serial.println("modo 1");
+      //Serial.println(F("modo 1");
       modoPatron();
     }
     
@@ -265,7 +279,7 @@ void callback()
   int topeMuestras=100;
   double arrayOfTops[topeMuestras];
   int contArrayOfTops=0;
-  //Serial.println("--------------Muestras-----------");
+  //Serial.println(F("--------------Muestras-----------");
   double acumuladorPromedio=0;
   for (int i=0; i<topeMuestras; i++) {
     //Obtengo todos los valores y los aguardo para tomar lods 20 mas altos
@@ -273,7 +287,7 @@ void callback()
     
     int k=analogRead(A0);
     
-    
+    //Serial.println(k);
     /*
     while(!(ADCSRA & 0x10)); // wait for adc to be ready
     ADCSRA = 0xf5; // restart adc
@@ -284,7 +298,7 @@ void callback()
     //k <<= 6; // form into a 16b signed int
     */
     //if (lecturaMic <=1023) 
-      //Serial.println(lecturaMic);
+      //Serial.println(F(lecturaMic);
     
     
     
@@ -311,14 +325,20 @@ void callback()
   double sum=0;
   int cantidadAPromediar=topeMuestras-10;
   for (int i=cantidadAPromediar-1; i<topeMuestras; i++) {
-    //Serial.println(arrayOfTops[i]);
+    //Serial.println(F(arrayOfTops[i]);
     sum=sum+arrayOfTops[i];
   }
   //GLOBAL_ruidoPromedio=acumuladorPromedio/topeMuestras;
 
   GLOBAL_ruidoPromedio=sum/10;
+
+  if(GLOBAL_ruidoPromedio<100){
+    digitalWrite(8, HIGH);
+  }else{
+    digitalWrite(8, LOW);
+  }
   
-  Serial.println("PROMEDIO DIO:");
+  Serial.println(F("PROMEDIO DIO:"));
   Serial.println(GLOBAL_ruidoPromedio);  
 }
 
@@ -352,17 +372,22 @@ void reccmd(String sms){
   if (sms=="C1"){//out
     setModoOut();
     BT1.write("C1|"); //out
-    BT1.flush(); 
+    delay(500);
+    BT1.flush();
+    delay(500);
   }
   if (sms=="C2"){//in
     setModoIn();
     BT1.write("C2|"); // in
+    delay(50000);
     BT1.flush();
+    delay(50000);
   }
   
   if (sms=="CE"){
     cleanEEPROM();
     BT1.write("CE|"); // Format EEPROM
+    BT1.flush(); 
   }
 
   if (sms[0]=='B'){
@@ -391,8 +416,10 @@ void reccmd(String sms){
     grabar(IDSoundGrab);
     BT1.write('G');
     BT1.print(IDSoundGrab);
-    BT1.write('|');    
+    BT1.write('|');
+    delay(50000);  
     BT1.flush();
+    delay(50000);
     
     IDSoundGrab=-1;
     estado=0;  //0 lecturea, 1 grabando
@@ -406,8 +433,10 @@ void reccmd(String sms){
     grabar(-1);
     BT1.write('G');
     BT1.print(IDSoundGrab);
-    BT1.write('|');    
+    BT1.write('|'); 
+    delay(50000);   
     BT1.flush();
+    delay(50000);
     
     IDSoundGrab=-1;
     estado=0;  //0 lecturea, 1 grabando
@@ -495,7 +524,7 @@ void iniDemo(){
            {
               //Serial.print(i);
               //Serial.print(":");
-              //Serial.println(EEPROM.read(i));
+              //Serial.println(F(EEPROM.read(i));
                 if (EEPROM.read(i) != 0)
                     return (i+1);
            }
@@ -505,7 +534,7 @@ void iniDemo(){
         int eSaveSound(int s[5]){
             int i=CalcularpriPOSVaciaeeprom();
 
-            Serial.print("eeprom save :");
+            Serial.print(F("eeprom save :"));
             Serial.println(i);
             
               
@@ -557,7 +586,7 @@ void iniDemo(){
         }
         void initEEPROM(){
             if ( (EEPROM.read(0)!=1) && (EEPROM.read(0)!=2) ){ //nunca inicio el programa
-                Serial.println("INICIANDO EEPROM - PRIMERA VEZ ");
+                Serial.println(F("INICIANDO EEPROM - PRIMERA VEZ "));
                 cleanEEPROM();
                 if (modo==0)
                   EEPROM.write(0,1);
@@ -566,7 +595,7 @@ void iniDemo(){
             }
             else{
                 ultPOSeeprom=CalcularultPOSeeprom();
-                Serial.println("ultima pos eeprom ");
+                Serial.println(F("ultima pos eeprom "));
                 Serial.println(ultPOSeeprom );
             }
         }
@@ -594,9 +623,9 @@ void grabar(int id){
     picosDeMuestrasGrabacion[i]=0;
   }
   
-  Serial.println("Comenzado a grabar el sonido en 2 segundos");
+  Serial.println(F("Comenzado a grabar el sonido en 2 segundos"));
   delay(200000);
-  Serial.println("Comenzado a grabar YA");
+  Serial.println(F("Comenzado a grabar YA"));
 
   /*
   bool comenzo=false;
@@ -611,9 +640,9 @@ void grabar(int id){
     int k = (j << 8) | m; // form into an int
     k -= 0x0200; // form into a signed int
     k <<= 6; // form into a 16b signed int
-    Serial.println(k);
+    Serial.println(F(k);
     if (k > valorInicial){
-      Serial.println("SIIIII");
+      Serial.println(F("SIIIII");
       comenzo=true;
     }
     delayMicroseconds(DELAY_ANCHO_BANDA);      //
@@ -658,11 +687,11 @@ void grabar(int id){
     for (int i = 0 ; i < FHT_N/2 ; i++) {
       //Obtengo los picos
       if(i!=0){
-        if(fht_log_out[i]>fht_log_out[i-1] && fht_log_out[i]>fht_log_out[i+1] && fht_log_out[i]>45 && i>10){//AHI PUSE 40 DE REFERENCIA
+        if(fht_log_out[i]>fht_log_out[i-1] && fht_log_out[i]>fht_log_out[i+1] && fht_log_out[i]>60 && i>10){//AHI PUSE 40 DE REFERENCIA
           //Es pico, incremento su pos
            //Serial.print(i);
            //Serial.print(":");
-           //Serial.println(fht_log_out[i]);
+           //Serial.println(F(fht_log_out[i]);
 
 //------------------------------------------------------------------------ me quedo con los 3 mas altos
         if(fht_log_out[i]>tresPrimerosPicos[0]){
@@ -723,17 +752,17 @@ void grabar(int id){
   } //del while de n muetras
   sei();
 
-  /*Serial.println("-----Veo picos caracteristicos------");
+  /*Serial.println(F("-----Veo picos caracteristicos------");
 for (int i = 0 ; i < FHT_N/2 ; i++) {
   
-  Serial.println(picosDeMuestrasGrabacion[i]);
+  Serial.println(F(picosDeMuestrasGrabacion[i]);
 }
 
 delay(200000);
-  Serial.println("-----Veo picos caracteristicos------");
+  Serial.println(F("-----Veo picos caracteristicos------");
 
 
-  Serial.println("Sonido finalizado de grabar, comenzando a escuchar en 2 segundos");
+  Serial.println(F("Sonido finalizado de grabar, comenzando a escuchar en 2 segundos");
   delay(200000);
 */
   int picosConocidos[5];
@@ -803,17 +832,17 @@ delay(200000);
     }
   }
 
-  //Serial.println("Picos grabados");
+  //Serial.println(F("Picos grabados");
   //Finalizado esto ya tengo en picosconocidos las pos de los 3 picos mas caracterisiticos del sonido recien escuchado
 
-  Serial.println("Grabo en la eeprom desde:");
+  Serial.println(F("Grabo en la eeprom desde:"));
   int getPrimeraPosParaGrabarLas5=0;
   if (id!=-1){
     getPrimeraPosParaGrabarLas5=eUpdateSound(id, picosConocidos);
   }else
     getPrimeraPosParaGrabarLas5=eSaveSound(picosConocidos);
   
-  Serial.println("valores:");
+  Serial.println(F("valores:"));
   Serial.println(getPrimeraPosParaGrabarLas5);
   
   for (int i = 0 ; i < 5 ; i++) {
@@ -852,7 +881,7 @@ while(cantidadCiclos<cantidadCiclosEncuentro){
   fht_mag_log(); // take the output of the fht
   //sei();
     
-  //Serial.println("----Ya Tome las Lecturas-----");
+  //Serial.println(F("----Ya Tome las Lecturas-----");
   
   //int picos[128];
   int tresPrimerosPicos[4];
@@ -870,7 +899,7 @@ while(cantidadCiclos<cantidadCiclosEncuentro){
     //picos[i]=0;
     //Obtengo los picos
     if(i!=0){
-      if(fht_log_out[i]>fht_log_out[i-1] && fht_log_out[i]>fht_log_out[i+1] && fht_log_out[i]>45 && i>10){//AHI PUSE 40 DE REFERENCIA
+      if(fht_log_out[i]>fht_log_out[i-1] && fht_log_out[i]>fht_log_out[i+1] && fht_log_out[i]>60 && i>10){//AHI PUSE 40 DE REFERENCIA
         if(fht_log_out[i]>tresPrimerosPicos[0]){
           tresPrimerosPicos[3]=tresPrimerosPicos[2];
           tresPrimerosPicosPos[3]=tresPrimerosPicosPos[2];  
@@ -908,10 +937,10 @@ while(cantidadCiclos<cantidadCiclosEncuentro){
   }
 
 
-  /*Serial.println("-----Picos escuchados------");
+  /*Serial.println(F("-----Picos escuchados------");
   //delay(300000);
   for (int i = 0 ; i < 3 ; i++) {
-   //Serial.println(tresPrimerosPicosPos[i]);
+   //Serial.println(F(tresPrimerosPicosPos[i]);
   }*/
 
   //si ya encontre uno, me fijo si este mismo aparece n veces durante la cantidad de tomas.
@@ -935,15 +964,15 @@ while(cantidadCiclos<cantidadCiclosEncuentro){
     }
     if (con>=3){
       cantidadEncuentros++;
-      Serial.println("Encontro una vez B");
-      break; // ojo CORTO si ya encontre 2 veces!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      Serial.println(F("Encontro una vez B"));
+      //break; // ojo CORTO si ya encontre 2 veces!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
     
   }else{
     
     int valorHastaDondeLeoDeLaEEPROM=ultPOSeeprom;
-    //Serial.println("Hasta donde leo de la EEPROM");
-    //Serial.println(valorHastaDondeLeoDeLaEEPROM);
+    //Serial.println(F("Hasta donde leo de la EEPROM");
+    //Serial.println(F(valorHastaDondeLeoDeLaEEPROM);
     //bool CantCoicidencia[valorHastaDondeLeoDeLaEEPROM]; //vector que guardara la cantida de coincidencias por patron ? tiene sentido, o si le pega a 3 listo adentro?
     if (valorHastaDondeLeoDeLaEEPROM <= 0) return;
     
@@ -962,18 +991,18 @@ while(cantidadCiclos<cantidadCiclosEncuentro){
 
       /*
           //Lo que leo de la EEPROM:
-          Serial.println("VOy a comparar contra esto de la eeprom:");
-          Serial.println(picosConocidosDeMemoria[0]);
-          Serial.println(picosConocidosDeMemoria[1]);
-          Serial.println(picosConocidosDeMemoria[2]);
-          Serial.println(picosConocidosDeMemoria[3]);
-          Serial.println(picosConocidosDeMemoria[4]);
+          Serial.println(F("VOy a comparar contra esto de la eeprom:");
+          Serial.println(F(picosConocidosDeMemoria[0]);
+          Serial.println(F(picosConocidosDeMemoria[1]);
+          Serial.println(F(picosConocidosDeMemoria[2]);
+          Serial.println(F(picosConocidosDeMemoria[3]);
+          Serial.println(F(picosConocidosDeMemoria[4]);
           //delay(1000000);
-          Serial.println("------------Vs picos:-------------");
-          Serial.println(tresPrimerosPicosPos[0]);
-          Serial.println(tresPrimerosPicosPos[1]);
-          Serial.println(tresPrimerosPicosPos[2]);
-          Serial.println(tresPrimerosPicosPos[3]);
+          Serial.println(F("------------Vs picos:-------------");
+          Serial.println(F(tresPrimerosPicosPos[0]);
+          Serial.println(F(tresPrimerosPicosPos[1]);
+          Serial.println(F(tresPrimerosPicosPos[2]);
+          Serial.println(F(tresPrimerosPicosPos[3]);
       */    
 
       int picosusado[5];
@@ -997,10 +1026,10 @@ while(cantidadCiclos<cantidadCiclosEncuentro){
                 && (picosusado[p]==0) 
           ){
             /*
-            Serial.println(picosConocidosDeMemoria[p]-delta);
-            Serial.println(tresPrimerosPicosPos[i]);
-            Serial.println(picosConocidosDeMemoria[p]+delta);
-            Serial.println(picosusado[i]);
+            Serial.println(F(picosConocidosDeMemoria[p]-delta);
+            Serial.println(F(tresPrimerosPicosPos[i]);
+            Serial.println(F(picosConocidosDeMemoria[p]+delta);
+            Serial.println(F(picosusado[i]);
             */
             con++;
             picosusado[p]=1;
@@ -1011,17 +1040,17 @@ while(cantidadCiclos<cantidadCiclosEncuentro){
 
       if (con>=3){
         /*
-        Serial.println("Lo que lei: "); 
-        for (int i = 0 ; i <= 3 ; i++) Serial.println(tresPrimerosPicosPos[i]); 
-        Serial.println("sonido encontrado: "); 
-        for (int i = 0 ; i <= 4 ; i++) Serial.println(picosConocidosDeMemoria[i]); 
-        Serial.println("sonido encontrado: ");  
-        Serial.println(idsound);  
-        for (int i = 0 ; i <= 4 ; i++) Serial.println(picosusado[i]);  
+        Serial.println(F("Lo que lei: "); 
+        for (int i = 0 ; i <= 3 ; i++) Serial.println(F(tresPrimerosPicosPos[i]); 
+        Serial.println(F("sonido encontrado: "); 
+        for (int i = 0 ; i <= 4 ; i++) Serial.println(F(picosConocidosDeMemoria[i]); 
+        Serial.println(F("sonido encontrado: ");  
+        Serial.println(F(idsound);  
+        for (int i = 0 ; i <= 4 ; i++) Serial.println(F(picosusado[i]);  
         */
-        cantidadCiclosEncuentro=5; //incremento el contador y voy a procesar de nuevo el while
+        cantidadCiclosEncuentro=6; //incremento el contador y voy a procesar de nuevo el while
         cantidadEncuentros++;
-        Serial.println("Encontro una vez A");
+        Serial.println(F("Encontro una vez A"));
         break;
       }
     }//for eeprom
@@ -1031,9 +1060,9 @@ while(cantidadCiclos<cantidadCiclosEncuentro){
 }//While de encontrar
 
 
-  if(cantidadEncuentros>1){
+  if(cantidadEncuentros>2){
 
-    Serial.println("Encontro mas de una");
+    Serial.println(F("Encontro mas de una"));
     Serial.println(cantidadEncuentros);
     
     //Prendo
@@ -1052,12 +1081,13 @@ while(cantidadCiclos<cantidadCiclosEncuentro){
       BT1.flush();*/
 
       BT1.write('N');
-      delay(400000);
+      delay(300000);
       BT1.print(idsound);
-      delay(400000);
+      delay(300000);
       BT1.write('|');
-      
-      delay(400000);
+      delay(300000);
+      BT1.flush();
+      delay(300000);
       digitalWrite(ledPin1, LOW);
   }
 }

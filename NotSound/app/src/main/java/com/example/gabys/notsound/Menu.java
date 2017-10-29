@@ -167,6 +167,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         ////////////////////////////////////////////////////////////////////
         hiloEstadoBT = new btThread();
         hiloEstadoBT.start();
+
     }
 
     public void processReceive(Context context, Intent intent) {
@@ -186,6 +187,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                 if (
                         (!this.getClass().getSimpleName().equals("SonidosActivity"))
                      && (!this.getClass().getSimpleName().equals("SonidosEdicionActivity"))
+                     && (!this.getClass().getSimpleName().equals("ConfigActivity"))
                 ) {
                     Intent inte = new Intent(getApplicationContext(), SonidoAlertaActivity.class);
                     inte.putExtra("sonidoSeleccionado", i);
@@ -375,8 +377,6 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
             try {
                 while (1 == 1) {
-
-                    Thread.sleep(4000);
                     if (MiServiceIBinder.BTConected()){
                         runOnUiThread(new Runnable() {
                             public void run() {
@@ -398,7 +398,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                             }
                         });
                     }
-
+                    Thread.sleep(4000);
                 }
 
             } catch (InterruptedException e) {
@@ -414,6 +414,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                         img_BT_icono.getDrawable().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.SRC_ATOP);
                     }
                 });
+
 
             }
         }

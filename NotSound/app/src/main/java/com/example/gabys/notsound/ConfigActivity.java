@@ -179,7 +179,7 @@ public class ConfigActivity extends Menu {
         String msgInfo="";
 
         switch (s) {
-            case "T0": msgInfo="Probando conexión"; break;
+            case "T0": msgInfo="Conexión exitosa"; break;
             case "C1":
                 msgInfo="Conexión exitosa. Modo: EXTERIOR";
                 swM.setChecked(false);
@@ -188,14 +188,21 @@ public class ConfigActivity extends Menu {
                 msgInfo="Conexión exitosa. Modo: INTERIOR";
                 swM.setChecked(true);
                 break;
-            default: msgInfo="Conexión exitosa"; break;
+            case "CE":
+                Toast.makeText(getApplicationContext(), "Operación exitosa", Toast.LENGTH_LONG).show();
+                break;
+            default: msgInfo=s; break;
         }
         s = txtInfo.getText().toString() + ((char) 10) + ((char) 13) + s;
 
         txtInfo.setText(msgInfo);
         grabacionExitosa=true;
-        if (progress != null)
+        if (progress != null){
             progress.cancel();
+            pdCanceller.removeCallbacks(progressRunnable);//para reset time
+        }
+
+
     }
 
     public void test(View view){
