@@ -172,7 +172,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
     public void processReceive(Context context, Intent intent) {
         Log.i("DESARROLLO","processReceive ");
         String s=intent.getExtras().getSerializable("sms").toString();
-        Toast.makeText(context, s, Toast.LENGTH_LONG).show();
+        //Toast.makeText(context, s, Toast.LENGTH_LONG).show();
         this.ActionRecive(s);
         try{
             int i=-1;
@@ -216,9 +216,6 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         msg.setData(b);
         try {
             mService.send(msg);
-
-
-
         } catch (RemoteException e) {
             e.printStackTrace();
             return false;
@@ -379,27 +376,29 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             try {
                 while (1 == 1) {
 
-                    Thread.sleep(2000);
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
-                            img_BT_icono.setImageResource(R.drawable.ic_check_black_24dp);
+                    Thread.sleep(4000);
+                    if (MiServiceIBinder.BTConected()){
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
+                                img_BT_icono.setImageResource(R.drawable.ic_check_black_24dp);
 
-                            img_BT.getDrawable().setColorFilter(getResources().getColor(android.R.color.background_light), PorterDuff.Mode.SRC_ATOP);
-                            img_BT_icono.getDrawable().setColorFilter(getResources().getColor(android.R.color.background_light), PorterDuff.Mode.SRC_ATOP);
-                        }
-                    });
+                                img_BT.getDrawable().setColorFilter(getResources().getColor(android.R.color.background_light), PorterDuff.Mode.SRC_ATOP);
+                                img_BT_icono.getDrawable().setColorFilter(getResources().getColor(android.R.color.background_light), PorterDuff.Mode.SRC_ATOP);
+                            }
+                        });
+                    }else{
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
+                                img_BT_icono.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
 
-                    Thread.sleep(2000);
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
-                            img_BT_icono.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+                                img_BT.getDrawable().setColorFilter(getResources().getColor(R.color.colorSecondary), PorterDuff.Mode.SRC_ATOP);
+                                img_BT_icono.getDrawable().setColorFilter(getResources().getColor(R.color.colorSecondary), PorterDuff.Mode.SRC_ATOP);
+                            }
+                        });
+                    }
 
-                            img_BT.getDrawable().setColorFilter(getResources().getColor(R.color.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-                            img_BT_icono.getDrawable().setColorFilter(getResources().getColor(R.color.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-                        }
-                    });
                 }
 
             } catch (InterruptedException e) {
@@ -426,7 +425,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
     }
-
+/*
     private Boolean estaBlueToothConectado (Context context, Intent intent){
 
         sendMSGSRV("T0|");
@@ -438,7 +437,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
             return true;
         }
     }
-
+*/
 
 /*
     public void setTextoAyuda(String titulo1, String cuerpo1, String titulo2, String cuerpo2){

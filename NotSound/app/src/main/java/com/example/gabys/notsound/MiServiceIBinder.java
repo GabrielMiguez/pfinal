@@ -76,7 +76,7 @@ public class MiServiceIBinder extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         _onBind(intent);
-        Toast.makeText(this, "Service Star...", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Service Star...", Toast.LENGTH_LONG).show();
         return START_STICKY;
     }
 
@@ -96,7 +96,8 @@ public class MiServiceIBinder extends Service {
                     //mediante el servicio, seguramente tengo que exponer algun metodo de escucha(lo realizo con el Binder)
                     if (bt.Conected()) {
                         bluetoothConectado(); //nofif
-                        Thread.sleep(5000); //espero 5 segndo, y vuelvo a intentar conectarme, solo cuando no estoy conectado.
+
+                        Thread.sleep(2000); //espero 5 segndo, y vuelvo a intentar conectarme, solo cuando no estoy conectado.
                         //podria llevarlo a la pantalla de configuracion.
                         continue;
                     }
@@ -112,7 +113,7 @@ public class MiServiceIBinder extends Service {
 
                     //si no esta conectado, intenta conectar cada 5 segundos
                     bt.conectar(dis);// una vez conectado, adentro se crean los hilos necesario para mentener la conexion abierta.
-                    Thread.sleep(10000);
+                    Thread.sleep(5000);
                 }
 
             } catch (InterruptedException e) {
@@ -156,6 +157,7 @@ public class MiServiceIBinder extends Service {
                 .setAutoCancel(false);
 
         nManager.notify(123123, builder.build());
+
     }
 
     public void bluetoothDesconectado() {

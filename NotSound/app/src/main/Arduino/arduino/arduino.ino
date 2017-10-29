@@ -25,7 +25,8 @@ int ledPin1 = 13;
 /*char palanca[3]="A0";*/
 char mic[3]="A0";
 volatile double GLOBAL_ruidoPromedio=0;  //volatile, por que se cambian en interrupciones
-volatile double procentajeSuperacionPromedio=50;
+double LOCAL_ruidoPromedio=0;  //sin volatile
+double procentajeSuperacionPromedio=80;
 char c;
 
 void(* resetFunc) (void) = 0;//declare reset function at address 0
@@ -34,41 +35,54 @@ byte oldTIMSK0;
 
 
 void setNormal(){
-  
-  TIMSK0 = oldTIMSK0; // turn off timer0 for lower jitter -->Problemas con el sleep
-  ADCSRA = oldADCSRA;
-  ADMUX = 0x40; // use adc0
-  DIDR0 = 0x01; // turn off the digital input for adc0
-  normal=1;
+  noInterrupts();
+	  TIMSK0 = oldTIMSK0; // turn off timer0 for lower jitter -->Problemas con el sleep
+	  ADCSRA = oldADCSRA;
+	  ADMUX = 0x40; // use adc0
+	  DIDR0 = 0x01; // turn off the digital input for adc0
+	  normal=1;
+  interrupts();
 }
 void setFast(){
-  TIMSK0 = 0; // turn off timer0 for lower jitter -->Problemas con el sleep
-  ADCSRA = 0xe5; // set the adc to free running mode -->Problemas con el analogRead
-  ADMUX = 0x40; // use adc0
-  DIDR0 = 0x01; // turn off the digital input for adc0
-  normal=0;
-
+  noInterrupts();
+	  TIMSK0 = 0; // turn off timer0 for lower jitter -->Problemas con el sleep
+	  ADCSRA = 0xe5; // set the adc to free running mode -->Problemas con el analogRead
+	  ADMUX = 0x40; // use adc0
+	  DIDR0 = 0x01; // turn off the digital input for adc0
+	  normal=0;
+  interrupts();
 }
 void setModoOut(){
     if (modo==0) return;
     
-    modo=0;
-    setNormal();
+	modo=0;
+	setNormal();		
+	EEPROM.write(0, 1);
+	
+	delay(4000);
+ 
     
-    EEPROM.write(0, 1);
-    delay(2000);
-    Timer1.attachInterrupt(callback);
-    //resetFunc();  //call reset
+	  Timer1.attachInterrupt(callback);
+	  Timer1.restart();
+ 
+	//Timer1.start()
+	//resetFunc();  //call reset
+	
 }
 void setModoIn(){
-    if (modo==1) return;
-    
-    modo=1;
-    Timer1.detachInterrupt();
-    setFast();
-    EEPROM.write(0, 2);
-    delay(20000);
-    //resetFunc();  //call reset
+    if (modo==1) return;    
+	
+	modo=1;
+	
+	Timer1.stop();
+	Timer1.detachInterrupt();		
+	
+	delay(2000);
+	setFast();
+	EEPROM.write(0, 2);
+	delay(4000);
+	//resetFunc();  //call reset
+	
 }
 
 
@@ -92,13 +106,16 @@ void setup()
   Serial.println("---- SET MODo ----");
   
   modo=1;
+  Timer1.initialize(20000000);//20segundos
+  
   if (EEPROM.read(0)==2){
+    Serial.println("---- INI FASt----");
     Timer1.detachInterrupt();
     setFast();
     modo=1;
   }else{
+    Serial.println("---- INI normal ----");
     setNormal();
-    Timer1.initialize(30000000);
     Timer1.attachInterrupt(callback);
     modo=0;
   }
@@ -127,10 +144,10 @@ grabar();
       if( c != '|')    //Hasta que el caracter sea END_CMD_CHAR
          buf += c;
       else{
-        reccmd(buf);
+          reccmd(buf);
         buf="";
       }
-      delay(250);
+      delay(25);
     } 
     /*
     if (BT1.available()){
@@ -170,8 +187,13 @@ cantidadTotales++;
       //k <<= 6; // form into a 16b signed int
       
       */
-      //if(lecturaMic>(GLOBAL_ruidoPromedio*procentajeSuperacionPromedio)){
-      if(k>(GLOBAL_ruidoPromedio +  procentajeSuperacionPromedio)){
+      
+	  noInterrupts();	//info de interrupciones: http://www.educachip.com/como-y-por-que-usar-las-interrupciones-en-arduino/
+			LOCAL_ruidoPromedio=GLOBAL_ruidoPromedio;
+	  interrupts();
+		
+	  //if(lecturaMic>(LOCAL_ruidoPromedio*procentajeSuperacionPromedio)){
+      if(k>(LOCAL_ruidoPromedio +  procentajeSuperacionPromedio)){
 
 Serial.println("---SE SUPERO EL PROMEDIO UNA VEZ---");
 //Serial.println(cantidadTotales);
@@ -197,7 +219,7 @@ k=analogRead(A0);
 //acumuladorMuestras=acumuladorMuestras+k;
           //Serial.println(k);
 
-          if(k>(GLOBAL_ruidoPromedio +  procentajeSuperacionPromedio)){
+          if(k>(LOCAL_ruidoPromedio +  procentajeSuperacionPromedio)){
             cantidadSuperaciones=cantidadSuperaciones+1;
           }
           
@@ -205,12 +227,12 @@ k=analogRead(A0);
 
 //Serial.println("---Fin toma muestras---");
         
-        if(cantidadSuperaciones>60){
-        //if((acumuladorMuestras/100)>=GLOBAL_ruidoPromedio +  procentajeSuperacionPromedio){
+        if(cantidadSuperaciones>80){
+        //if((acumuladorMuestras/100)>=LOCAL_ruidoPromedio +  procentajeSuperacionPromedio){
           //Prende
           //Prendo led
           Serial.println("Promedio global-:");
-          Serial.println(GLOBAL_ruidoPromedio +  procentajeSuperacionPromedio);
+          Serial.println(LOCAL_ruidoPromedio +  procentajeSuperacionPromedio);
           Serial.println("Promedio recien calculado:");
           Serial.println(cantidadSuperaciones);
           //Serial.println(cantidadSuperaciones);
@@ -239,15 +261,16 @@ k=analogRead(A0);
 void callback()
 {
   if (modo!=0) return; // modo != OUT => salgo
-  //if (normal==0) return; //modo fast me voy
+  if (normal==0) return; //modo fast me voy
   int topeMuestras=100;
   double arrayOfTops[topeMuestras];
   int contArrayOfTops=0;
   //Serial.println("--------------Muestras-----------");
   double acumuladorPromedio=0;
   for (int i=0; i<topeMuestras; i++) {
+    //Obtengo todos los valores y los aguardo para tomar lods 20 mas altos
     
-    //Serial.println("AREAD 3");
+    
     int k=analogRead(A0);
     
     
@@ -265,12 +288,12 @@ void callback()
     
     
     
-    acumuladorPromedio=acumuladorPromedio+k;
-    /*
+    //acumuladorPromedio=acumuladorPromedio+k;
+    
     arrayOfTops[contArrayOfTops]=k;
-    contArrayOfTops++;*/
+    contArrayOfTops++;
   }
-/*
+
   //Hago burbuja para ordenarlos
   double temp=0;
   for (int i=0; i<topeMuestras; i++){
@@ -283,18 +306,20 @@ void callback()
       }
     }
   }
-*/
+
   //Tomo los ultimos 20 que son los mas altos y saco el promedio en base a esos
-  /*double sum=0;
-  int cantidadAPromediar=topeMuestras-20;
+  double sum=0;
+  int cantidadAPromediar=topeMuestras-10;
   for (int i=cantidadAPromediar-1; i<topeMuestras; i++) {
     //Serial.println(arrayOfTops[i]);
     sum=sum+arrayOfTops[i];
-  }*/
-  GLOBAL_ruidoPromedio=acumuladorPromedio/topeMuestras;
-  //Serial.println("PROMEDIO DIO:");
-  //Serial.println(GLOBAL_ruidoPromedio);
+  }
+  //GLOBAL_ruidoPromedio=acumuladorPromedio/topeMuestras;
+
+  GLOBAL_ruidoPromedio=sum/10;
   
+  Serial.println("PROMEDIO DIO:");
+  Serial.println(GLOBAL_ruidoPromedio);  
 }
 
 void reccmd(String sms){
@@ -558,187 +583,6 @@ void iniDemo(){
 //---- Funciones EEPROM ----
 
 
-void _grabar(){
-  //PROCESO GRABACION
-  int picosDeMuestrasGrabacion[FHT_N/2];
-  //Inicializo
-  for (int i = 0 ; i < FHT_N/2 ; i++) {
-    picosDeMuestrasGrabacion[i]=0;
-  }
-
-  
-  
-  Serial.println("Comenzado a grabar el sonido en 2 segundos");
-  delay(200000);
-  Serial.println("Comenzado a grabar YA");
-
-  /*
-  bool comenzo=false;
-  int valorInicial=200;
-
-  cli();
-  while(!comenzo){
-    while(!(ADCSRA & 0x10)); // wait for adc to be ready
-    ADCSRA = 0xf5; // restart adc
-    byte m = ADCL; // fetch adc data
-    byte j = ADCH;
-    int k = (j << 8) | m; // form into an int
-    k -= 0x0200; // form into a signed int
-    k <<= 6; // form into a 16b signed int
-    Serial.println(k);
-    if (k > valorInicial){
-      Serial.println("SIIIII");
-      comenzo=true;
-    }
-    delayMicroseconds(DELAY_ANCHO_BANDA);      //
-  } 
-  */    
-  
-  //Uso los primeros segundos para grabar un sonido y usarlo después para los picos.
-  int cantidadDeCiclos=400;
-  cli();  // UDRE interrupt slows this way down on arduino1.0
-  while(cantidadDeCiclos>=0) { // reduces jitter
-    for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
-      while(!(ADCSRA & 0x10)); // wait for adc to be ready
-      ADCSRA = 0xf5; // restart adc
-      byte m = ADCL; // fetch adc data
-      byte j = ADCH;
-      int k = (j << 8) | m; // form into an int
-      k -= 0x0200; // form into a signed int
-      k <<= 6; // form into a 16b signed int
-      fht_input[i] = k; // put real data into bins
-      delayMicroseconds(DELAY_ANCHO_BANDA);      //
-    }
-    fht_window(); // window the data for better frequency response
-    fht_reorder(); // reorder the data before doing the fht
-    fht_run(); // process the data in the fht
-    fht_mag_log(); // take the output of the fht
-    
-    cantidadDeCiclos=cantidadDeCiclos-1;
-
-    //Obtengo los picos y sus posiciones de esa tirada de audio
-    /*int tresPrimerosPicos[5];
-    tresPrimerosPicos[0]=0;
-    tresPrimerosPicos[1]=0;
-    tresPrimerosPicos[2]=0;
-    tresPrimerosPicos[3]=0;
-    tresPrimerosPicos[4]=0;
-    int tresPrimerosPicosPos[5];
-    tresPrimerosPicosPos[0]=0;
-    tresPrimerosPicosPos[1]=0;
-    tresPrimerosPicosPos[2]=0;
-    tresPrimerosPicosPos[3]=0;
-    tresPrimerosPicosPos[4]=0;*/
-    for (int i = 0 ; i < FHT_N/2 ; i++) {
-      //Obtengo los picos
-      if(i!=0){
-        if(fht_log_out[i]>fht_log_out[i-1] && fht_log_out[i]>fht_log_out[i+1] && fht_log_out[i]>35 && i>10){//AHI PUSE 40 DE REFERENCIA
-          //Es pico, incremento su pos
-           Serial.print(i);
-           Serial.print(":");
-           Serial.println(fht_log_out[i]);
-          picosDeMuestrasGrabacion[i]=picosDeMuestrasGrabacion[i]+1;
-        }
-      }
-    }    
-  }
-  sei();
-
-  /*Serial.println("-----Veo picos caracteristicos------");
-for (int i = 0 ; i < FHT_N/2 ; i++) {
-  
-  Serial.println(picosDeMuestrasGrabacion[i]);
-}
-
-delay(200000);
-  Serial.println("-----Veo picos caracteristicos------");
-
-
-  Serial.println("Sonido finalizado de grabar, comenzando a escuchar en 2 segundos");
-  delay(200000);
-*/
-  int picosConocidos[5];
-  picosConocidos[0]=0;
-  picosConocidos[1]=0;
-  picosConocidos[2]=0;
-  picosConocidos[3]=0;
-  picosConocidos[4]=0;
-  int picosConocidosValor[5];
-  picosConocidosValor[0]=0;
-  picosConocidosValor[1]=0;
-  picosConocidosValor[2]=0;
-  picosConocidosValor[3]=0;
-  picosConocidosValor[4]=0;
-  
-  //Obtengo del vector aquellos 3 que tengan mas veces contabilizados y seran los 3 picos que voy a grabar
-  for (int i = 0 ; i < FHT_N/2 ; i++) {
-    if(picosDeMuestrasGrabacion[i]>0){
-      if(picosDeMuestrasGrabacion[i]>picosConocidosValor[0]){
-        //Lo grabo en la primera y corro los otros    
-        picosConocidosValor[4]=picosConocidosValor[3];
-        picosConocidosValor[3]=picosConocidosValor[2];    
-        picosConocidosValor[2]=picosConocidosValor[1];
-        picosConocidosValor[1]=picosConocidosValor[0];
-        picosConocidosValor[0]=picosDeMuestrasGrabacion[i];
-        picosConocidos[4]=picosConocidos[3];
-        picosConocidos[3]=picosConocidos[2];
-        picosConocidos[2]=picosConocidos[1];
-        picosConocidos[1]=picosConocidos[0];
-        picosConocidos[0]=i;
-      }else{
-        if(picosDeMuestrasGrabacion[i]>picosConocidosValor[1]){
-          //Lo grabo en la segunda y corro los otros dos  
-          picosConocidosValor[4]=picosConocidosValor[3];
-          picosConocidosValor[3]=picosConocidosValor[2];      
-          picosConocidosValor[2]=picosConocidosValor[1];
-          picosConocidosValor[1]=picosDeMuestrasGrabacion[i];
-          picosConocidos[4]=picosConocidos[3];
-          picosConocidos[3]=picosConocidos[2];
-          picosConocidos[2]=picosConocidos[1];
-          picosConocidos[1]=i;
-        }else{
-          if(picosDeMuestrasGrabacion[i]>picosConocidosValor[2]){
-            //Lo grabo en la segunda y corro los otros dos  
-            picosConocidosValor[4]=picosDeMuestrasGrabacion[3];
-            picosConocidosValor[3]=picosDeMuestrasGrabacion[2];      
-            picosConocidosValor[2]=picosDeMuestrasGrabacion[i];
-            picosConocidos[4]=picosConocidos[3];
-            picosConocidos[3]=picosConocidos[2];
-            picosConocidos[2]=i;
-          }else{
-            if(picosDeMuestrasGrabacion[i]>picosConocidosValor[3]){
-              picosConocidosValor[4]=picosDeMuestrasGrabacion[3];
-              picosConocidosValor[3]=picosDeMuestrasGrabacion[i]; 
-              picosConocidos[4]=picosConocidos[3];
-              picosConocidos[3]=i;
-            }else{
-              if(picosDeMuestrasGrabacion[i]>picosConocidosValor[4]){
-                picosConocidosValor[4]=picosDeMuestrasGrabacion[i]; 
-                picosConocidos[4]=i;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  //Serial.println("Picos grabados");
-  //Finalizado esto ya tengo en picosconocidos las pos de los 3 picos mas caracterisiticos del sonido recien escuchado
-
-  Serial.println("Grabo en la eeprom desde:");
-  int getPrimeraPosParaGrabarLas5=eSaveSound(picosConocidos);
-  Serial.println("valores:");
-  Serial.println(getPrimeraPosParaGrabarLas5);
-  
-  for (int i = 0 ; i < 5 ; i++) {
-      Serial.println(EEPROM.read(getPrimeraPosParaGrabarLas5+i));
-  }
-  IDSoundGrab=getPrimeraPosParaGrabarLas5;
-  
-  //TERMINO PROCESO GRABACION
-}
-
 void grabar(int id){  
     //grabo picos no count de frecuencias, ya que en la lectura me quedo con los picos en aplitud de las 3 frecuencias mas altas en amp
     //por ende cambio el grabar, para que tenga en cuenta la cantidad de frecuencias picos, pero no solo con el filtro, sino siempre guardo la frecuencia de los 3 pcios mas altos.
@@ -749,8 +593,6 @@ void grabar(int id){
   for (int i = 0 ; i < FHT_N/2 ; i++) {
     picosDeMuestrasGrabacion[i]=0;
   }
-
-  
   
   Serial.println("Comenzado a grabar el sonido en 2 segundos");
   delay(200000);

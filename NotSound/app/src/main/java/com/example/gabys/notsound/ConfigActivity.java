@@ -1,12 +1,15 @@
 package com.example.gabys.notsound;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -40,6 +43,10 @@ public class ConfigActivity extends Menu {
     private Switch swB, swM;
     private FloatingActionButton btnBuscar;
     public TextView txtInfo;
+    private boolean grabacionExitosa;
+    ProgressDialog progress;
+    Runnable progressRunnable;
+    Handler pdCanceller;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,18 +110,67 @@ public class ConfigActivity extends Menu {
             }
         });
 
+
+        swM.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+             /*
+            }
+        });
+
         swM.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                */
                 //Log.v("Switch State=", ""+isChecked);
-                if (!isChecked) {
+                grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
+
+                progress = new ProgressDialog(ConfigActivity.this);
+                //progress.setTitle("Grabando");
+                progress.setMessage("Configurando Dispositivo. Espere...");
+                progress.setCancelable(false);
+                progress.show();
+
+                if (!swM.isChecked()) {
+                    swM.setChecked(true); //coloca como antes, no deja desactivar
                     sendMSGSRV("C1|");
-                } else
+                } else {
+                    swM.setChecked(false); //coloca como antes, no deja desactivar
                     sendMSGSRV("C2|");
+                }
+
+                // Se crea un proceso para que al superar el TIMEOUT de GRABACION se ejecute.
+                // Si la grabacion no fue exitosa: se va a cerrar el ProgressDialog y va a mostrar un mensaje de error.
+                progressRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+
+                        progress.cancel();
+                        if (!grabacionExitosa) {
+                            AlertDialog.Builder dialogo1 = new AlertDialog.Builder(ConfigActivity.this);
+                            dialogo1.setTitle("Atención");
+                            dialogo1.setMessage("Se superó el tiempo de espera.");
+                            dialogo1.setCancelable(false);
+                            dialogo1.setNegativeButton("Cerrar", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialogo1, int id) {
+                                }
+                            });
+
+                            dialogo1.show();
+                        }
+                    }
+                };
+
+                pdCanceller = new Handler();
+                pdCanceller.postDelayed(progressRunnable, ConfigActivity.GRABACION_TIMEOUT); // Se setea el tiempo de espera antes de que llame al proceso de arriba.
             }
         });
 
         recuperar();
+        //Obtengo el modo en el que esta el dispositivo?
     }
 
     //Metodo para Implememtar Accion en cada Activity
@@ -122,16 +178,24 @@ public class ConfigActivity extends Menu {
     public void ActionRecive(String s){
         String msgInfo="";
 
-        s = txtInfo.getText().toString() + ((char) 10) + ((char) 13) + s;
-
         switch (s) {
-            case "C1": msgInfo="Probando conexión"; break;
-            case "T0": msgInfo="Conexión exitosa. Modo: EXTERIOR"; break;
-            case "T1": msgInfo="Conexión exitosa. Modo: INTERIOR"; break;
+            case "T0": msgInfo="Probando conexión"; break;
+            case "C1":
+                msgInfo="Conexión exitosa. Modo: EXTERIOR";
+                swM.setChecked(false);
+                break;
+            case "C2":
+                msgInfo="Conexión exitosa. Modo: INTERIOR";
+                swM.setChecked(true);
+                break;
             default: msgInfo="Conexión exitosa"; break;
         }
+        s = txtInfo.getText().toString() + ((char) 10) + ((char) 13) + s;
 
         txtInfo.setText(msgInfo);
+        grabacionExitosa=true;
+        if (progress != null)
+            progress.cancel();
     }
 
     public void test(View view){
@@ -266,6 +330,11 @@ public class ConfigActivity extends Menu {
             //selecciono el item
             lstdispos.setSelection(i,true);
 
+            if (prefe.getString("modo", "").toString().equals("C1")){
+                swM.setChecked(true);
+            }else{
+                swM.setChecked(false);
+            }
         }catch (Exception e){
 
         }
@@ -276,6 +345,12 @@ public class ConfigActivity extends Menu {
             SharedPreferences preferencias=getSharedPreferences("configuracion",Context.MODE_PRIVATE);
             SharedPreferences.Editor editor=preferencias.edit();
             editor.putString("dispositivo", lstdispos.getSelectedItem().toString());
+            if (swM.isChecked()){
+                editor.putString("modo", "C1");
+            }else{
+                editor.putString("modo", "C2");
+            }
+
             editor.commit();
             //Toast.makeText(this,"Datos grabados", Toast.LENGTH_LONG).show();
 
