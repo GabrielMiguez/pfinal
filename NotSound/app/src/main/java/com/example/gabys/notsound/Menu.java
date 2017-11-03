@@ -375,48 +375,51 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
         public void run() {
 
 
-            try {
+
                 while (1 == 1) {
-                    if (MiServiceIBinder.BTConected()){
+                    try {
+                        Thread.sleep(500);
+                        if (MiServiceIBinder.BTConected()) {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
+                                    img_BT_icono.setImageResource(R.drawable.ic_check_black_24dp);
+
+                                    img_BT.getDrawable().setColorFilter(getResources().getColor(android.R.color.background_light), PorterDuff.Mode.SRC_ATOP);
+                                    img_BT_icono.getDrawable().setColorFilter(getResources().getColor(android.R.color.background_light), PorterDuff.Mode.SRC_ATOP);
+                                }
+                            });
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
+                                    img_BT_icono.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+
+                                    img_BT.getDrawable().setColorFilter(getResources().getColor(R.color.colorSecondary), PorterDuff.Mode.SRC_ATOP);
+                                    img_BT_icono.getDrawable().setColorFilter(getResources().getColor(R.color.colorSecondary), PorterDuff.Mode.SRC_ATOP);
+                                }
+                            });
+                        }
+                        Thread.sleep(3500);
+
+                    } catch (InterruptedException e) {
+                        /*
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+
                         runOnUiThread(new Runnable() {
                             public void run() {
                                 img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
-                                img_BT_icono.setImageResource(R.drawable.ic_check_black_24dp);
+                                img_BT_icono.setImageResource(android.R.drawable.ic_menu_help);
 
-                                img_BT.getDrawable().setColorFilter(getResources().getColor(android.R.color.background_light), PorterDuff.Mode.SRC_ATOP);
-                                img_BT_icono.getDrawable().setColorFilter(getResources().getColor(android.R.color.background_light), PorterDuff.Mode.SRC_ATOP);
+                                img_BT.getDrawable().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.SRC_ATOP);
+                                img_BT_icono.getDrawable().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.SRC_ATOP);
                             }
                         });
-                    }else{
-                        runOnUiThread(new Runnable() {
-                            public void run() {
-                                img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
-                                img_BT_icono.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+                        */
 
-                                img_BT.getDrawable().setColorFilter(getResources().getColor(R.color.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-                                img_BT_icono.getDrawable().setColorFilter(getResources().getColor(R.color.colorSecondary), PorterDuff.Mode.SRC_ATOP);
-                            }
-                        });
                     }
-                    Thread.sleep(4000);
                 }
-
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
-                        img_BT_icono.setImageResource(android.R.drawable.ic_menu_help);
-
-                        img_BT.getDrawable().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.SRC_ATOP);
-                        img_BT_icono.getDrawable().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.SRC_ATOP);
-                    }
-                });
-
-
-            }
         }
     }
 
