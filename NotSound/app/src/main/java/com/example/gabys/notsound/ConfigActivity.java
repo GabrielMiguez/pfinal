@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.DragEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -35,7 +37,7 @@ public class ConfigActivity extends Menu {
     public BluetoothAdapter BA;
     public BluetoothDevice BD;
 
-    public static int GRABACION_TIMEOUT = 15000 + 1000; // Extiendo un segundo mas el Timeout para que no coinicda con el tiempo de grabacion.
+    public static int GRABACION_TIMEOUT = 1000 + 1000; // Extiendo un segundo mas el Timeout para que no coinicda con el tiempo de grabacion.
 
     Set<BluetoothDevice> pairedDevices;
     ArrayAdapter mArrayAdapter;
@@ -47,6 +49,7 @@ public class ConfigActivity extends Menu {
     ProgressDialog progress;
     Runnable progressRunnable;
     Handler pdCanceller;
+    CompoundButton.OnCheckedChangeListener listener;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,67 +113,76 @@ public class ConfigActivity extends Menu {
             }
         });
 
+        listener = new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                metodo_swM();
+            }
+        };
 
+        swM.setOnCheckedChangeListener(listener);
+
+/*
         swM.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-
-             /*
+                metodo_swM();
             }
         });
-
-        swM.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                */
-                //Log.v("Switch State=", ""+isChecked);
-                grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
-
-                progress = new ProgressDialog(ConfigActivity.this);
-                //progress.setTitle("Grabando");
-                progress.setMessage("Configurando Dispositivo. Espere...");
-                progress.setCancelable(false);
-                progress.show();
-
-                if (!swM.isChecked()) {
-                    swM.setChecked(true); //coloca como antes, no deja desactivar
-                    sendMSGSRV("C1|");
-                } else {
-                    swM.setChecked(false); //coloca como antes, no deja desactivar
-                    sendMSGSRV("C2|");
-                }
-
-                // Se crea un proceso para que al superar el TIMEOUT de GRABACION se ejecute.
-                // Si la grabacion no fue exitosa: se va a cerrar el ProgressDialog y va a mostrar un mensaje de error.
-                progressRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-
-                        progress.cancel();
-                        if (!grabacionExitosa) {
-                            AlertDialog.Builder dialogo1 = new AlertDialog.Builder(ConfigActivity.this);
-                            dialogo1.setTitle("Atención");
-                            dialogo1.setMessage("Se superó el tiempo de espera.");
-                            dialogo1.setCancelable(false);
-                            dialogo1.setNegativeButton("Cerrar", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialogo1, int id) {
-                                }
-                            });
-
-                            dialogo1.show();
-                        }
-                    }
-                };
-
-                pdCanceller = new Handler();
-                pdCanceller.postDelayed(progressRunnable, ConfigActivity.GRABACION_TIMEOUT); // Se setea el tiempo de espera antes de que llame al proceso de arriba.
-            }
-        });
-
+*/
         recuperar();
         //Obtengo el modo en el que esta el dispositivo?
+    }
+
+    private void metodo_swM(){
+        //Log.v("Switch State=", ""+isChecked);
+        grabacionExitosa = false; // Si la grabacion es exitosa se modifica desde el metodo ActionRecive
+
+        progress = new ProgressDialog(ConfigActivity.this);
+        //progress.setTitle("Grabando");
+        progress.setMessage("Configurando Dispositivo. Espere...");
+        progress.setCancelable(false);
+        progress.show();
+
+        if (!swM.isChecked()) {
+            swM.setOnCheckedChangeListener(null); //desactivo para que no detecte el cambio desde la programacion
+            swM.setChecked(true); //coloca como antes, no deja desactivar
+            swM.setOnCheckedChangeListener(listener); //vuelvo a habiliar la deteccion de cambios por el usuario
+
+            sendMSGSRV("C1|");
+        } else {
+            swM.setOnCheckedChangeListener(null); //desactivo para que no detecte el cambio desde la programacion
+            swM.setChecked(false); //coloca como antes, no deja desactivar
+            swM.setOnCheckedChangeListener(listener); //vuelvo a habiliar la deteccion de cambios por el usuario
+
+            sendMSGSRV("C2|");
+        }
+
+        // Se crea un proceso para que al superar el TIMEOUT de GRABACION se ejecute.
+        // Si la grabacion no fue exitosa: se va a cerrar el ProgressDialog y va a mostrar un mensaje de error.
+        progressRunnable = new Runnable() {
+            @Override
+            public void run() {
+
+                progress.cancel();
+                if (!grabacionExitosa) {
+                    AlertDialog.Builder dialogo1 = new AlertDialog.Builder(ConfigActivity.this);
+                    dialogo1.setTitle("Atención");
+                    dialogo1.setMessage("Se superó el tiempo de espera.");
+                    dialogo1.setCancelable(false);
+                    dialogo1.setNegativeButton("Cerrar", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialogo1, int id) {
+                        }
+                    });
+
+                    dialogo1.show();
+                }
+            }
+        };
+
+        pdCanceller = new Handler();
+        pdCanceller.postDelayed(progressRunnable, ConfigActivity.GRABACION_TIMEOUT); // Se setea el tiempo de espera antes de que llame al proceso de arriba.
     }
 
     //Metodo para Implememtar Accion en cada Activity
@@ -182,11 +194,19 @@ public class ConfigActivity extends Menu {
             case "T0": msgInfo="Conexión exitosa"; break;
             case "C1":
                 msgInfo="Conexión exitosa. Modo: EXTERIOR";
+
+                swM.setOnCheckedChangeListener(null); //desactivo para que no detecte el cambio desde la programacion
                 swM.setChecked(false);
+                swM.setOnCheckedChangeListener(listener); //vuelvo a habiliar la deteccion de cambios por el usuario
+
                 break;
             case "C2":
                 msgInfo="Conexión exitosa. Modo: INTERIOR";
+
+                swM.setOnCheckedChangeListener(null); //desactivo para que no detecte el cambio desde la programacion
                 swM.setChecked(true);
+                swM.setOnCheckedChangeListener(listener); //vuelvo a habiliar la deteccion de cambios por el usuario
+
                 break;
             case "CE":
                 Toast.makeText(getApplicationContext(), "Operación exitosa", Toast.LENGTH_LONG).show();
@@ -338,9 +358,14 @@ public class ConfigActivity extends Menu {
             lstdispos.setSelection(i,true);
 
             if (prefe.getString("modo", "").toString().equals("C1")){
+                swM.setOnCheckedChangeListener(null); //desactivo para que no detecte el cambio desde la programacion
                 swM.setChecked(true);
+                swM.setOnCheckedChangeListener(listener); //vuelvo a habiliar la deteccion de cambios por el usuario
+
             }else{
+                swM.setOnCheckedChangeListener(null); //desactivo para que no detecte el cambio desde la programacion
                 swM.setChecked(false);
+                swM.setOnCheckedChangeListener(listener); //vuelvo a habiliar la deteccion de cambios por el usuario
             }
         }catch (Exception e){
 

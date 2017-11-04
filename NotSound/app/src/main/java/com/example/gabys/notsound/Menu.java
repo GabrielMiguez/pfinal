@@ -378,7 +378,7 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
                 while (1 == 1) {
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(2000);
                         if (MiServiceIBinder.BTConected()) {
                             runOnUiThread(new Runnable() {
                                 public void run() {
