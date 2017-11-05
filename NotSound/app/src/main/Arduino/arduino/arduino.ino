@@ -18,6 +18,8 @@ bool estado=0;  //0 lecturea, 1 grabando
 bool normal=1; //SetNormal or fast
 int priPOSeeprom=5;   //los primeros 5 son de config
 int ultPOSeeprom=5;   //se actualizara con el maximo puede haber espacios en el medio
+int picosgrabaTemp[5];
+int idTEMP;
         
 int IDSoundGrab=-1;
 int ledPin = 10;
@@ -29,7 +31,7 @@ double LOCAL_ruidoPromedio=0;  //sin volatile
 double procentajeSuperacionPromedio=80;
 char c;
 
-void(* resetFunc) (void) = 0;//declare reset function at address 0
+//void(* resetFunc) (void) = 0;//declare reset function at address 0
 byte oldADCSRA;
 byte oldTIMSK0;
 
@@ -325,14 +327,14 @@ void callback()
   double sum=0;
   int cantidadAPromediar=topeMuestras-10;
   for (int i=cantidadAPromediar-1; i<topeMuestras; i++) {
-    //Serial.println(F(arrayOfTops[i]);
+    Serial.println(arrayOfTops[i]);
     sum=sum+arrayOfTops[i];
   }
   //GLOBAL_ruidoPromedio=acumuladorPromedio/topeMuestras;
 
   GLOBAL_ruidoPromedio=sum/10;
 
-  if(GLOBAL_ruidoPromedio<100){
+  if(GLOBAL_ruidoPromedio<10){
     digitalWrite(9, HIGH);
   }else{
     digitalWrite(9, LOW);
@@ -415,7 +417,7 @@ void reccmd(String sms){
     
     grabar(IDSoundGrab);
     BT1.write('G');
-    BT1.print(IDSoundGrab);
+    //BT1.print(IDSoundGrab);
     BT1.write('|');
     delay(50000);  
     BT1.flush();
@@ -432,7 +434,7 @@ void reccmd(String sms){
     IDSoundGrab=-1;
     grabar(-1);
     BT1.write('G');
-    BT1.print(IDSoundGrab);
+    //BT1.print(IDSoundGrab);
     BT1.write('|'); 
     delay(50000);   
     BT1.flush();
@@ -442,7 +444,19 @@ void reccmd(String sms){
     estado=0;  //0 lecturea, 1 grabando
     delay(400000);
   }
-    
+
+  if (sms=="X"){ //confirmar sonido de la temporal
+    estado=1;  //0 lecturea, 1 grabando
+    confirmarGrabar();
+    BT1.write('X');
+    BT1.print(IDSoundGrab);
+    BT1.write('|');
+    delay(50000);  
+    BT1.flush();
+    delay(50000);
+    estado=0;  //0 lecturea, 1 grabando
+  }
+  
 }
 
 void iniDemo(){
@@ -835,12 +849,42 @@ delay(200000);
   //Serial.println(F("Picos grabados");
   //Finalizado esto ya tengo en picosconocidos las pos de los 3 picos mas caracterisiticos del sonido recien escuchado
 
+/* antes de tener teporal
+    Serial.println(F("Grabo en la eeprom desde:"));
+    int getPrimeraPosParaGrabarLas5=0;
+    if (id!=-1){
+      getPrimeraPosParaGrabarLas5=eUpdateSound(id, picosConocidos);
+    }else
+      getPrimeraPosParaGrabarLas5=eSaveSound(picosConocidos);
+    
+    Serial.println(F("valores:"));
+    Serial.println(getPrimeraPosParaGrabarLas5);
+    
+    for (int i = 0 ; i < 5 ; i++) {
+        Serial.println(EEPROM.read(getPrimeraPosParaGrabarLas5+i));
+    }
+    IDSoundGrab=getPrimeraPosParaGrabarLas5;
+*/    
+  
+  //-------------------------------- GRABO EN VECTOR TEMP
+  Serial.println(F("Grabo picos en TEMP"));
+  idTEMP=id;
+  for (int i = 0 ; i < 5 ; i++) {
+    picosgrabaTemp[i]=picosConocidos[i];
+  }
+  
+  
+  //--------------------------------
+  //TERMINO PROCESO GRABACION
+}
+
+void confirmarGrabar(){
   Serial.println(F("Grabo en la eeprom desde:"));
   int getPrimeraPosParaGrabarLas5=0;
-  if (id!=-1){
-    getPrimeraPosParaGrabarLas5=eUpdateSound(id, picosConocidos);
+  if (idTEMP!=-1){
+    getPrimeraPosParaGrabarLas5=eUpdateSound(idTEMP, picosgrabaTemp);
   }else
-    getPrimeraPosParaGrabarLas5=eSaveSound(picosConocidos);
+    getPrimeraPosParaGrabarLas5=eSaveSound(picosgrabaTemp);
   
   Serial.println(F("valores:"));
   Serial.println(getPrimeraPosParaGrabarLas5);
@@ -849,8 +893,6 @@ delay(200000);
       Serial.println(EEPROM.read(getPrimeraPosParaGrabarLas5+i));
   }
   IDSoundGrab=getPrimeraPosParaGrabarLas5;
-  
-  //TERMINO PROCESO GRABACION
 }
 
 void modoPatron() {

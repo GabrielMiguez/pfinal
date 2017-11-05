@@ -35,6 +35,7 @@ public class SonidosEdicionActivity extends Menu {
     private static int RESULT_LOAD_IMAGE = 1;
 
     private Boolean grabacionExitosa = false;
+    private Boolean confirmacionExitosa = false;
 
     private Sonidos sonidos;
     private int itemSeleccionado;
@@ -60,7 +61,6 @@ public class SonidosEdicionActivity extends Menu {
         setContentView(R.layout.activity_sonidos_edicion);
 
         super.CreateMenu();
-
         ImageView img = (ImageView) findViewById(R.id.img_ImagenSonido);
         // set a onclick listener for when the button gets clicked
         img.setOnClickListener(new View.OnClickListener() {
@@ -202,7 +202,7 @@ public class SonidosEdicionActivity extends Menu {
         }
     }
 
-    public void guardarSonidoEdicion (View v){
+    private void save(){
         int IDSonido = sonidos.getAvailableSonidoID();
         if(!txt_sonidoID.getText().toString().equals("(Desconocido)")){ IDSonido = Integer.parseInt(txt_sonidoID.getText().toString()); }
         String nombreSonido = txt_sonidoNombre.getText().toString();
@@ -234,6 +234,67 @@ public class SonidosEdicionActivity extends Menu {
         Toast t = Toast.makeText(getApplicationContext(), "Guardado exitoso", Toast.LENGTH_SHORT);
         t.show();
         this.onBackPressed();
+    }
+
+    public void guardarSonidoEdicion (View v){
+        //antes de confirmar la edicion me fijo si grabe un audio, si grabe tengo que esperar la confirmacion de ardu.
+        if (grabacionExitosa){
+            if (!sendMSGSRV("X|")){
+                // Si hubo un error en la conexion del Bluetooth aborta la grabacion
+                AlertDialog.Builder dialogoError = new AlertDialog.Builder(SonidosEdicionActivity.this);
+                dialogoError.setTitle("Error");
+                dialogoError.setMessage("El dispositivo móvil no está conectado al dispositivo electrónico.");
+                dialogoError.setCancelable(false);
+                dialogoError.setPositiveButton("OK", null);
+                dialogoError.show();
+
+                // Cambia el icono si el guardado NO fue exitoso
+                fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
+                fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
+
+                return;
+            }else{
+                //dialogo confirmando----------------
+                progress = new ProgressDialog(SonidosEdicionActivity.this);
+                //progress.setTitle("Grabando");
+                progress.setMessage("Grabación en proceso. Espere...");
+                progress.setCancelable(false);
+                progress.show();
+
+                // Se crea un proceso para que al superar el TIMEOUT de GRABACION se ejecute.
+                // Si la grabacion no fue exitosa: se va a cerrar el ProgressDialog y va a mostrar un mensaje de error.
+                progressRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+
+                        progress.cancel();
+                        if (!grabacionExitosa) {
+                            AlertDialog.Builder dialogo1 = new AlertDialog.Builder(SonidosEdicionActivity.this);
+                            dialogo1.setTitle("Atención");
+                            dialogo1.setMessage("El Sonido no fue grabado debido a que se superó el tiempo de espera.");
+                            dialogo1.setCancelable(false);
+                            dialogo1.setNegativeButton("Cerrar", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialogo1, int id) {
+                                }
+                            });
+
+                            dialogo1.show();
+
+                            // Cambia el icono si el guardado NO fue exitoso
+                            fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
+                            fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
+                        }
+                    }
+                };
+
+                pdCanceller = new Handler();
+                pdCanceller.postDelayed(progressRunnable, ConfigActivity.GRABACION_TIMEOUT); // Se setea el tiempo de espera antes de que llame al proceso de arriba.
+
+                //-----------------------------------
+            }
+        }else{
+            save();
+        }
     }
 
     public void tomarFoto (){
@@ -398,8 +459,8 @@ public class SonidosEdicionActivity extends Menu {
 
         //'G1|'<-Sonido Guardado con ID 1
         if (s.charAt(0)=='G'){
-            s=s.substring(1);
-            IDSonido_grabado =  Integer.valueOf(s);
+            //s=s.substring(1);
+            //IDSonido_grabado =  Integer.valueOf(s);
 
             // Seccion de validacion del ID del sonido
             grabacionExitosa = true;
@@ -409,6 +470,20 @@ public class SonidosEdicionActivity extends Menu {
             fab_grabarAudio.setImageResource(R.drawable.ic_mic_black_24dp);
             fab_grabarAudio.setColorFilter(Color.rgb(0,0,0));
             Toast.makeText(this, "Grabación exitosa", Toast.LENGTH_SHORT).show();
+        }
+
+        //'G1|'<-Sonido Guardado con ID 1
+        if (s.charAt(0)=='X'){
+            s=s.substring(1);
+            IDSonido_grabado =  Integer.valueOf(s);
+
+            // Seccion de validacion del ID del sonido
+            confirmacionExitosa = true;
+            progress.cancel(); // Se cierra el ProgressDialog porque el bluetooth le devolvio el ID del sonido
+
+            Toast.makeText(this, "Confirmación exitosa", Toast.LENGTH_SHORT).show();
+
+            save();
         }
 
     }

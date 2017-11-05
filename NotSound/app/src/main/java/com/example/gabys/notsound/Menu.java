@@ -378,15 +378,17 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
 
                 while (1 == 1) {
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(1000);
                         if (MiServiceIBinder.BTConected()) {
                             runOnUiThread(new Runnable() {
+
                                 public void run() {
                                     img_BT.setImageResource(android.R.drawable.stat_sys_data_bluetooth);
                                     img_BT_icono.setImageResource(R.drawable.ic_check_black_24dp);
 
                                     img_BT.getDrawable().setColorFilter(getResources().getColor(android.R.color.background_light), PorterDuff.Mode.SRC_ATOP);
                                     img_BT_icono.getDrawable().setColorFilter(getResources().getColor(android.R.color.background_light), PorterDuff.Mode.SRC_ATOP);
+
                                 }
                             });
                         } else {
@@ -400,9 +402,9 @@ public class Menu extends AppCompatActivity implements NavigationView.OnNavigati
                                 }
                             });
                         }
-                        Thread.sleep(3500);
+                        Thread.sleep(3000);
 
-                    } catch (InterruptedException e) {
+                    } catch (Exception /*InterruptedException*/ e) {
                         /*
                         // TODO Auto-generated catch block
                         e.printStackTrace();

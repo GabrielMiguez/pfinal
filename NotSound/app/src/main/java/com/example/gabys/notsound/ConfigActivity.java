@@ -37,7 +37,7 @@ public class ConfigActivity extends Menu {
     public BluetoothAdapter BA;
     public BluetoothDevice BD;
 
-    public static int GRABACION_TIMEOUT = 1000 + 1000; // Extiendo un segundo mas el Timeout para que no coinicda con el tiempo de grabacion.
+    public static int GRABACION_TIMEOUT = 1000 + 15000; // Extiendo un segundo mas el Timeout para que no coinicda con el tiempo de grabacion.
 
     Set<BluetoothDevice> pairedDevices;
     ArrayAdapter mArrayAdapter;
